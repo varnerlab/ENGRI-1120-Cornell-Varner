@@ -15,9 +15,9 @@ end
 
 # ╔═╡ 1cfec5d8-01ac-11ec-0f44-b955ded5ccc4
 md"""
-### What is a Matrix and a Vector?
+### What is a Matrix, a Vector and what can we do with them?
 
-__Matricies__: Matricies are two-dimensional rectangular arrays of numbers, widgets, etc with $m$ rows and $n$ cols.  that take the form:
+__Matricies__: Matricies are two-dimensional rectangular arrays of numbers, widgets, etc with $m$ rows and $n$ columns:
 
 $\mathbf{A} = 
 \begin{pmatrix}
@@ -27,9 +27,11 @@ a_{2,1} & a_{2,2} & \cdots & a_{2,n} \\
 a_{m,1} & a_{m,2} & \cdots & a_{m,n} 
 \end{pmatrix}$
 
-where $a_{ij}$ denotes the _element_ of the matrix $\mathbf{A}$ that lives on the $i$th row and $j$th col. By convention, the row index is always the first subscript while the column index is always listed second. If $m=n$ the matrix is called a _square_ matrix; square matricies have some special properties as we shall see. Just like numbers, matricies can undergo typical mathematical operations, such as addition, subtraction and multiplication (some small differences). However, the notion of division has a much different meaning for matricies compared to numbers. 
+where $a_{ij}$ denotes the _element_ of the matrix $\mathbf{A}$ that lives on the $i$th row and $j$th col. By convention, the row index is always the first subscript while the column index is always listed second. If $m=n$ the matrix is called a _square_ matrix; square matricies have some special properties (as we shall see later). 
 
-__Vectors__: Vectors are a specal matrix subtype that is one-dimensional, where _elements_ are arranged as either a single row or single col. For example, a $m\times{1}$ _col_ vector $\mathbf{a}$ is given by:
+Just like numbers, matricies can participate in typical mathematical operations, such as addition, subtraction and multiplication (with some small differences). However, the division operation has a much different meaning for matricies when compared to numbers. 
+
+__Vectors__: Vectors are a specal type of matrix that is one-dimensional, where _elements_ are arranged as either a single row or single column. For example, a $m\times{1}$ _column_ vector $\mathbf{a}$ is given by:
 
 $\mathbf{a} = 
 \begin{pmatrix}
@@ -65,10 +67,10 @@ This is because adding (or subtracting) matricies or vectors, as well as multipl
 # ╔═╡ bc9366e3-1526-47c4-8ddb-598c71e73d2c
 md"""
 
-##### Multiplying a Matrix by a Vector
+##### Multiplying a Matrix by a Vector from the Right and Left
 
-A common operation that we will do is _right multiplying_ a matrix $\mathbf{A}$ by a vector $\mathbf{x}$. 
-Suppose $\mathbf{A}$ is a $m\times{n}$ matrix, and $\mathbf{x}$ is a $n\times{1}$ column vector, then:
+A common operation is the _right multiplication_ of a matrix $\mathbf{A}$ by a vector $\mathbf{x}$. 
+Suppose $\mathbf{A}$ is a $m\times{n}$ matrix, and $\mathbf{x}$ is a $n\times{1}$ column vector. The _right product_ given by:
 
 $\mathbf{y} = 
 \mathbf{A}\mathbf{x}$
@@ -78,14 +80,49 @@ generates a $m\times{1}$ column vector $\mathbf{y}$, where the $i$th element is 
 $y_{i} =
 \sum_{j=1}^{n}a_{ij}x_{j}\qquad{i=1,2,\cdots,m}$
 
+The _right multiplication operation_ can be represented graphically as:
 
-[Graphical description of right multiplication](https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/src/matrix_and_vectors/Ax.png)
+$(load("Ax.png"))
+"""
+
+# ╔═╡ 9ecbde84-f37f-4a92-b6c0-9919287e29c2
+md"""
+We could also consider the _left multiplication_ of a matrix by a vector. 
+Suppose $\mathbf{A}$ is a $m\times{n}$ matrix, and $\mathbf{x}$ is a $m\times{1}$ col vector, then the left product given by:
+
+$\mathbf{y} = 
+\mathbf{x}^{T}\mathbf{A}$
+
+where $\mathbf{x}^{T}$ denotes the [transpose](https://en.wikipedia.org/wiki/Transpose) of the vector $\mathbf{x}$.
+The _left product_ generates a $1\times{n}$ row vector with elements:
+
+$y_{i} = 
+\sum_{j=1}^{m}a_{ji}x_{j}\qquad{i=1,2,\cdots,n}$
 """
 
 # ╔═╡ 68e93b4a-9dd6-4bee-8114-4f53cec205be
 md"""
 
-##### Multiplying a Matrix by a Matrix
+##### Matrix multiplication
+
+Many of the important uses of matricies depend upon the definition of matrix multiplication.
+Matrix-matrix products have different properties compared with the product of two scalar numbers. 
+First, only _compatible_ matricies can be 
+multiplied together. For example, consider two matricies $\mathbf{A}$ and $\mathbf{B}$. For $\mathbf{A}$ and $\mathbf{B}$ to be compatible, 
+meaning we can compute the matrix product $\mathbf{C} = \mathbf{A}\mathbf{B}$, the number of columns of $\mathbf{A}$ must be same as the number of rows of $\mathbf{B}$. 
+
+Given a matrix $\mathbf{A}$ with _m_ rows and _n_ columns, and a matrix $\mathbf{B}$ with _n_ rows and _p_ columns, the 
+product matrix $\mathbf{C}$ is a matrix with _m_ rows and _p_ columns in which the (i,j)th element of $\mathbf{C}$ is given by:
+
+$c_{ij} = \sum_{k=1}^{n}a_{ik}b_{kj}\qquad{i=1,2,\cdots,m;~j=1,2,\cdots,p}$
+
+In general, matrix multiplication is not communinative e.g., $\mathbf{A}\mathbf{B}\neq\mathbf{B}\mathbf{A}$, thus the order of multiplication matters (unlike multiplying two scalar numbers together). However, while matrix multiplication is not communinative, it is distributive:
+
+$\mathbf{A}\left(\mathbf{B}+\mathbf{C}\right) = \mathbf{A}\mathbf{B}+\mathbf{A}\mathbf{C}$
+
+and associative:
+
+$\mathbf{A}\left(\mathbf{B}\mathbf{C}\right) = \left(\mathbf{A}\mathbf{B}\right)\mathbf{C}$
 
 """
 
@@ -1320,12 +1357,13 @@ version = "0.9.1+5"
 """
 
 # ╔═╡ Cell order:
-# ╠═74716da5-76fa-4be9-9845-006ddfdc1fa6
+# ╟─74716da5-76fa-4be9-9845-006ddfdc1fa6
 # ╟─1cfec5d8-01ac-11ec-0f44-b955ded5ccc4
 # ╟─253de134-b79f-4d84-aebf-853efc15e6d4
 # ╠═5c0cc547-38e2-4cdb-85e1-eaf37f79bd74
 # ╟─bc9366e3-1526-47c4-8ddb-598c71e73d2c
-# ╠═68e93b4a-9dd6-4bee-8114-4f53cec205be
+# ╟─9ecbde84-f37f-4a92-b6c0-9919287e29c2
+# ╟─68e93b4a-9dd6-4bee-8114-4f53cec205be
 # ╠═3293cb77-40ec-4d59-b3cd-56770d56b328
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
