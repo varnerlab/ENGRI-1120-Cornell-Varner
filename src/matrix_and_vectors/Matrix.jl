@@ -110,6 +110,10 @@ The _left product_ generates a $1\times{n}$ row vector with elements:
 
 $y_{i} = 
 \sum_{j=1}^{m}a_{ji}x_{j}\qquad{i=1,2,\cdots,n}$
+
+The _left matrix vector multiplication_ can be represented graphically as: 
+
+$(load("xA.png"))
 """
 
 # ╔═╡ 68e93b4a-9dd6-4bee-8114-4f53cec205be
