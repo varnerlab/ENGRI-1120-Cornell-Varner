@@ -17,7 +17,7 @@ end
 md"""
 ### What is a Matrix, a Vector and what can we do with them?
 
-__Matricies__: Matricies are two-dimensional rectangular arrays of numbers, widgets, etc with $m$ rows and $n$ columns:
+__Matrices__: Matrices are two-dimensional rectangular arrays of numbers, widgets, etc with $m$ rows and $n$ columns:
 
 $\mathbf{A} = 
 \begin{pmatrix}
@@ -27,9 +27,9 @@ a_{2,1} & a_{2,2} & \cdots & a_{2,n} \\
 a_{m,1} & a_{m,2} & \cdots & a_{m,n} 
 \end{pmatrix}$
 
-where $a_{ij}$ denotes the _element_ of the matrix $\mathbf{A}$ that lives on the $i$th row and $j$th col. By convention, the row index is always the first subscript while the column index is always listed second. If $m=n$ the matrix is called a _square_ matrix; square matricies have some special properties (as we shall see later). 
+where $a_{ij}$ denotes the _element_ of the matrix $\mathbf{A}$ that lives on the $i$th row and $j$th col. By convention, the row index is always the first subscript while the column index is always listed second. If $m=n$ the matrix is called a _square_ matrix; square Matrices have some special properties (as we shall see later). 
 
-Just like numbers, matricies can participate in typical mathematical operations, such as addition, subtraction and multiplication (with some small differences). However, the division operation has a much different meaning for matricies when compared to numbers. 
+Just like numbers, Matrices can participate in typical mathematical operations, such as addition, subtraction and multiplication (with some small differences). However, the division operation has a much different meaning for Matrices when compared to numbers. 
 
 __Vectors__: Vectors are a specal type of matrix that is one-dimensional, where _elements_ are arranged as either a single row or single column. For example, a $m\times{1}$ _column_ vector $\mathbf{a}$ is given by:
 
@@ -54,10 +54,10 @@ a_{1} & a_{2} & \cdots & a_{n}
 # ╔═╡ 253de134-b79f-4d84-aebf-853efc15e6d4
 md"""
 
-##### Adding and subtracting matricies and vectors, and multiplying by these objects by constants
+##### Adding and subtracting Matrices and vectors, and multiplying by these objects by constants
 
-Matricies and vectors must be the _same dimension_ to be compatible for addition or subtraction operations. 
-This is because adding (or subtracting) matricies or vectors, as well as multiplying these objects by a scalar constant, is done element wise. 
+Matrices and vectors must be the _same dimension_ to be compatible for addition or subtraction operations. 
+This is because adding (or subtracting) Matrices or vectors, as well as multiplying these objects by a scalar constant, is done element wise. 
 For example, suppose we have two $n\times{1}$ vectors $\mathbf{v}_{1}$ and $\mathbf{v}_{2}$, then the sum $\mathbf{v}$ is given by:
 
 $\mathbf{v} = \mathbf{v}_{1} + \mathbf{v}_{2}$
@@ -88,7 +88,7 @@ generates a $m\times{1}$ column vector $\mathbf{y}$, where the $i$th element is 
 $y_{i} =
 \sum_{j=1}^{n}a_{ij}x_{j}\qquad{i=1,2,\cdots,m}$
 
-The _right multiplication operation_ can be represented graphically as (Fig inspired by [Visualizing Matrix Multiplication as a Linear Combination, Eli Bendersky, Apr. 12, 15 · Big Data Zone](https://dzone.com/articles/visualizing-matrix)):
+The _right multiplication operation_ can be represented graphically (Fig inspired by [Visualizing Matrix Multiplication as a Linear Combination, Eli Bendersky, Apr. 12, 15 · Big Data Zone](https://dzone.com/articles/visualizing-matrix)):
 
 $(load("Ax.png"))
 """
@@ -107,7 +107,7 @@ The _left product_ generates a $1\times{n}$ row vector with elements:
 $y_{i} = 
 \sum_{j=1}^{m}a_{ji}x_{j}\qquad{i=1,2,\cdots,n}$
 
-The _left matrix vector multiplication_ can be represented graphically as (Fig inspired by [Visualizing Matrix Multiplication as a Linear Combination, Eli Bendersky, Apr. 12, 15 · Big Data Zone](https://dzone.com/articles/visualizing-matrix)): 
+The _left multiplication operation_ can be represented graphically (Fig inspired by [Visualizing Matrix Multiplication as a Linear Combination, Eli Bendersky, Apr. 12, 15 · Big Data Zone](https://dzone.com/articles/visualizing-matrix)): 
 
 $(load("xA.png"))
 """
@@ -117,10 +117,10 @@ md"""
 
 ##### Matrix multiplication
 
-Many of the important uses of matricies depend upon the definition of matrix multiplication.
+Many of the important uses of Matrices depend upon the definition of matrix multiplication.
 Matrix-matrix products have different properties compared with the product of two scalar numbers. 
-First, only _compatible_ matricies can be 
-multiplied together. For example, consider two matricies $\mathbf{A}$ and $\mathbf{B}$. For $\mathbf{A}$ and $\mathbf{B}$ to be compatible, 
+First, only _compatible_ Matrices can be 
+multiplied together. For example, consider two Matrices $\mathbf{A}$ and $\mathbf{B}$. For $\mathbf{A}$ and $\mathbf{B}$ to be compatible, 
 meaning we can compute the matrix product $\mathbf{C} = \mathbf{A}\mathbf{B}$, the number of columns of $\mathbf{A}$ must be same as the number of rows of $\mathbf{B}$. 
 
 Given a matrix $\mathbf{A}$ with _m_ rows and _n_ columns, and a matrix $\mathbf{B}$ with _n_ rows and _p_ columns, the 
