@@ -92,7 +92,7 @@ generates a $m\times{1}$ column vector $\mathbf{y}$, where the $i$th element is 
 $y_{i} =
 \sum_{j=1}^{n}a_{ij}x_{j}\qquad{i=1,2,\cdots,m}$
 
-The _right multiplication operation_ can be represented graphically as:
+The _right multiplication operation_ can be represented graphically as (Fig inspired by [Visualizing Matrix Multiplication as a Linear Combination, Eli Bendersky, Apr. 12, 15 · Big Data Zone](https://dzone.com/articles/visualizing-matrix)):
 
 $(load("Ax.png"))
 """
@@ -111,7 +111,7 @@ The _left product_ generates a $1\times{n}$ row vector with elements:
 $y_{i} = 
 \sum_{j=1}^{m}a_{ji}x_{j}\qquad{i=1,2,\cdots,n}$
 
-The _left matrix vector multiplication_ can be represented graphically as: 
+The _left matrix vector multiplication_ can be represented graphically as (Fig inspired by [Visualizing Matrix Multiplication as a Linear Combination, Eli Bendersky, Apr. 12, 15 · Big Data Zone](https://dzone.com/articles/visualizing-matrix)): 
 
 $(load("xA.png"))
 """
@@ -139,6 +139,10 @@ $\mathbf{A}\left(\mathbf{B}+\mathbf{C}\right) = \mathbf{A}\mathbf{B}+\mathbf{A}\
 and associative:
 
 $\mathbf{A}\left(\mathbf{B}\mathbf{C}\right) = \left(\mathbf{A}\mathbf{B}\right)\mathbf{C}$
+
+The _matrix multiplication_ operation can be represented graphically as (Fig inspired by [Visualizing Matrix Multiplication as a Linear Combination, Eli Bendersky, Apr. 12, 15 · Big Data Zone](https://dzone.com/articles/visualizing-matrix)): 
+
+$(load("AB.png"))
 
 """
 
