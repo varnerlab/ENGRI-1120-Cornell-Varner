@@ -62,17 +62,13 @@ For example, suppose we have two $n\times{1}$ vectors $\mathbf{v}_{1}$ and $\mat
 
 $\mathbf{v} = \mathbf{v}_{1} + \mathbf{v}_{2}$
 
-where the ith element of $\mathbf{v}$ is given by:
-
-$v_{i} = v_{i,1}+ v_{i,2}$
+where the ith element of $\mathbf{v}$ is given by: $v_{i} = v_{i,1}+ v_{i,2}$
 
 Multiplying a matrix (or vector) by a constant is also done element wise. For example, suppose we have a $n\times{1}$ vector $\mathbf{v}$ and a contants _c_. Then the product: 
 
 $\mathbf{y} = c\mathbf{v}$
 
-has elements:
-
-$y_{i} = cv_{i}$
+has elements: $y_{i} = cv_{i}$
 
 """
 
