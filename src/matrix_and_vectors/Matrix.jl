@@ -66,10 +66,15 @@ where the ith element of $\mathbf{v}$ is given by:
 
 $v_{i} = v_{i,1}+ v_{i,2}$
 
+Multiplying a matrix (or vector) by a constant is also done element wise. For example, suppose we have a $n\times{1}$ vector $\mathbf{v}$ and a contants _c_. Then the product: 
+
+$\mathbf{y} = c\mathbf{v}$
+
+has elements:
+
+$y_{i} = cv_{i}$
+
 """
-
-# ╔═╡ 5c0cc547-38e2-4cdb-85e1-eaf37f79bd74
-
 
 # ╔═╡ bc9366e3-1526-47c4-8ddb-598c71e73d2c
 md"""
@@ -1367,7 +1372,6 @@ version = "0.9.1+5"
 # ╟─74716da5-76fa-4be9-9845-006ddfdc1fa6
 # ╟─1cfec5d8-01ac-11ec-0f44-b955ded5ccc4
 # ╟─253de134-b79f-4d84-aebf-853efc15e6d4
-# ╠═5c0cc547-38e2-4cdb-85e1-eaf37f79bd74
 # ╟─bc9366e3-1526-47c4-8ddb-598c71e73d2c
 # ╟─9ecbde84-f37f-4a92-b6c0-9919287e29c2
 # ╟─68e93b4a-9dd6-4bee-8114-4f53cec205be
