@@ -56,8 +56,15 @@ md"""
 
 ##### Adding and subtracting matricies and vectors, and multiplying by these objects by constants
 
-Addition and subtraction operations can only be completed between compatible objects. Matricies or vectors must be the _same dimension_ to be compatible for addition or subtraction operations. 
-This is because adding (or subtracting) matricies or vectors, as well as multiplying these objects by a constant is done element wise. 
+Matricies and vectors must be the _same dimension_ to be compatible for addition or subtraction operations. 
+This is because adding (or subtracting) matricies or vectors, as well as multiplying these objects by a scalar constant, is done element wise. 
+For example, suppose we have two $n\times{1}$ vectors $\mathbf{v}_{1}$ and $\mathbf{v}_{2}$, then the sum $\mathbf{v}$ is given by:
+
+$\mathbf{v} = \mathbf{v}_{1} + \mathbf{v}_{2}$
+
+where the ith element of $\mathbf{v}$ is given by:
+
+$v_{i} = v_{i,1}+ v_{i,2}$
 
 """
 
@@ -88,7 +95,7 @@ $(load("Ax.png"))
 # ╔═╡ 9ecbde84-f37f-4a92-b6c0-9919287e29c2
 md"""
 We could also consider the _left multiplication_ of a matrix by a vector. 
-Suppose $\mathbf{A}$ is a $m\times{n}$ matrix, and $\mathbf{x}$ is a $m\times{1}$ col vector, then the left product given by:
+Suppose $\mathbf{A}$ is a $m\times{n}$ matrix, and $\mathbf{x}$ is a $m\times{1}$ col vector, then the _left product_ is given by:
 
 $\mathbf{y} = 
 \mathbf{x}^{T}\mathbf{A}$
@@ -1364,6 +1371,6 @@ version = "0.9.1+5"
 # ╟─bc9366e3-1526-47c4-8ddb-598c71e73d2c
 # ╟─9ecbde84-f37f-4a92-b6c0-9919287e29c2
 # ╟─68e93b4a-9dd6-4bee-8114-4f53cec205be
-# ╠═3293cb77-40ec-4d59-b3cd-56770d56b328
+# ╟─3293cb77-40ec-4d59-b3cd-56770d56b328
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
