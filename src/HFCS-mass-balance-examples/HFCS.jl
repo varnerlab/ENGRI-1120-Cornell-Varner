@@ -90,7 +90,7 @@ $$\mathbf{W}\dot{\mathbf{m}}=\mathbf{b}$$
 # Let's start doing some Julia! (the fun part ...)
 
 # Define mass flow rate vector (kg/hr) -
-mdot = [12,12]
+mdot = [100,100] # kg/hr
 
 # ╔═╡ eb822e57-423a-4662-b402-052a616180d5
 # define the composition array -
@@ -100,7 +100,7 @@ W = [0.92 -0.50 ; 0.0 -0.42 ; 0.08 -0.08]
 # Compute the b-vector (reaction rate vector)
 bV = W*mdot
 
-# ╔═╡ b960739d-8b82-451e-bb71-cc53ccc73ee6
+# ╔═╡ 783ce2ee-398e-4d2e-9389-acfaa47b96df
 sum(bV)
 
 # ╔═╡ 9ad93173-2896-4aec-bb77-2aa3b51c8b50
@@ -201,7 +201,7 @@ uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 # ╠═f6dcdae8-e1a1-44da-b085-4859df008dec
 # ╠═eb822e57-423a-4662-b402-052a616180d5
 # ╠═2ce2941b-047b-4c19-b757-6a3b3af83d21
-# ╠═b960739d-8b82-451e-bb71-cc53ccc73ee6
+# ╠═783ce2ee-398e-4d2e-9389-acfaa47b96df
 # ╟─9ad93173-2896-4aec-bb77-2aa3b51c8b50
 # ╠═4444d802-7d3c-4978-b9f3-5dd421c337b6
 # ╠═146cd344-c295-4d14-aa87-5f0ad4655640
