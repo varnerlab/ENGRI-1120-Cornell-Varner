@@ -154,6 +154,14 @@ bV_max = [max_rate ; -1*max_rate; 0.0]
 # compute the maximum flow rate -
 mdot_max = W_inv*bV_max
 
+# ╔═╡ a0523812-c4f7-461d-8ef0-1533bb86da3a
+md"""
+ #### Is there a diffent (less complicated) way to do this?
+"""
+
+# ╔═╡ 7920ee9f-cab4-4d20-b0a2-61eda1ada306
+
+
 # ╔═╡ dc80bb02-0fb5-11ec-0866-0709291e7ff7
 html"""<style>
 main {
@@ -210,6 +218,8 @@ uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 # ╠═1a010c01-b515-4fd4-9f47-d7595c3a99f2
 # ╠═c0da6422-1318-49a3-8405-4a62f4323f55
 # ╠═eb90e0aa-df15-44b3-a11d-29742667fc9f
+# ╟─a0523812-c4f7-461d-8ef0-1533bb86da3a
+# ╠═7920ee9f-cab4-4d20-b0a2-61eda1ada306
 # ╟─dc80bb02-0fb5-11ec-0866-0709291e7ff7
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
