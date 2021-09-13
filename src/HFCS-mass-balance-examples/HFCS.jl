@@ -146,6 +146,9 @@ Let's put a pin in how we actually compute $\mathbf{W}^{-1}$ for the moment (and
 # compute W inverse -
 W_inv = pinv(W)
 
+# ╔═╡ d144a329-ea6c-4b69-80ca-aaf38d793491
+W_inv*W
+
 # ╔═╡ c0da6422-1318-49a3-8405-4a62f4323f55
 # what is my bV -
 bV_max = [max_rate ; -1*max_rate; 0.0]
@@ -160,7 +163,19 @@ md"""
 """
 
 # ╔═╡ 7920ee9f-cab4-4d20-b0a2-61eda1ada306
+W_new = W[1:2,:]
 
+# ╔═╡ 2dc5f057-b0d7-469c-a4be-b1ffb9190efe
+W_inv_new = inv(W_new)
+
+# ╔═╡ 4910fdf8-306e-4937-afe1-3a6bb099f4f0
+W_inv_new*W_new
+
+# ╔═╡ 0b6c30a4-53ea-4dbb-a145-81e37f511c2d
+bV_max_new = bV_max[1:2]
+
+# ╔═╡ e316ae95-549c-4fd5-80d6-2b653db355f6
+m_dot_new = W_inv_new*bV_max_new
 
 # ╔═╡ dc80bb02-0fb5-11ec-0866-0709291e7ff7
 html"""<style>
@@ -216,10 +231,15 @@ uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 # ╠═9326629c-679a-4f8b-a06b-4eb39a752aa3
 # ╟─bb74b0b6-b209-425c-ad8f-e2cbc16d7670
 # ╠═1a010c01-b515-4fd4-9f47-d7595c3a99f2
+# ╠═d144a329-ea6c-4b69-80ca-aaf38d793491
 # ╠═c0da6422-1318-49a3-8405-4a62f4323f55
 # ╠═eb90e0aa-df15-44b3-a11d-29742667fc9f
 # ╟─a0523812-c4f7-461d-8ef0-1533bb86da3a
 # ╠═7920ee9f-cab4-4d20-b0a2-61eda1ada306
+# ╠═2dc5f057-b0d7-469c-a4be-b1ffb9190efe
+# ╠═4910fdf8-306e-4937-afe1-3a6bb099f4f0
+# ╠═0b6c30a4-53ea-4dbb-a145-81e37f511c2d
+# ╠═e316ae95-549c-4fd5-80d6-2b653db355f6
 # ╟─dc80bb02-0fb5-11ec-0866-0709291e7ff7
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
