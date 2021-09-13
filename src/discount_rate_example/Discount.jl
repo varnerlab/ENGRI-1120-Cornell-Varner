@@ -33,7 +33,7 @@ discount_factor_array = [0.01, 0.02, 0.04, 0.08, 0.12]
 
 # ╔═╡ e62c8c89-c19e-4f5b-a46d-5c67d451ed3e
 # how many time units?
-number_of_time_periods = 30
+number_of_time_periods = 60
 
 # ╔═╡ 7736fa80-0e11-4745-9a9f-dff03896fec3
 begin
