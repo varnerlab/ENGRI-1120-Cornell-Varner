@@ -12,6 +12,7 @@ begin
 	using Images
 	using Plots
 	using ImageMagick
+	using LinearAlgebra
 end
 
 # ╔═╡ b337d2fa-74fe-4dda-a88f-a5bc32260c68
@@ -121,6 +122,154 @@ md"""
 How can we turn a currently unsolvable problem into a problem that we can solve?
 """
 
+# ╔═╡ 777bae38-20e6-4956-a0c9-6245aae429b4
+md"""
+#### Turn that frown upside down: approximate methods to solve for the exit compostion
+"""
+
+# ╔═╡ 5852e1da-8b57-40a4-9f93-2c2b40dd101a
+md"""
+
+###### Method 1: The $C_{1}\gg{K}$ case
+
+If $C_{1}\gg{K}$, then $\hat{r}_{1}$ becomes linear:
+
+$$\hat{r}_{1}\simeq k_{cat}C_{2}$$
+
+which means we can write the concetration balances (in matrix vector form) as:
+
+$\begin{pmatrix}
+-D_{3} & -k_{cat} & 0 \\
+0 & -\left(D_{3}+k_{d}\right) & 0 \\
+0 & k_{cat} & -D_{3} 
+\end{pmatrix}
+\begin{pmatrix}
+C_{1} \\
+C_{2} \\
+C_{3}
+\end{pmatrix} = -
+\begin{pmatrix}
+D_{1}C_{11} \\
+D_{2}C_{22} \\
+0
+\end{pmatrix}$
+
+This linear system of equations is in the form: $\mathbf{A}\mathbf{x} = \mathbf{b}$. Thus, we can solve for the unknown composition vector by computing the inverse of the $\mathbf{A}$ matrix or:
+
+$$\mathbf{x} = \mathbf{A}^{-1}\mathbf{b}$$
+"""
+
+# ╔═╡ e3fd51c5-f8c0-4c64-af7e-a0b6943a62a3
+begin
+	
+	# Problem parameters (make sure we have the correct units!)
+	F1 = 10.0 			# units: μL/hr
+	F2 = 5.0 			# units: μL/hr
+	V = 30.0 			# units: μL
+	kd = 0.10   		# units: hr^-1
+	kcat = 16.2*(3600) 	# units: hr^-1
+	K = 5.0 			# units: mmol/L
+	
+	# Setup the dilution D1, D2 and D3 -
+	D1 = (F1/V) 		# units: hr^-1
+	D2 = (F2/V) 		# units: hr^-1
+	D3 = D1 + D2 		# units: hr^-1
+	
+	# What is C11 and C12?
+	C11 = 10.0 			# units: mmol/L
+	C22 = 2.0 			# units: mmol/L
+	
+	# return -
+	nothing
+end
+
+# ╔═╡ 5875710a-e259-4986-b43b-2a5d2702010f
+A1 = [-D3 -kcat 0 ; 0 -(D3+kd) 0 ; 0 kcat -D3]
+
+# ╔═╡ 905e5822-ce8a-4545-8500-7bd8f681f373
+# can we find the inverse?
+rank(A1)
+
+# ╔═╡ 14f943e3-bf54-4582-9c44-45d29c93b1d7
+bV1 = [-D1*C11 ; -D2*C22 ; 0]
+
+# ╔═╡ efacdd42-3564-4788-82a8-eec6d1dee154
+# compute the output composition?
+c_out_1 = inv(A1)*bV1
+
+# ╔═╡ fc2dc16e-495a-4fd9-a9f7-859583d959d4
+# check:
+I = inv(A1)*A1
+
+# ╔═╡ e58faa37-938c-4475-9a73-fd5922da721f
+md"""
+
+##### Method 2: Taylor expansion of $\hat{r}_{1}$ around some point $x^{\star}$ = ($C^{\star}_{1}$, $C^{\star}_{2}$) 
+
+The Taylor expansion of $\hat{r}_{1}$ is given by:
+
+$$\hat{r}_{1}\simeq \hat{r}_{1}\left(x^{\star}\right)+
+\left(\frac{\partial{\hat{r}_{1}}}{\partial C_{1}}\right)\Bigg\vert_{x^{\star}}\left(C_{1} - C^{\star}_{1} \right) + 
+\left(\frac{\partial{\hat{r}_{1}}}{\partial C_{2}}\right)\Bigg\vert_{x^{\star}}\left(C_{2} - C^{\star}_{2} \right) + H.O.T $$
+
+where the derivative(s) are evaluated at $x^{\circ}$:
+
+$$a = \left(\frac{\partial{\hat{r}_{1}}}{\partial C_{1}}\right)\Bigg\vert_{x^{\star}} = \frac{k_{cat}C^{\star}_{2}K}{\left(K+C^{\star}_{1}\right)^2}$$
+
+and:
+
+$$b = \left(\frac{\partial{\hat{r}_{1}}}{\partial C_{2}}\right)\Bigg\vert_{x^{\star}} = \frac{k_{cat}C^{\star}_{1}}{\left(K+C^{\star}_{1}\right)}$$
+
+Substituting the Taylor expansion of $\hat{r}_{1}$ into the concentration balance and re-writing the system in matrix-vector form
+gives:
+
+$\begin{pmatrix}
+-(D_{3} + a) & -b & 0 \\
+0 & -\left(D_{3}+k_{d}\right) & 0 \\
+a & b & -D_{3} 
+\end{pmatrix}
+\begin{pmatrix}
+C_{1} \\
+C_{2} \\
+C_{3}
+\end{pmatrix} = -
+\begin{pmatrix}
+D_{1}C_{11} -\hat{r}^{\star}_{1} +aC^{\star}_{1} + bC^{\star}_{2} \\
+D_{2}C_{22} \\
+\hat{r}^{\star}_{1} - aC^{\star}_{1} - bC^{\star}_{2}
+\end{pmatrix}$
+"""
+
+# ╔═╡ eecc36b0-366f-469b-8743-f9f96a5f6e6c
+# select a point to linearize around -
+x = (0.001,0.5)
+
+# ╔═╡ 766bf53c-2feb-49ad-bd97-c79659fe22af
+# compute r1star
+r1 = kcat*(x[2])*(x[1]/(K+x[1]))
+
+# ╔═╡ 543959b5-2646-4fa8-9b76-27d24adaa7ac
+# compute a -
+a = (kcat*x[2]*K)/((K+x[1])^2)
+
+# ╔═╡ ccc23a08-b3f5-4e73-acdc-e5cad8589d63
+# compute b -
+b = (kcat*x[1])/(K+x[1])
+
+# ╔═╡ e817a504-8012-45d5-9e4a-870f68812d8b
+# Setup A2 -
+A2 = [-(D3+a) -b 0 ; 0 -(D3+kd) 0 ; a b -D3]
+
+# ╔═╡ 9526aab3-74de-4dca-a928-9f48511f294c
+rank(A2)
+
+# ╔═╡ cef6c183-d137-4594-ac30-666e9aa7c977
+bV2 = [-D1*C11+r1-a*x[1]-b*x[2] ; -D2*C22 ; -r1+a*x[1]+b*x[2]]
+
+# ╔═╡ 453cc1b5-ab5a-4ed0-b126-9123601aaaa9
+# compute the exit composition -
+c_out_2 = inv(A2)*bV2
+
 # ╔═╡ 1e3fa40e-19f2-4c97-8353-1705a266ee5e
 html"""<style>
 main {
@@ -148,6 +297,7 @@ FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
 ImageIO = "82e4d734-157c-48bb-816b-45c225c6df19"
 ImageMagick = "6218d12a-5da1-5696-b52f-db25d2ecc6d1"
 Images = "916415d5-f1e6-5110-898d-aaa5f9f070e0"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 
 [compat]
@@ -1377,6 +1527,23 @@ version = "0.9.1+5"
 # ╟─cb4478c2-ca0a-40bb-bb9f-cd4e0437381e
 # ╟─e78f1041-4259-491f-86d4-1f7d6ced4f15
 # ╟─f954ba83-d8a5-4ef0-b84e-e513e95dbb0f
+# ╟─777bae38-20e6-4956-a0c9-6245aae429b4
+# ╠═5852e1da-8b57-40a4-9f93-2c2b40dd101a
+# ╠═e3fd51c5-f8c0-4c64-af7e-a0b6943a62a3
+# ╠═5875710a-e259-4986-b43b-2a5d2702010f
+# ╠═905e5822-ce8a-4545-8500-7bd8f681f373
+# ╠═14f943e3-bf54-4582-9c44-45d29c93b1d7
+# ╠═efacdd42-3564-4788-82a8-eec6d1dee154
+# ╠═fc2dc16e-495a-4fd9-a9f7-859583d959d4
+# ╟─e58faa37-938c-4475-9a73-fd5922da721f
+# ╠═eecc36b0-366f-469b-8743-f9f96a5f6e6c
+# ╠═766bf53c-2feb-49ad-bd97-c79659fe22af
+# ╠═543959b5-2646-4fa8-9b76-27d24adaa7ac
+# ╠═ccc23a08-b3f5-4e73-acdc-e5cad8589d63
+# ╠═e817a504-8012-45d5-9e4a-870f68812d8b
+# ╠═9526aab3-74de-4dca-a928-9f48511f294c
+# ╠═cef6c183-d137-4594-ac30-666e9aa7c977
+# ╠═453cc1b5-ab5a-4ed0-b126-9123601aaaa9
 # ╟─1e3fa40e-19f2-4c97-8353-1705a266ee5e
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
