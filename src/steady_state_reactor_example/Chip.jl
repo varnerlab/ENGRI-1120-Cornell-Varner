@@ -13,6 +13,7 @@ begin
 	using Plots
 	using ImageMagick
 	using LinearAlgebra
+	using Optim
 end
 
 # ╔═╡ b337d2fa-74fe-4dda-a88f-a5bc32260c68
@@ -162,6 +163,9 @@ $$\mathbf{x} = \mathbf{A}^{-1}\mathbf{b}$$
 # ╔═╡ e3fd51c5-f8c0-4c64-af7e-a0b6943a62a3
 begin
 	
+	# initialize -
+	parameter_dict = Dict{String,Any}()
+	
 	# Problem parameters (make sure we have the correct units!)
 	F1 = 10.0 			# units: μL/hr
 	F2 = 5.0 			# units: μL/hr
@@ -179,19 +183,35 @@ begin
 	C11 = 10.0 			# units: mmol/L
 	C22 = 2.0 			# units: mmol/L
 	
+	# package the parameters -
+	parameter_dict["F1"] = F1
+	parameter_dict["F2"] = F2
+	parameter_dict["V"] = V
+	parameter_dict["kd"] = kd
+	parameter_dict["kcat"] = kcat
+	parameter_dict["K"] = K
+	parameter_dict["D1"] = D1
+	parameter_dict["D2"] = D2
+	parameter_dict["D3"] = D3
+	parameter_dict["C11"] = C11
+	parameter_dict["C22"] = C22
+	
 	# return -
 	nothing
 end
 
-# ╔═╡ 5875710a-e259-4986-b43b-2a5d2702010f
-A1 = [-D3 -kcat 0 ; 0 -(D3+kd) 0 ; 0 kcat -D3]
+# ╔═╡ 204fa395-1288-4dcd-90f9-16eaca2c7f07
+begin
+	
+	# setup A1 -
+	A1 = [-D3 -kcat 0 ; 0 -(D3+kd) 0 ; 0 kcat -D3]
+	
+	# setup bV1 -
+	bV1 = [-D1*C11 ; -D2*C22 ; 0]
 
-# ╔═╡ 905e5822-ce8a-4545-8500-7bd8f681f373
-# can we find the inverse?
-rank(A1)
-
-# ╔═╡ 14f943e3-bf54-4582-9c44-45d29c93b1d7
-bV1 = [-D1*C11 ; -D2*C22 ; 0]
+	# return -
+	nothing
+end
 
 # ╔═╡ efacdd42-3564-4788-82a8-eec6d1dee154
 # compute the output composition?
@@ -232,43 +252,144 @@ a & b & -D_{3}
 C_{1} \\
 C_{2} \\
 C_{3}
-\end{pmatrix} = -
+\end{pmatrix} = 
 \begin{pmatrix}
-D_{1}C_{11} -\hat{r}^{\star}_{1} +aC^{\star}_{1} + bC^{\star}_{2} \\
-D_{2}C_{22} \\
-\hat{r}^{\star}_{1} - aC^{\star}_{1} - bC^{\star}_{2}
+-D_{1}C_{11} + \hat{r}^{\star}_{1} - aC^{\star}_{1} - bC^{\star}_{2} \\
+-D_{2}C_{22} \\
+-\hat{r}^{\star}_{1} + aC^{\star}_{1} + bC^{\star}_{2}
 \end{pmatrix}$
 """
 
 # ╔═╡ eecc36b0-366f-469b-8743-f9f96a5f6e6c
 # select a point to linearize around -
-x = (0.001,0.5)
-
-# ╔═╡ 766bf53c-2feb-49ad-bd97-c79659fe22af
-# compute r1star
-r1 = kcat*(x[2])*(x[1]/(K+x[1]))
+x = (0.00001,0.5)
 
 # ╔═╡ 543959b5-2646-4fa8-9b76-27d24adaa7ac
-# compute a -
-a = (kcat*x[2]*K)/((K+x[1])^2)
-
-# ╔═╡ ccc23a08-b3f5-4e73-acdc-e5cad8589d63
-# compute b -
-b = (kcat*x[1])/(K+x[1])
-
-# ╔═╡ e817a504-8012-45d5-9e4a-870f68812d8b
-# Setup A2 -
-A2 = [-(D3+a) -b 0 ; 0 -(D3+kd) 0 ; a b -D3]
-
-# ╔═╡ 9526aab3-74de-4dca-a928-9f48511f294c
-rank(A2)
-
-# ╔═╡ cef6c183-d137-4594-ac30-666e9aa7c977
-bV2 = [-D1*C11+r1-a*x[1]-b*x[2] ; -D2*C22 ; -r1+a*x[1]+b*x[2]]
+begin
+	
+	# compute r1star
+	r1 = kcat*(x[2])*(x[1]/(K+x[1]))
+	
+	# compute a and b -
+	a = (kcat*x[2]*K)/((K+x[1])^2)
+	
+	# compute b -
+	b = (kcat*x[1])/(K+x[1])
+	
+	# Setup A2 -
+	A2 = [-(D3+a) -b 0 ; 0 -(D3+kd) 0 ; a b -D3]
+	
+	# setup bV2 -
+	bV2 = [-D1*C11+r1-a*x[1]-b*x[2] ; -D2*C22 ; -r1+a*x[1]+b*x[2]]
+	
+	# return -
+	nothing
+end
 
 # ╔═╡ 453cc1b5-ab5a-4ed0-b126-9123601aaaa9
 # compute the exit composition -
 c_out_2 = inv(A2)*bV2
+
+# ╔═╡ 60acab50-aa82-4622-ba02-db02282a2ed0
+md"""
+
+##### Method 3: Optimization approach: Nelder-Mead Method
+
+The last approach (and the method most commonly used in practice) is to recast the problem of estimating the unknown exit composition as an _optimization problem_. In this case, we iteratively make a solution guess, test how good this guess is by computing the squared error using an _objective function_, and then use this error to inform our next guess of the solution. How the error is used to generate a new guess depends upon the _optimization algorithm_ (of which there is a huge number). 
+
+In this case, let's use the $\texttt{Optim}$ package of Julia which encodes many optimization algorithm, and particularly the [Nelder-Mead](https://en.wikipedia.org/wiki/Nelder–Mead_method) algorithm which is a common direct (derivative free) approach for solving unconstrained optimization problems. 
+
+"""
+
+# ╔═╡ 45c480f6-2b41-4075-b764-d1f6a71fc0f9
+begin
+	
+	"""
+		compute_soln_error(soln_array::Array{Float64,1}, parameters::Dict{String,Any}) -> Array{Float64,1}
+	"""
+	function compute_soln_error(soln_array::Array{Float64,1}, parameters::Dict{String,Any})::Array{Float64,1}
+		
+		try
+			
+			# Get parameters from the Dict -
+			F1 = parameters["F1"]
+			F2 = parameters["F2"]
+			V = parameters["V"]
+			kd = parameters["kd"]
+			kcat = parameters["kcat"]
+			K = parameters["K"]
+			D1 = parameters["D1"]
+			D2 = parameters["D2"]
+			D3 = parameters["D3"]
+			C11 = parameters["C11"]
+			C22 = parameters["C22"]
+
+ 			# Alias the soln -
+			C1 = soln_array[1]
+			C2 = soln_array[2]
+			C3 = soln_array[3]
+
+ 			# compute r1 and r2 -
+			r1 = kcat*C2*(C1/(K+C1))
+			r2 = kd*C2
+
+ 			# setup A matrix and bV -
+			AM = [-D3 0 0; 0 -D3 0; 0 0 -D3]
+			bV = [D1*C11-r1; D2*C22-r2; r1]
+
+ 			# compute the error -
+			error_array = AM*soln_array + bV
+
+			# return -
+			return error_array
+		catch error
+			rethrow()
+		end
+	end
+	
+	# return -
+	nothing
+end
+
+# ╔═╡ 3fc4c269-2a2c-445e-8786-4b56fa60b80f
+# compue the soln error -
+soln_error = compute_soln_error(c_out_2, parameter_dict)
+
+# ╔═╡ 5687b01f-2ace-4a80-9b3c-9e881f89eaf3
+begin
+	
+	function objective_function(state_array, parameters)::Float64
+		
+		# compute the soln error -
+		soln_error_array = compute_soln_error(state_array, parameters)
+		
+		# return -
+		return transpose(soln_error_array)*soln_error_array
+	end
+
+	# return -
+	nothing
+end
+
+# ╔═╡ 73a5e9c2-58c9-428c-8f03-17561d7630f6
+begin
+	# using optim -
+	
+	# Use the answer from Method 2 as a starting point 
+	xinitial = c_out_2
+	
+	# setup the objective function -
+	OF(p) = objective_function(p,parameter_dict)
+    
+    # call the optimizer -
+    opt_result = optimize(OF,xinitial,NelderMead())
+end
+
+# ╔═╡ f5022387-72e1-4262-94ad-3bffd4010ae2
+nm_soln = Optim.minimizer(opt_result)
+
+# ╔═╡ 075683a3-3c19-4edd-9a21-a93f1d31e9bf
+nm_error_check = compute_soln_error(nm_soln, parameter_dict)
 
 # ╔═╡ 1e3fa40e-19f2-4c97-8353-1705a266ee5e
 html"""<style>
@@ -298,6 +419,7 @@ ImageIO = "82e4d734-157c-48bb-816b-45c225c6df19"
 ImageMagick = "6218d12a-5da1-5696-b52f-db25d2ecc6d1"
 Images = "916415d5-f1e6-5110-898d-aaa5f9f070e0"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+Optim = "429524aa-4258-5aef-a3af-852621145aeb"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 
 [compat]
@@ -305,6 +427,7 @@ FileIO = "~1.11.1"
 ImageIO = "~0.5.8"
 ImageMagick = "~1.2.1"
 Images = "~0.24.1"
+Optim = "~1.4.1"
 Plots = "~1.21.3"
 """
 
@@ -404,6 +527,12 @@ git-tree-sha1 = "417b0ed7b8b838aa6ca0a87aadf1bb9eb111ce40"
 uuid = "5ae59095-9a9b-59fe-a467-6f913c188581"
 version = "0.12.8"
 
+[[CommonSubexpressions]]
+deps = ["MacroTools", "Test"]
+git-tree-sha1 = "7b8a93dba8af7e3b42fecabf646260105ac373f7"
+uuid = "bbf7d656-a473-5ed7-a52c-81e309532950"
+version = "0.3.0"
+
 [[Compat]]
 deps = ["Base64", "Dates", "DelimitedFiles", "Distributed", "InteractiveUtils", "LibGit2", "Libdl", "LinearAlgebra", "Markdown", "Mmap", "Pkg", "Printf", "REPL", "Random", "SHA", "Serialization", "SharedArrays", "Sockets", "SparseArrays", "Statistics", "Test", "UUIDs", "Unicode"]
 git-tree-sha1 = "4866e381721b30fac8dda4c8cb1d9db45c8d2994"
@@ -459,6 +588,18 @@ uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
 [[DelimitedFiles]]
 deps = ["Mmap"]
 uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
+
+[[DiffResults]]
+deps = ["StaticArrays"]
+git-tree-sha1 = "c18e98cba888c6c25d1c3b048e4b3380ca956805"
+uuid = "163ba53b-c6d8-5494-b064-1a9d43ac40c5"
+version = "1.0.3"
+
+[[DiffRules]]
+deps = ["NaNMath", "Random", "SpecialFunctions"]
+git-tree-sha1 = "3ed8fa7178a10d1cd0f1ca524f249ba6937490c0"
+uuid = "b552c78f-8df3-52c6-915a-8e097449b14b"
+version = "1.3.0"
 
 [[Distances]]
 deps = ["LinearAlgebra", "Statistics", "StatsAPI"]
@@ -534,6 +675,18 @@ git-tree-sha1 = "3c041d2ac0a52a12a27af2782b34900d9c3ee68c"
 uuid = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
 version = "1.11.1"
 
+[[FillArrays]]
+deps = ["LinearAlgebra", "Random", "SparseArrays", "Statistics"]
+git-tree-sha1 = "caf289224e622f518c9dbfe832cdafa17d7c80a6"
+uuid = "1a297f60-69ca-5386-bcde-b61e274b549b"
+version = "0.12.4"
+
+[[FiniteDiff]]
+deps = ["ArrayInterface", "LinearAlgebra", "Requires", "SparseArrays", "StaticArrays"]
+git-tree-sha1 = "8b3c09b56acaf3c0e581c66638b85c8650ee9dca"
+uuid = "6a86dc24-6348-571c-b903-95158fe2bd41"
+version = "2.8.1"
+
 [[FixedPointNumbers]]
 deps = ["Statistics"]
 git-tree-sha1 = "335bfdceacc84c5cdf16aadc768aa5ddfc5383cc"
@@ -551,6 +704,12 @@ deps = ["Printf"]
 git-tree-sha1 = "8339d61043228fdd3eb658d86c926cb282ae72a8"
 uuid = "59287772-0a20-5a39-b81b-1366585eb4c0"
 version = "0.4.2"
+
+[[ForwardDiff]]
+deps = ["CommonSubexpressions", "DiffResults", "DiffRules", "LinearAlgebra", "NaNMath", "Printf", "Random", "SpecialFunctions", "StaticArrays"]
+git-tree-sha1 = "b5e930ac60b613ef3406da6d4f42c35d8dc51419"
+uuid = "f6369f11-7733-5829-9624-2563aa707210"
+version = "0.10.19"
 
 [[FreeType2_jll]]
 deps = ["Artifacts", "Bzip2_jll", "JLLWrappers", "Libdl", "Pkg", "Zlib_jll"]
@@ -895,6 +1054,12 @@ git-tree-sha1 = "7f3efec06033682db852f8b3bc3c1d2b0a0ab066"
 uuid = "38a345b3-de98-5d2b-a5d3-14cd9215e700"
 version = "2.36.0+0"
 
+[[LineSearches]]
+deps = ["LinearAlgebra", "NLSolversBase", "NaNMath", "Parameters", "Printf"]
+git-tree-sha1 = "f27132e551e959b3667d8c93eae90973225032dd"
+uuid = "d3d80556-e9d4-5f37-9878-2ab0fcc64255"
+version = "7.1.1"
+
 [[LinearAlgebra]]
 deps = ["Libdl"]
 uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
@@ -962,6 +1127,12 @@ version = "0.3.3"
 [[MozillaCACerts_jll]]
 uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
 
+[[NLSolversBase]]
+deps = ["DiffResults", "Distributed", "FiniteDiff", "ForwardDiff"]
+git-tree-sha1 = "144bab5b1443545bc4e791536c9f1eacb4eed06a"
+uuid = "d41bc354-129a-5804-8e4c-c37616107c6c"
+version = "7.8.1"
+
 [[NaNMath]]
 git-tree-sha1 = "bfe47e760d60b82b66b61d2d44128b62e3a369fb"
 uuid = "77ba4419-2d1f-58cd-9bb1-8ffee604a2e3"
@@ -1011,6 +1182,12 @@ deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl", "Pk
 git-tree-sha1 = "13652491f6856acfd2db29360e1bbcd4565d04f1"
 uuid = "efe28fd5-8261-553b-a9e1-b2916fc3738e"
 version = "0.5.5+0"
+
+[[Optim]]
+deps = ["Compat", "FillArrays", "LineSearches", "LinearAlgebra", "NLSolversBase", "NaNMath", "Parameters", "PositiveFactorizations", "Printf", "SparseArrays", "StatsBase"]
+git-tree-sha1 = "7863df65dbb2a0fa8f85fcaf0a41167640d2ebed"
+uuid = "429524aa-4258-5aef-a3af-852621145aeb"
+version = "1.4.1"
 
 [[Opus_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1086,6 +1263,12 @@ deps = ["Base64", "Contour", "Dates", "Downloads", "FFMPEG", "FixedPointNumbers"
 git-tree-sha1 = "2dbafeadadcf7dadff20cd60046bba416b4912be"
 uuid = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 version = "1.21.3"
+
+[[PositiveFactorizations]]
+deps = ["LinearAlgebra"]
+git-tree-sha1 = "17275485f373e6673f7e7f97051f703ed5b15b20"
+uuid = "85a6dd25-e78a-55b7-8502-1745935b8125"
+version = "0.2.4"
 
 [[Preferences]]
 deps = ["TOML"]
@@ -1528,22 +1711,22 @@ version = "0.9.1+5"
 # ╟─e78f1041-4259-491f-86d4-1f7d6ced4f15
 # ╟─f954ba83-d8a5-4ef0-b84e-e513e95dbb0f
 # ╟─777bae38-20e6-4956-a0c9-6245aae429b4
-# ╠═5852e1da-8b57-40a4-9f93-2c2b40dd101a
+# ╟─5852e1da-8b57-40a4-9f93-2c2b40dd101a
 # ╠═e3fd51c5-f8c0-4c64-af7e-a0b6943a62a3
-# ╠═5875710a-e259-4986-b43b-2a5d2702010f
-# ╠═905e5822-ce8a-4545-8500-7bd8f681f373
-# ╠═14f943e3-bf54-4582-9c44-45d29c93b1d7
+# ╠═204fa395-1288-4dcd-90f9-16eaca2c7f07
 # ╠═efacdd42-3564-4788-82a8-eec6d1dee154
 # ╠═fc2dc16e-495a-4fd9-a9f7-859583d959d4
 # ╟─e58faa37-938c-4475-9a73-fd5922da721f
 # ╠═eecc36b0-366f-469b-8743-f9f96a5f6e6c
-# ╠═766bf53c-2feb-49ad-bd97-c79659fe22af
 # ╠═543959b5-2646-4fa8-9b76-27d24adaa7ac
-# ╠═ccc23a08-b3f5-4e73-acdc-e5cad8589d63
-# ╠═e817a504-8012-45d5-9e4a-870f68812d8b
-# ╠═9526aab3-74de-4dca-a928-9f48511f294c
-# ╠═cef6c183-d137-4594-ac30-666e9aa7c977
 # ╠═453cc1b5-ab5a-4ed0-b126-9123601aaaa9
+# ╠═3fc4c269-2a2c-445e-8786-4b56fa60b80f
+# ╟─60acab50-aa82-4622-ba02-db02282a2ed0
+# ╠═73a5e9c2-58c9-428c-8f03-17561d7630f6
+# ╠═f5022387-72e1-4262-94ad-3bffd4010ae2
+# ╠═075683a3-3c19-4edd-9a21-a93f1d31e9bf
+# ╠═5687b01f-2ace-4a80-9b3c-9e881f89eaf3
+# ╠═45c480f6-2b41-4075-b764-d1f6a71fc0f9
 # ╟─1e3fa40e-19f2-4c97-8353-1705a266ee5e
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
