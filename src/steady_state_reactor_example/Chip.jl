@@ -221,6 +221,9 @@ c_out_1 = inv(A1)*bV1
 # check:
 I = inv(A1)*A1
 
+# ╔═╡ bf5521d9-192f-4378-9cbc-270142ab689b
+A1
+
 # ╔═╡ e58faa37-938c-4475-9a73-fd5922da721f
 md"""
 
@@ -262,7 +265,7 @@ C_{3}
 
 # ╔═╡ eecc36b0-366f-469b-8743-f9f96a5f6e6c
 # select a point to linearize around -
-x = (0.00001,0.5)
+x = (0.001,0.5)
 
 # ╔═╡ 543959b5-2646-4fa8-9b76-27d24adaa7ac
 begin
@@ -351,6 +354,10 @@ begin
 	nothing
 end
 
+# ╔═╡ cd7176c0-a8be-4982-b31d-2674fe20e84c
+# compue the soln error -
+soln_error_1 = compute_soln_error(c_out_1, parameter_dict)
+
 # ╔═╡ 3fc4c269-2a2c-445e-8786-4b56fa60b80f
 # compue the soln error -
 soln_error = compute_soln_error(c_out_2, parameter_dict)
@@ -376,7 +383,7 @@ begin
 	# using optim -
 	
 	# Use the answer from Method 2 as a starting point 
-	xinitial = c_out_2
+	xinitial = [0.01, 0.1, 1.0]
 	
 	# setup the objective function -
 	OF(p) = objective_function(p,parameter_dict)
@@ -1716,6 +1723,8 @@ version = "0.9.1+5"
 # ╠═204fa395-1288-4dcd-90f9-16eaca2c7f07
 # ╠═efacdd42-3564-4788-82a8-eec6d1dee154
 # ╠═fc2dc16e-495a-4fd9-a9f7-859583d959d4
+# ╠═bf5521d9-192f-4378-9cbc-270142ab689b
+# ╠═cd7176c0-a8be-4982-b31d-2674fe20e84c
 # ╟─e58faa37-938c-4475-9a73-fd5922da721f
 # ╠═eecc36b0-366f-469b-8743-f9f96a5f6e6c
 # ╠═543959b5-2646-4fa8-9b76-27d24adaa7ac

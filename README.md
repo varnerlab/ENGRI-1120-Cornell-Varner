@@ -6,4 +6,3 @@ This repository holds example problems discussed in lecture. The problems are st
 [Julia](https://julialang.org) and [Pluto](https://github.com/fonsp/Pluto.jl) please check out the tutorial for 
 [MIT 18.S191/6.S083/22.S092 course from Fall 2020](https://computationalthinking.mit.edu/Fall20/installation/).
 
-
