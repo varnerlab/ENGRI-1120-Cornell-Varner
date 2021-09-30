@@ -38,11 +38,12 @@ Discount rate example which discusses the time value of money (a dollar today is
 
 [![Pluto](https://img.shields.io/badge/ENGRI1120-NPV-brightgreen)](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-NPV.jl.html)
 
-Net Present Value (NPV) example taken from [MIT 15.401](https://ocw.mit.edu/courses/sloan-school-of-management/15-401-finance-theory-i-fall-2008/)
+Net Present Value (NPV) example taken from [MIT 15.401](https://ocw.mit.edu/courses/sloan-school-of-management/15-401-finance-theory-i-fall-2008/). Should we install that new compute controlled lighting system? I don't know, let's compute the NPV and find out. 
 
 [![Pluto](https://img.shields.io/badge/ENGRI1120-LostWork-brightgreen)](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-LostWork-Turbine.jl.html)
 
 Lost work example for an adiabatic turbine in the [Rankine Power Generation Cycle](https://en.wikipedia.org/wiki/Rankine_cycle). 
+We use the open first and second law balances to compute the work lost from an inefficient turbine. 
 
 
 
