@@ -6,7 +6,7 @@ This repository holds example problems discussed in lecture. The problems are st
 [Julia](https://julialang.org) and [Pluto](https://github.com/fonsp/Pluto.jl) please check out the tutorial for 
 [MIT 18.S191/6.S083/22.S092 course from Fall 2020](https://computationalthinking.mit.edu/Fall20/installation/).
 
-1. [Install Julia (we use v1.6.2, other versions should work)](https://julialang.org/downloads/)
+1. [Install Julia (we are using v1.6.x, newer versions of Julia should also work)](https://julialang.org/downloads/)
 1. [Install Pluto.jl](https://github.com/fonsp/Pluto.jl#installation)
 1. Clone this repo:
     ```bash
@@ -22,3 +22,6 @@ This repository holds example problems discussed in lecture. The problems are st
     julia -E "using Pluto; Pluto.run()"
     ```
 1. From Pluto, open one of the `.jl` notebook files located in the `ENGRI-1120-Cornell-Varner/notebooks/` directory—enjoy!
+
+### Notebooks
+[![Pluto](https://img.shields.io/badge/POMDPs-notebook-389826)](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-HFCS.jl.html)
