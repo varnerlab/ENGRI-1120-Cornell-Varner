@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.16.0
+# v0.16.1
 
 using Markdown
 using InteractiveUtils
@@ -14,12 +14,11 @@ begin
 	using ImageMagick
 	using LinearAlgebra
 	using Optim
+	using PlutoUI
 end
 
-# ╔═╡ b337d2fa-74fe-4dda-a88f-a5bc32260c68
-md"""
-$(load("Reactor.png"))
-"""
+# ╔═╡ ce580d07-e462-4c11-8cd6-b314f3ea13af
+PlutoUI.LocalResource("./figs/Reactor.png")
 
 # ╔═╡ c38c856c-153d-11ec-0945-f7587b6f2699
 md"""
@@ -428,6 +427,7 @@ Images = "916415d5-f1e6-5110-898d-aaa5f9f070e0"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 Optim = "429524aa-4258-5aef-a3af-852621145aeb"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 
 [compat]
 FileIO = "~1.11.1"
@@ -436,6 +436,7 @@ ImageMagick = "~1.2.1"
 Images = "~0.24.1"
 Optim = "~1.4.1"
 Plots = "~1.21.3"
+PlutoUI = "~0.7.12"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -795,6 +796,17 @@ git-tree-sha1 = "8a954fed8ac097d5be04921d595f741115c1b2ad"
 uuid = "2e76f6c2-a576-52d4-95c1-20adfe4de566"
 version = "2.8.1+0"
 
+[[HypertextLiteral]]
+git-tree-sha1 = "72053798e1be56026b81d4e2682dbe58922e5ec9"
+uuid = "ac1192a8-f4b3-4bfe-ba22-af5b92cd3ab2"
+version = "0.9.0"
+
+[[IOCapture]]
+deps = ["Logging", "Random"]
+git-tree-sha1 = "f7be53659ab06ddc986428d3a9dcc95f6fa6705a"
+uuid = "b5f81e59-6552-4d32-b1f0-c071b021bf89"
+version = "0.2.2"
+
 [[IdentityRanges]]
 deps = ["OffsetArrays"]
 git-tree-sha1 = "be8fcd695c4da16a1d6d0cd213cb88090a150e3b"
@@ -1082,9 +1094,9 @@ uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
 
 [[MKL_jll]]
 deps = ["Artifacts", "IntelOpenMP_jll", "JLLWrappers", "LazyArtifacts", "Libdl", "Pkg"]
-git-tree-sha1 = "c253236b0ed414624b083e6b72bfe891fbd2c7af"
+git-tree-sha1 = "5455aef09b40e5020e1520f551fa3135040d4ed0"
 uuid = "856f044c-d86e-5d09-b602-aeab76dc8ba7"
-version = "2021.1.1+1"
+version = "2021.1.1+2"
 
 [[MacroTools]]
 deps = ["Markdown", "Random"]
@@ -1270,6 +1282,12 @@ deps = ["Base64", "Contour", "Dates", "Downloads", "FFMPEG", "FixedPointNumbers"
 git-tree-sha1 = "2dbafeadadcf7dadff20cd60046bba416b4912be"
 uuid = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 version = "1.21.3"
+
+[[PlutoUI]]
+deps = ["Base64", "Dates", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "Markdown", "Random", "Reexport", "UUIDs"]
+git-tree-sha1 = "f35ae11e070dbf123d5a6f54cbda45818d765ad2"
+uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
+version = "0.7.12"
 
 [[PositiveFactorizations]]
 deps = ["LinearAlgebra"]
@@ -1710,7 +1728,7 @@ version = "0.9.1+5"
 
 # ╔═╡ Cell order:
 # ╠═dcb245de-bc64-4892-a542-faaf9b6d7303
-# ╟─b337d2fa-74fe-4dda-a88f-a5bc32260c68
+# ╟─ce580d07-e462-4c11-8cd6-b314f3ea13af
 # ╟─c38c856c-153d-11ec-0945-f7587b6f2699
 # ╠═2baefe3c-f9d1-4851-85e8-2f81d49f60c6
 # ╟─61f56a22-d722-41a7-b371-06058bfd5da5
