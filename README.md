@@ -24,4 +24,5 @@ This repository holds example problems discussed in lecture. The problems are st
 1. From Pluto, open one of the `.jl` notebook files located in the `ENGRI-1120-Cornell-Varner/notebooks/` directory—enjoy!
 
 ### Notebooks
-[![Pluto](https://img.shields.io/badge/ENGRI-1120-notebook)](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-HFCS.jl.html)
+[![Pluto](https://img.shields.io/badge/ENGRI-1120-notebook)](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-HFCS.jl.html)High-Fructose Corn Syrup (HFCS) Example
+ 
