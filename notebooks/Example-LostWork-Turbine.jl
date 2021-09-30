@@ -15,7 +15,7 @@ PlutoUI.LocalResource("./figs/Rankine.png")
 # ╔═╡ 88b9e9f5-f1ed-4146-a63d-f941be18c559
 md"""
 
-#### Example: Compute the steady-state rate of shaft work $\dot{W}_{sh}$
+#### Example: Compute the steady-state rate of shaft work $\dot{W}_{sh}$ (and some other stuff)
 
 Compute the steady-state rate of shaft work $\dot{W}_{sh}$ (units: kW), and the irreversible enthlapy change from an insulated turbine with efficiency of $\eta$ =86\%. The working fluid is water with a steady-state flow rate of $\dot{m}$ = 4.0 kg/s. Let the input temperature 
 T$_{2}$ = 500$^{\circ}$C and pressure P$_{2}$ = 11 MPa. The temperature of the exit stream from the turbine T$_{3}$ = 100$^{\circ}$C.
@@ -30,16 +30,18 @@ The steady-state open first law (energy balance) relates the heat, work and enth
 
 $$\dot{Q}+\dot{W}^{*}_{sh} + \sum_{s}^{\mathcal{S}}v_{s}\dot{m}_{s}H_{s} = 0$$
 
-where $\dot{W}^{*}_{sh}$ denotes the rate of _actual_ shaft work recovered from the turbine. If the turbine is operating _reversibly_ then the rate of shaft work that we actually recover is equal to the theoretical maximum shaft work. Howver, in this problem, we know that the turbine is not operating reversibly, thus we use $\dot{W}^{*}_{sh}$.
+where $\dot{W}^{*}_{sh}$ denotes the rate of _actual_ shaft work recovered from the turbine. If the turbine is operating _reversibly_ then the rate of shaft work that we actually recover is equal to the theoretical maximum shaft work. However, in this problem, we know that the turbine is not operating reversibly, thus we use $\dot{W}^{*}_{sh}$.
 
-Let's begin by throwing out terms in the open energy balance, and solving for the rate of shaft work $\dot{W}^{*}_{sh}$. The problem says the turbine is insulated, thus $\dot{Q}$ = 0. Second, we know that $\mathcal{S}$ = 2, and that the mass flow rate into the turbine $\dot{m}_{2}=\dot{m}_{3}\equiv{\dot{m}}$. Solving for the rate of shaft work gives the expression:
+Let's begin by throwing out terms in the open energy balance, and solving for the rate of shaft work $\dot{W}^{*}_{sh}$. The problem says the turbine is insulated, thus $\dot{Q}$ = 0. Second, we know that $\mathcal{S}$ = 2, and that the mass flow rate into the turbine equals mass flow rate out teh turbine $\dot{m}_{2}=\dot{m}_{3}\equiv{\dot{m}}$. Solving for the rate of shaft work gives the expression:
 
-$$\dot{W}^{*}_{sh} = \dot{m}\left(H_{3} - H_{2}\right)_{I}$$
+$$\dot{W}^{*}_{sh} = \dot{m}\left(H^{\prime}_{3} - H_{2}\right)_{I}$$
 
-where the $\left(\star\right)_{I}$ terms denotes the enthalpy difference for the _actual irreversible_ process. However, we do not know what the _actual irreversible_ enthalpy difference is, but we do know:
+where the $\left(\star\right)_{I}$ term denotes the enthalpy difference for the _actual irreversible_ process, and $H^{\prime}_{3}$ denotes the _actual_ operating point 3. However, we do not know what the _actual irreversible_ enthalpy difference is i.e., we don't know $H^{\prime}_{3}$.
 
-* the turbine efficiency and
-* that a reversible adiabatic process is _constant entropy_. 
+However, we do know:
+
+* the turbine efficiency $\eta_{T}$ and
+* that a reversible adiabatic process is _constant entropy_ ($S_{2}=S_{3}$).
 
 ##### How can we compute $\left(\star\right)_{I}$?
 
@@ -55,6 +57,8 @@ $$\Delta{H}_{I} = \eta_{T}\Delta{H}_{R}$$
 which we can substitute into the expression for work to give:
 
 $$\dot{W}^{*}_{sh} = \dot{m}\eta_{T}\left(H_{3} - H_{2}\right)_{R}$$
+
+__Why__? Because we can follow along the line of constant entropy on a PH-diagram until we hit the outlet pressure (or temperature), which gives $H_{3}$.
 
 """
 
@@ -105,8 +109,7 @@ The open second law (entropy balance) at steady-state (with a single heat-transf
 
 $$-\left(\sum_{s}^{\mathcal{S}}v_{s}\dot{m}_{s}S_{s} + \frac{\dot{Q}}{T_{\sigma}}\right) = \dot{S}_{G}\geq{0}$$
 
-The turbine is adiabatic, thus $\dot{Q}$ = 0, is operating at steady-state, and we has a single input and output (meaning $\dot{m}_{2}=\dot{m}_{3}\equiv{\dot{m}}$). Putting these ideas together, and throwing out terms in the open entropy balance gives an 
-expression for the raye of entropy generation:
+The turbine is adiabatic ($\dot{Q}$ = 0), is operating at steady-state, and has a single input and output ( $\dot{m}_{2}=\dot{m}_{3}\equiv{\dot{m}}$). Putting these ideas together, and throwing out terms in the open entropy balance that we don't need, gives an expression for the rate of entropy generation:
 
 $$-\dot{m}\left(S_{2} - S_{3}\right) = \dot{S}_{G}$$
 
@@ -117,6 +120,9 @@ begin
 	# lookup entropy values from the PH diagram -
 	S₂ = 6.5 	# units: kJ/kg-K
 	S₃ = 7.0 	# units: kJ/kg-K
+	
+	# return -
+	nothing
 end
 
 # ╔═╡ c787d47d-7a06-4603-8a12-cdaec354374e
@@ -146,6 +152,24 @@ $$\dot{W}_{lost} = \left(\eta_{T} - 1\right) \dot{m}\Delta{H}_{R}$$
 
 # ╔═╡ 3fc1d446-16dd-479e-bc80-03df6804f557
 W_dot_lost = (ηₜ - 1)*ΔH_R
+
+# ╔═╡ c6b5e534-d843-4637-aeb8-c26528605f7c
+md"""
+#### What is the surrounding temperature $T_{\sigma}$?
+
+We know from the class notes that:
+
+$$\dot{W}_{lost} = T_{\sigma}\dot{S}_{G}$$
+
+thus we can solve for $T_{\sigma}$:
+
+$$T_{\sigma} = \frac{\dot{W}_{lost}}{\dot{S}_{G}}$$
+
+"""
+
+# ╔═╡ e1738875-0394-486a-94c2-0a20647a6857
+# Compute T_σ -
+T_σ = W_dot_lost/SG_dot
 
 # ╔═╡ e4681733-6926-44a9-9eea-ace0f74b797d
 html"""<style>
@@ -275,6 +299,8 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 # ╟─bb9d6c95-1391-489c-8c00-d5f27ac832d2
 # ╠═db18c3bf-15b3-47c9-be0b-1f543e07fc19
 # ╠═3fc1d446-16dd-479e-bc80-03df6804f557
+# ╟─c6b5e534-d843-4637-aeb8-c26528605f7c
+# ╠═e1738875-0394-486a-94c2-0a20647a6857
 # ╟─e4681733-6926-44a9-9eea-ace0f74b797d
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
