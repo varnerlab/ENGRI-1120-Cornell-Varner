@@ -4,16 +4,12 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ 64af17f4-c632-425c-a101-9dfa5e8cbd84
-# julia setup -
-using PlutoUI
-
 # ╔═╡ 35dd2eca-2446-11ec-1de6-0feeace9d4f7
 md"""
 
-#### Flash separation of a binary mixtrure of component A and component B
+#### Flash separation of a binary mixture of component A and component B
 
-A liquid feed stream that contains 60% component A (1) and 40% component B (2) is seperated in a flash drum operating at P = 1.21 MPa and T = 150$^{\circ}$C. The saturation pressures of pure component A and B can be modeled using the [Antoine equation](https://en.wikipedia.org/wiki/Antoine_equation): 
+A liquid feed stream that contains 60% component A (1) and 40% component B (2) is separated in a Flash Drum operating at P = 1.21 MPa and T = 150$^{\circ}$C. The saturation pressures of pure component A and B can be modeled using the [Antoine equation](https://en.wikipedia.org/wiki/Antoine_equation): 
 
 $$\begin{eqnarray}
 \ln\left(P_{1}^{sat}\right) &=& 15 -\frac{3010}{T+250}\\
@@ -26,13 +22,13 @@ where $T$ denotes the temperature in units of celcius $^{\circ}$C and $P_{\star}
 
 1. The liquid and vapor phases of all streams are ideal
 1. The liquid and vapor phases inside the Flash Drum are ideal (Raoult's law)
-1. The liquid and vapor phases inside the Flash Drum reach vapor-liquid equlibrium instantly 
+1. The liquid and vapor phases inside the Flash Drum reach vapor-liquid equilibrium instantly 
 
 ##### Solve:
 
  * Calculate the fraction of the input stream that exits the drum as liquid
  * Calculate the fraction of the input stream that exits the drum as vapor
- * Calculate the composition of the liquid ($x_{1}$ and $x_{2}$) and vapor phases ($y_{1}$ and $y_{2}$) in the exit streams 
+ * Calculate the composition of the liquid ($x_{1}$ and $x_{2}$) and vapor ($y_{1}$ and $y_{2}$) in the exit streams 
 
 """
 
@@ -91,7 +87,7 @@ $$x_{1} = \frac{P - P_{2}^{sat}}{P_{1}^{sat} -  P_{2}^{sat}}$$
 """
 
 # ╔═╡ 8e13e386-6fbc-4bdf-8eed-de5bd35247da
-# compute P1sat -
+# compute P1sat (units: kPa)
 P1_sat = exp(15 - (3010)/(T+250))
 
 # ╔═╡ 45a8e5fc-0929-496b-b01a-0e6f27f8b457
@@ -118,7 +114,6 @@ $$y_{i} = x_{i}\left(\frac{P_{i}^{sat}}{P}\right)\qquad{i=1,2}$$
 # ╔═╡ 7608d2c9-eb24-4db1-9fb3-452d52770e17
 # solve for y₁:
 y₁ = x₁ * (P1_sat/P)
-
 
 # ╔═╡ 76f6cf32-8f87-4df0-b1db-a51ee102f709
 # solve for y₂:
@@ -225,6 +220,16 @@ a {
 </style>
 """
 
+# ╔═╡ 64af17f4-c632-425c-a101-9dfa5e8cbd84
+# julia setup -
+using PlutoUI
+
+# ╔═╡ 79f99ade-b514-4768-9bc9-bcfa281ce02f
+png_joinpathsplit__FILE__1assetsimagepng = let
+    import PlutoUI
+    PlutoUI.LocalResource(joinpath(split(@__FILE__, '#')[1] * ".assets", "image.png"))
+end
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
@@ -319,6 +324,7 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 # ╠═64af17f4-c632-425c-a101-9dfa5e8cbd84
 # ╟─35dd2eca-2446-11ec-1de6-0feeace9d4f7
 # ╟─92ff1f65-d717-47a8-9cd3-af71c2855210
+# ╠═79f99ade-b514-4768-9bc9-bcfa281ce02f
 # ╠═98e43733-8711-4aa4-9081-697dd8865592
 # ╟─792e101b-e736-46d2-bbf3-a1197a0cc654
 # ╟─9e171e7c-953d-4a75-b6f6-cbae930dd1ab
