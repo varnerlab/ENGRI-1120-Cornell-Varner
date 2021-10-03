@@ -38,3 +38,7 @@ Net Present Value (NPV) example taken from [MIT 15.401](https://ocw.mit.edu/cour
 
 * [Example notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-LostWork-Turbine.jl.html): Lost work example for an adiabatic turbine in the [Rankine Power Generation Cycle](https://en.wikipedia.org/wiki/Rankine_cycle). 
 We use the open first and second law balances to compute the work lost from an inefficient turbine. 
+
+* [Example notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-ThrottleValue.jl.html): Analysis of the throttle valve operation in the [vapor compression refrigeration cycle (VCRC)](https://en.wikipedia.org/wiki/Vapor-compression_refrigeration).
+
+* [Example notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-FlashSepration.jl.html): How can we separate a mixture with no moving parts? We use a [Flash Drum](https://en.wikipedia.org/wiki/Vapor–liquid_separator) which works in a similar way to the throttle valve of the VCRC. Its not magic, its just physics!
