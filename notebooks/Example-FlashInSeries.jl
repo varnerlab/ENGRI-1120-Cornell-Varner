@@ -26,7 +26,7 @@ end
 
 # ╔═╡ 12187222-b5b2-464f-926a-87d72f50624b
 md"""
-### Example: Graphic Analysis of a Flash Separation
+### Graphic Analysis of a Flash Separation
 
 Let's revisit the previous flash separation example and explore the solution of the problem graphically. 
   
