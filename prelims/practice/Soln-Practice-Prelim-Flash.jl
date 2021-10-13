@@ -34,7 +34,7 @@ where the Antoine parameters are given in the problem. We can solve for $T$ to g
 
 $$T = - \left(C + \frac{B}{\log_{10}P^{sat}_{i} - A}\right)$$
 
-We can choose _either_ pure component endpoints, let's choose pure component 1 which gives $P_{1}^{sat}\simeq$15.9 bar.
+We can choose _either_ pure component endpoints, let's choose pure component 1 which gives $P_{1}^{sat}\simeq$ 15.9 bar.
 """
 
 # ╔═╡ e86e41b3-d39b-4986-b1cd-4ed34eaabae5
@@ -337,7 +337,7 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 # ╔═╡ Cell order:
 # ╟─4abf8eda-2c36-11ec-3cdb-4104751a59ad
 # ╟─c017ef4d-a828-4f46-922a-453d72636c39
-# ╟─d5b781d8-6e6a-4bc9-9b45-1272e1b86e61
+# ╠═d5b781d8-6e6a-4bc9-9b45-1272e1b86e61
 # ╠═e86e41b3-d39b-4986-b1cd-4ed34eaabae5
 # ╟─796fd591-bf7f-4b94-af8f-f5b7ab25e563
 # ╠═453aba4c-fc32-46a7-ad1c-0c360a5dc886
