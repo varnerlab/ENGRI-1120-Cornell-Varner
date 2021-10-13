@@ -44,3 +44,12 @@ We use the open first and second law balances to compute the work lost from an i
 * [Example notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-FlashSeparation.jl.html): How can we separate a mixture with no moving parts? We use a [Flash Drum](https://en.wikipedia.org/wiki/Vapor–liquid_separator) which works in a similar way to the throttle valve of the VCRC. Its not magic, its just physics!
 
 * [Example notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-GraphicalFlash.jl.html): We revisit the previous flash separation problem and develop the solution graphically using a Pressure composition (Pxy) phase diagram.
+
+### Notebooks for Practice Prelim 1
+The notebooks for practice prelim 1 solutions can be found in the `prelims/practice` directory.
+Static versions of the notebooks can be found here:
+
+* [Notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Soln-PracticePrelim-CoffeeMaker.html) Coffee maker problem
+* [Notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Soln-PracticePrelim-FlashProblem.html) Flash separation problem
+* [Notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Soln-PracticePrelim-ModVCRR.html) Modified VCRC problem
+
