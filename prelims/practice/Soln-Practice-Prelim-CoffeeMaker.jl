@@ -81,7 +81,7 @@ begin
 
 	# show -
 	with_terminal() do
-		println("m_1_dot = $(m_1_dot) and m_2_dot = $(m_2_dot)")
+		println("m_1_dot = $(m_1_dot) kg/min and m_2_dot = $(m_2_dot) kg/min")
 	end
 end
 
@@ -113,7 +113,15 @@ You already solved for the mass flow rates $\dot{m}_{i}$, and the enthalpy of ea
 """
 
 # ╔═╡ a3882553-e45f-49a9-8399-9adaaf02a9e7
-W_dot_sh = m_3_dot*H₃ - (m_1_dot*H₁ + m_2_dot*H₂)
+begin
+	
+	W_dot_sh = m_3_dot*H₃ - (m_1_dot*H₁ + m_2_dot*H₂)
+	
+	with_terminal() do
+		println("Rate of work for grinder = $(W_dot_sh) kJ/min")
+	end
+	
+end
 
 # ╔═╡ ff263509-d5a8-4227-898b-67491b99bf51
 md"""
@@ -157,7 +165,10 @@ begin
 	m_5_dot = xc[1]
 	Qdot = xc[2]
 	
-	(m_5_dot, Qdot)
+	# show -
+	with_terminal() do
+		println("m_5_dot = $(m_5_dot) kg/min and Q_dot = $(Qdot) kJ/min")
+	end
 end
 
 # ╔═╡ 2387358c-ee90-4594-9023-b03a51867745
@@ -183,7 +194,14 @@ $$t_{2} = \frac{m_{2}}{\dot{m}_{5}}$$
 """
 
 # ╔═╡ cf7f585a-29a0-4df6-a2a1-dd40dd8a9cf0
-t₂ = m_coffee/(m_5_dot)
+begin
+	
+	t₂ = m_coffee/(m_5_dot) # units: minutes
+	
+	with_terminal() do
+		println("Time for coffee to fill cup: $(t₂) min")
+	end
+end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
