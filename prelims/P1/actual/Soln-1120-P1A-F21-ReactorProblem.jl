@@ -7,6 +7,8 @@ using InteractiveUtils
 # ╔═╡ 828b5fdc-2f57-11ec-2ba2-bd6c394912fa
 begin
 	using PlutoUI
+	using LinearAlgebra
+	using PrettyTables
 end
 
 # ╔═╡ 8c65af87-71e1-45ed-a635-d97a6e6b7a3e
@@ -59,9 +61,6 @@ $$\sum_{s}v_{s}\dot{F}_{s} = 0$$
 For the __reactor__ we have a single in and a single out, so $\dot{F}_{1}$ = $\dot{F}_{2}$. However, for the __filter__ we have a single in, but two exit streams, thus: $\dot{F}_{2} = \dot{F}_{3}+\dot{F}_{4}$
 """
 
-# ╔═╡ f1f4e379-7837-42f1-a7dd-391df25d542b
-# fill in values here
-
 # ╔═╡ 3e17b4fe-1025-471b-ba7e-f257d3f9ef0b
 md"""
 ###### Mol flow rates:
@@ -75,16 +74,16 @@ $\dot{n}_{gen,k}$ denotes the generation (reaction) terms for species $k$ that a
 
 $$\dot{n}_{gen,k} = \left(\sum_{r}\sigma_{kr}\hat{r}_{r}\right)V$$
 
-where $\sigma_{kr}$ denotes the stoichiometric coefficient for species $k$ in reaction $r$, and $\hat{r}_{r}$ denotes the _specific reaction rate_ for reaction $r$ (units: mmol/min-L). For this problem, we have a single reaction whose rate was given in the problem, and $\sigma_{11}$ = -1 and $\sigma_{21}$ = +1, where $A$ = 1 and $B$ = 2.
+where $\sigma_{kr}$ denotes the stoichiometric coefficient for species $k$ in reaction $r$, and $\hat{r}_{r}$ denotes the _specific reaction rate_ for reaction $r$ (units: mmol/min-L) and $V$ denotes volume (units: L). For this problem, we have a single reaction whose rate $\hat{r}_{1}$ which was given in the problem, the volume $V$ was given, and $\sigma_{11}$ = -1 and $\sigma_{21}$ = +1, where $A$ = 1 and $B$ = 2.
 
-For the __reactor__ the species mol balances are given by:
+For the __reactor__, the species mol balances are given by:
 
 $$\begin{eqnarray}
 \dot{n}_{11} -\dot{n}_{12} -\hat{r}_{1}V &=& 0\\
 \dot{n}_{21} -\dot{n}_{22} +\hat{r}_{1}V &=& 0\\
 \end{eqnarray}$$
 
-For the __filtration unit__ the species mol balances are given by:
+For the __filtration unit__, the species mol balances are given by:
 
 $$\begin{eqnarray}
 \dot{n}_{12} -\dot{n}_{13} - \dot{n}_{14} &=& 0\\
@@ -93,7 +92,82 @@ $$\begin{eqnarray}
 """
 
 # ╔═╡ 75e41abc-bf6b-42b6-a400-3e68b49e53a1
-# fill in values here
+begin
+	
+	# data given in the problem setup -
+	n11 = 100.0 	# units: mol/min
+	n21 = 0.0 		# units: mol/min
+	n14 = 14.0 		# units: mol/min
+	n24 = 0.0 		# units: mol/min
+	F1_dot = 10.0 	# units: L/min
+	F3_dot = 4.0 	# units: L/min
+	
+	# reaction terms -
+	r1_hat = 3.0    # units: mmol/min-L
+	V = 14.0 		# units: L
+	
+	# show - 
+	nothing 
+end
+
+# ╔═╡ 51cf0922-fa58-4335-9f34-ae033203f4df
+# matrix vector around reactor and filtration -
+begin
+	
+	# setup both units - unknowns: n12, n22, n13, n23, F2_dot and F4_dot -
+	AT = [-1 0 0 0 0 0; 0 -1 0 0 0 0; 1 0 -1 0 0 0; 0 1 0 -1 0 0; 0 0 0 0 -1 0; 0 0 0 0 1 -1];
+	bT = [-n11 + r1_hat*V ; -n21 - r1_hat*V ; n14 ; n24 ; -F1_dot ; F3_dot]
+	x_dot = inv(AT)*bT
+	n12 = x_dot[1]
+	n22 = x_dot[2]
+	n13 = x_dot[3]
+	n23 = x_dot[4]
+	F2_dot = x_dot[5]
+	F4_dot = x_dot[6]
+	
+	# show -
+	nothing
+end
+
+# ╔═╡ 99d53a10-dc5e-43ae-8095-4ef594f9c420
+begin
+	# put all the data into a table, so we can display the solution using the PrettyTable.j package -
+	data_table = zeros(4,4)
+	
+	# row 1 -
+	data_table[1,1] = 1
+	data_table[1,2] = n11
+	data_table[1,3] = n21
+	data_table[1,4] = F1_dot
+	
+	# row 2 -
+	data_table[2,1] = 2
+	data_table[2,2] = n12
+	data_table[2,3] = n22
+	data_table[2,4] = F2_dot
+	
+	# row 3 -
+	data_table[3,1] = 3
+	data_table[3,2] = n13
+	data_table[3,3] = n23
+	data_table[3,4] = F3_dot
+	
+	# row 4 -
+	data_table[4,1] = 4
+	data_table[4,2] = n14
+	data_table[4,3] = n24
+	data_table[4,4] = F4_dot
+	
+	
+	with_terminal() do
+		
+		# setup the table -
+		header_row = (["Stream","n1,i","n2,i","Vol Flow Rate"],["","[mmol/min]","[mmol/min]","[L/min]"]);
+		
+		# write the table -
+		pretty_table(data_table; header=header_row)
+	end
+end
 
 # ╔═╡ ccee2491-9a2e-45d2-a607-f27b54ad66ae
 md"""
@@ -110,7 +184,7 @@ $$\dot{m}_{2} = \dot{m}_{3} + \dot{m}_{4}$$
 """
 
 # ╔═╡ c3967197-6c0c-4f7f-ac02-20a95ba921ca
-
+# fill me in
 
 # ╔═╡ 00a50f4a-838e-4f5a-b01d-0a754ca5a256
 md"""
@@ -129,7 +203,7 @@ $$\dot{W}_{sh} = \dot{m}_{1}\left(H_{2}-H_{1}\right)$$.
 """
 
 # ╔═╡ 1f41d0db-abb1-48c6-8651-655ba4f73686
-
+# fill me in
 
 # ╔═╡ ddaabaaa-f1dd-4853-9412-f7972dc4dc6d
 md"""
@@ -151,15 +225,38 @@ $$\dot{Q} = \dot{m}_{3}H_{3} + \dot{m}_{4}H_{4} - \dot{m}_{2}H_{2}$$
 """
 
 # ╔═╡ 8196a83d-b705-479a-b8fd-551f1ef95bd3
+# fill me in
 
+# ╔═╡ db72171c-3964-4992-8d00-c9f8217a829d
+html"""
+<style>
+main {
+    max-width: 1200px;
+    width: 95%;
+    margin: auto;
+    font-family: "Roboto, monospace";
+}
+
+a {
+    color: blue;
+    text-decoration: none;
+}
+
+.H1 {
+    padding: 0px 30px;
+}
+</style>"""
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
+PrettyTables = "08abe8d2-0d0c-5749-adfa-8a2ac140af0d"
 
 [compat]
 PlutoUI = "~0.7.16"
+PrettyTables = "~1.2.2"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -169,9 +266,30 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 [[Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 
+[[Crayons]]
+git-tree-sha1 = "3f71217b538d7aaee0b69ab47d9b7724ca8afa0d"
+uuid = "a8cc5b0e-0ffa-5ad4-8c14-923d3ee1735f"
+version = "4.0.4"
+
+[[DataAPI]]
+git-tree-sha1 = "cc70b17275652eb47bc9e5f81635981f13cea5c8"
+uuid = "9a962f9c-6df0-11e9-0e5d-c546b8b5ee8a"
+version = "1.9.0"
+
+[[DataValueInterfaces]]
+git-tree-sha1 = "bfc1187b79289637fa0ef6d4436ebdfe6905cbd6"
+uuid = "e2d170a0-9d28-54be-80f0-106bbe20a464"
+version = "1.0.0"
+
 [[Dates]]
 deps = ["Printf"]
 uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
+
+[[Formatting]]
+deps = ["Printf"]
+git-tree-sha1 = "8339d61043228fdd3eb658d86c926cb282ae72a8"
+uuid = "59287772-0a20-5a39-b81b-1366585eb4c0"
+version = "0.4.2"
 
 [[Hyperscript]]
 deps = ["Test"]
@@ -194,11 +312,23 @@ version = "0.2.2"
 deps = ["Markdown"]
 uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 
+[[IteratorInterfaceExtensions]]
+git-tree-sha1 = "a3f24677c21f5bbe9d2a714f95dcd58337fb2856"
+uuid = "82899510-4779-5014-852e-03e436cf321d"
+version = "1.0.0"
+
 [[JSON]]
 deps = ["Dates", "Mmap", "Parsers", "Unicode"]
 git-tree-sha1 = "8076680b162ada2a031f707ac7b4953e30667a37"
 uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 version = "0.21.2"
+
+[[Libdl]]
+uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
+
+[[LinearAlgebra]]
+deps = ["Libdl"]
+uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
 [[Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
@@ -222,6 +352,12 @@ git-tree-sha1 = "4c8a7d080daca18545c56f1cac28710c362478f3"
 uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 version = "0.7.16"
 
+[[PrettyTables]]
+deps = ["Crayons", "Formatting", "Markdown", "Reexport", "Tables"]
+git-tree-sha1 = "69fd065725ee69950f3f58eceb6d144ce32d627d"
+uuid = "08abe8d2-0d0c-5749-adfa-8a2ac140af0d"
+version = "1.2.2"
+
 [[Printf]]
 deps = ["Unicode"]
 uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
@@ -241,6 +377,18 @@ uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
 [[Serialization]]
 uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
 
+[[TableTraits]]
+deps = ["IteratorInterfaceExtensions"]
+git-tree-sha1 = "c06b2f539df1c6efa794486abfb6ed2022561a39"
+uuid = "3783bdb8-4a98-5b6b-af9a-565f29a5fe9c"
+version = "1.0.1"
+
+[[Tables]]
+deps = ["DataAPI", "DataValueInterfaces", "IteratorInterfaceExtensions", "LinearAlgebra", "TableTraits", "Test"]
+git-tree-sha1 = "fed34d0e71b91734bf0a7e10eb1bb05296ddbcd0"
+uuid = "bd369af6-aec1-5ad0-b16a-f7cc5008161c"
+version = "1.6.0"
+
 [[Test]]
 deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
 uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
@@ -258,9 +406,10 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 # ╟─b56695f3-68c1-4b76-8cc8-bb57d7e34699
 # ╟─59a9a683-e2da-4690-9950-80e2bcedbb18
 # ╟─f198f507-e5ca-4ec1-a2bd-648965f94780
-# ╠═f1f4e379-7837-42f1-a7dd-391df25d542b
 # ╟─3e17b4fe-1025-471b-ba7e-f257d3f9ef0b
 # ╠═75e41abc-bf6b-42b6-a400-3e68b49e53a1
+# ╟─99d53a10-dc5e-43ae-8095-4ef594f9c420
+# ╟─51cf0922-fa58-4335-9f34-ae033203f4df
 # ╟─ccee2491-9a2e-45d2-a607-f27b54ad66ae
 # ╠═c3967197-6c0c-4f7f-ac02-20a95ba921ca
 # ╟─00a50f4a-838e-4f5a-b01d-0a754ca5a256
@@ -268,5 +417,6 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 # ╟─ddaabaaa-f1dd-4853-9412-f7972dc4dc6d
 # ╠═8196a83d-b705-479a-b8fd-551f1ef95bd3
 # ╠═828b5fdc-2f57-11ec-2ba2-bd6c394912fa
+# ╟─db72171c-3964-4992-8d00-c9f8217a829d
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
