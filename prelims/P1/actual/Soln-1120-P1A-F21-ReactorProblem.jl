@@ -184,7 +184,61 @@ $$\dot{m}_{2} = \dot{m}_{3} + \dot{m}_{4}$$
 """
 
 # ╔═╡ c3967197-6c0c-4f7f-ac02-20a95ba921ca
-# fill me in
+begin
+	
+	# setup problem -
+	m1_dot = 12.0 	# units: kg/min
+	m3_dot = 4.8 	# units: kg/min
+	
+	# reactor -
+	m2_dot = m1_dot
+	
+	# filter -
+	m4_dot = m2_dot - m3_dot
+	
+	nothing
+end
+
+# ╔═╡ 230abf7b-db83-49b9-a0d0-124aa2b328e5
+begin
+	
+	# initialize -
+	mass_data_table = zeros(4,4)
+	
+	# row 1
+	mass_data_table[1,1] = 1
+	mass_data_table[1,2] = 1.2
+	mass_data_table[1,3] = m1_dot
+	mass_data_table[1,4] = 120.9
+
+	# row 2
+	mass_data_table[2,1] = 2
+	mass_data_table[2,2] = 1.2
+	mass_data_table[2,3] = m2_dot
+	mass_data_table[2,4] = 200.9
+
+	# row 3
+	mass_data_table[3,1] = 3
+	mass_data_table[3,2] = 1.2
+	mass_data_table[3,3] = m3_dot
+	mass_data_table[3,4] = 125.0
+
+	# row 3
+	mass_data_table[4,1] = 4
+	mass_data_table[4,2] = 1.2
+	mass_data_table[4,3] = m4_dot
+	mass_data_table[4,4] = 260.0
+	
+	with_terminal() do 
+		
+		# setup the table -
+		mass_header_row = (["Stream","density","mdot_i","H"],["","[kg/L]","[kg/min]","[kJ/kg]"]);
+		
+		# write the table -
+		pretty_table(mass_data_table; header=mass_header_row)
+		
+	end
+end
 
 # ╔═╡ 00a50f4a-838e-4f5a-b01d-0a754ca5a256
 md"""
@@ -203,7 +257,19 @@ $$\dot{W}_{sh} = \dot{m}_{1}\left(H_{2}-H_{1}\right)$$.
 """
 
 # ╔═╡ 1f41d0db-abb1-48c6-8651-655ba4f73686
-# fill me in
+begin
+	# alias the H's
+	H₁ = mass_data_table[1,4];
+	H₂ = mass_data_table[2,4];
+	H₃ = mass_data_table[3,4];
+	H₄ = mass_data_table[4,4];
+	
+	# compute the ΔH -
+	ΔH = (H₂ - H₁)
+	
+	# compute the work -
+	W = m1_dot*ΔH
+end
 
 # ╔═╡ ddaabaaa-f1dd-4853-9412-f7972dc4dc6d
 md"""
@@ -225,7 +291,10 @@ $$\dot{Q} = \dot{m}_{3}H_{3} + \dot{m}_{4}H_{4} - \dot{m}_{2}H_{2}$$
 """
 
 # ╔═╡ 8196a83d-b705-479a-b8fd-551f1ef95bd3
-# fill me in
+begin
+	# compute the Qdot -
+	Q_dot = m3_dot*H₃ + m4_dot*H₄ - m2_dot*H₂
+end
 
 # ╔═╡ db72171c-3964-4992-8d00-c9f8217a829d
 html"""
@@ -408,10 +477,11 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 # ╟─f198f507-e5ca-4ec1-a2bd-648965f94780
 # ╟─3e17b4fe-1025-471b-ba7e-f257d3f9ef0b
 # ╠═75e41abc-bf6b-42b6-a400-3e68b49e53a1
-# ╟─99d53a10-dc5e-43ae-8095-4ef594f9c420
+# ╠═99d53a10-dc5e-43ae-8095-4ef594f9c420
 # ╟─51cf0922-fa58-4335-9f34-ae033203f4df
 # ╟─ccee2491-9a2e-45d2-a607-f27b54ad66ae
 # ╠═c3967197-6c0c-4f7f-ac02-20a95ba921ca
+# ╟─230abf7b-db83-49b9-a0d0-124aa2b328e5
 # ╟─00a50f4a-838e-4f5a-b01d-0a754ca5a256
 # ╠═1f41d0db-abb1-48c6-8651-655ba4f73686
 # ╟─ddaabaaa-f1dd-4853-9412-f7972dc4dc6d
