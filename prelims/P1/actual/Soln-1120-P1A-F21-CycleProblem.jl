@@ -141,7 +141,12 @@ which gives:
 
 $$\sum_{u=1}^{2}\sum_{s=1}^{2}v_{su}H_{s} = 0$$
 
+We could extend this to higher-order cycles, but the summation relationship will continue to hold.
+
 """
+
+# ╔═╡ b80e0292-e9cf-4653-b63c-8fbf48bb47c9
+
 
 # ╔═╡ 8b76c6e5-3623-4dc4-a0bd-bf442f0e5195
 html"""
@@ -274,6 +279,7 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 # ╟─ac4ee87c-9b2b-441c-b084-5fdd80a16b02
 # ╟─61e17d6d-a898-408a-9d22-6c74ca8a8d8f
 # ╟─5ff6b6c8-b772-48b6-9030-c2911a2753ae
+# ╠═b80e0292-e9cf-4653-b63c-8fbf48bb47c9
 # ╟─346a0b1f-0c48-4837-99e0-7bfd8b6d9def
 # ╟─8b76c6e5-3623-4dc4-a0bd-bf442f0e5195
 # ╟─00000000-0000-0000-0000-000000000001
