@@ -78,6 +78,69 @@ Yes, for a cyclic process the summation relationship is always true.
 __Why__? Enthaply is a _state function_ that is path independent, meaning, changes in enthalpy do not depend upon the path taken only on the endpoints. Thus, since we have a cyclic process we always end where we start, hence no overall enthalpy change. 
 
 __Hmmm__: I don't know that about Enthalpy (yet), so how should we approach this problem?
+If you create _any_ steady-state cyclic process where which unit has a single input, and a single output, the enthaply terms will sum to zero, hence the heat and work summation expression holds. In symbols, for _any_ steady-state cyclic process where which unit has a single input, and a single output, the following must be true:
+
+$$\sum_{u}\sum_{s}v_{su}\dot{m}_{s}H_{s} = 0$$
+
+where $v_{su}$ denotes a direction parameter that relates stream $s$ and unit $u$; 
+
+* if stream $s$ __enters__ unit $u$ then $v_{su}$ = 1
+* if stream $s$ __exits__ unit $u$ then $v_{su}$ = -1
+* if stream $s$ __is not connected to__ unit $u$ then $v_{su}$ = 0
+
+Since each unit has a single input and output, $\dot{m}_{1}=\dot{m}_{2}=\dots\equiv{\dot{m}}$ which gives:
+
+$$\dot{m}\left(\sum_{u}\sum_{s}v_{su}H_{s}\right) = 0$$
+
+We know that $\dot{m}\neq{0}$, thus:
+
+$$\left(\sum_{u}\sum_{s}v_{su}H_{s}\right) = 0$$
+"""
+
+# ╔═╡ df49d1e4-6ba1-4e8f-80fa-4d9833ef6d0a
+md"""
+##### Test cases:
+"""
+
+# ╔═╡ a80b3623-ebdc-4f32-a120-4f24087c446d
+md"""$(PlutoUI.LocalResource("./figs/Fig-Linear-TwoNode-F21.png"))
+__Test case I__: Linear two node network
+"""
+
+# ╔═╡ ac4ee87c-9b2b-441c-b084-5fdd80a16b02
+md"""
+Let's run out the sum for the linear two-node network test case. For this case:
+
+$$\sum_{u=1}^{2}\sum_{s=1}^{3}v_{su}H_{s} = \left(v_{11}+v_{12}\right)H_{1} + \left(v_{21}+v_{22}\right)H_{2}+\left(v_{31}+v_{32}\right)H_{3}$$
+
+* Value for $$\left(v_{11}+v_{12}\right)$$ = 1
+* Value for $$\left(v_{21}+v_{22}\right)$$ = 0
+* Value for $$\left(v_{31}+v_{32}\right)$$ = -1
+
+which gives: 
+
+$$\sum_{u=1}^{2}\sum_{s=1}^{3}v_{su}H_{s} = \left(H_{1} - H_{3}\right)\neq{0}$$
+
+"""
+
+# ╔═╡ 61e17d6d-a898-408a-9d22-6c74ca8a8d8f
+md"""$(PlutoUI.LocalResource("./figs/Fig-Cycle-TwoNode-F21.png"))
+__Test case II__: Two node cyclic network
+"""
+
+# ╔═╡ 5ff6b6c8-b772-48b6-9030-c2911a2753ae
+md"""
+Let's run out the sum for the cyclic two-node network test case. For this case:
+
+$$\sum_{u=1}^{2}\sum_{s=1}^{2}v_{su}H_{s} = \left(v_{11}+v_{12}\right)H_{1} + \left(v_{21}+v_{22}\right)H_{2}$$
+
+* Value for $$\left(v_{11}+v_{12}\right)$$ = 0
+* Value for $$\left(v_{21}+v_{22}\right)$$ = 0
+
+which gives: 
+
+$$\sum_{u=1}^{2}\sum_{s=1}^{2}v_{su}H_{s} = 0$$
+
 """
 
 # ╔═╡ 8b76c6e5-3623-4dc4-a0bd-bf442f0e5195
@@ -206,7 +269,12 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 # ╟─2172328e-0de6-4ede-9acb-cd89cf545e9a
 # ╟─659ab1d4-1015-465d-af19-d896070367e8
 # ╟─828b05ea-2f9d-4c09-9dc4-d0332a64e607
-# ╠═346a0b1f-0c48-4837-99e0-7bfd8b6d9def
+# ╟─df49d1e4-6ba1-4e8f-80fa-4d9833ef6d0a
+# ╟─a80b3623-ebdc-4f32-a120-4f24087c446d
+# ╟─ac4ee87c-9b2b-441c-b084-5fdd80a16b02
+# ╟─61e17d6d-a898-408a-9d22-6c74ca8a8d8f
+# ╟─5ff6b6c8-b772-48b6-9030-c2911a2753ae
+# ╟─346a0b1f-0c48-4837-99e0-7bfd8b6d9def
 # ╟─8b76c6e5-3623-4dc4-a0bd-bf442f0e5195
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
