@@ -196,6 +196,7 @@ begin
 	# filter -
 	m4_dot = m2_dot - m3_dot
 	
+	# show -
 	nothing
 end
 
