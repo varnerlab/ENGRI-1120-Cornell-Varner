@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.16.1
+# v0.16.4
 
 using Markdown
 using InteractiveUtils
@@ -97,14 +97,14 @@ begin
 	# data given in the problem setup -
 	n11 = 100.0 	# units: mol/min
 	n21 = 0.0 		# units: mol/min
-	n14 = 14.0 		# units: mol/min
 	n24 = 0.0 		# units: mol/min
 	F1_dot = 10.0 	# units: L/min
 	F3_dot = 4.0 	# units: L/min
 	
-	# reaction terms -
-	r1_hat = 3.0    # units: mmol/min-L
+	# reaction terms -> change for γ and δ versions of prelim
+	r1_hat = 4.0    # units: mmol/min-L
 	V = 14.0 		# units: L
+	n14 = 8.0 		# units: mol/min
 	
 	# show - 
 	nothing 

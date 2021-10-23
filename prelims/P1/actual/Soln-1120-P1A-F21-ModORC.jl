@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.16.3
+# v0.16.4
 
 using Markdown
 using InteractiveUtils
@@ -50,15 +50,54 @@ You get the $H$, $S$, $T$ and $P$ values from the problem statement, and from th
 # ╔═╡ f561e6bd-63d0-43db-9bcb-5135afdfe7d4
 begin
 	
+# 	# setup the state table -
+# 	state_table_data_array = zeros(4,5)
+	
+# 	# setup each row -
+# 	# row 1:
+# 	state_table_data_array[1,1] = -100.0
+# 	state_table_data_array[1,2] = 2200.0
+# 	state_table_data_array[1,3] = 78.1
+# 	state_table_data_array[1,4] = 0.4716
+# 	state_table_data_array[1,5] = 0.0
+	
+# 	# row 2:
+# 	state_table_data_array[2,1] = 20.0
+# 	state_table_data_array[2,2] = 2200.0
+# 	state_table_data_array[2,3] = 307.2
+# 	state_table_data_array[2,4] = 1.4038
+# 	state_table_data_array[2,5] = 1.0
+	
+# 	# row 3:
+# 	state_table_data_array[3,1] = -100.0
+# 	state_table_data_array[3,2] = 48.0
+# 	state_table_data_array[3,3] = 240.3
+# 	state_table_data_array[3,4] = 1.4038
+# 	state_table_data_array[3,5] = 0.97
+	
+# 	# row 4:
+# 	state_table_data_array[4,1] = -100.0
+# 	state_table_data_array[4,2] = 48.0
+# 	state_table_data_array[4,3] = 78.1
+# 	state_table_data_array[4,4] = 0.4716
+# 	state_table_data_array[4,5] = 0.0
+	
+	# show -
+	nothing 
+end
+
+# ╔═╡ 2cef6853-6624-428a-81c4-4e8fdb8727f7
+begin
+	
 	# setup the state table -
 	state_table_data_array = zeros(4,5)
 	
 	# setup each row -
 	# row 1:
-	state_table_data_array[1,1] = -100.0
+	state_table_data_array[1,1] = -90.0
 	state_table_data_array[1,2] = 2200.0
-	state_table_data_array[1,3] = 78.1
-	state_table_data_array[1,4] = 0.4716
+	state_table_data_array[1,3] = 86.8
+	state_table_data_array[1,4] = 0.5184
 	state_table_data_array[1,5] = 0.0
 	
 	# row 2:
@@ -69,17 +108,17 @@ begin
 	state_table_data_array[2,5] = 1.0
 	
 	# row 3:
-	state_table_data_array[3,1] = -100.0
-	state_table_data_array[3,2] = 48.0
-	state_table_data_array[3,3] = 240.3
+	state_table_data_array[3,1] = -90.0
+	state_table_data_array[3,2] = 90.0
+	state_table_data_array[3,3] = 249.0
 	state_table_data_array[3,4] = 1.4038
-	state_table_data_array[3,5] = 0.97
+	state_table_data_array[3,5] = 0.99
 	
 	# row 4:
-	state_table_data_array[4,1] = -100.0
-	state_table_data_array[4,2] = 48.0
-	state_table_data_array[4,3] = 78.1
-	state_table_data_array[4,4] = 0.4716
+	state_table_data_array[4,1] = -90.0
+	state_table_data_array[4,2] = 90.0
+	state_table_data_array[4,3] = 86.8
+	state_table_data_array[4,4] = 0.5184
 	state_table_data_array[4,5] = 0.0
 	
 	# show -
@@ -100,9 +139,9 @@ end
 # do this computation in matrix - vector form
 begin
 
-	# setup process connectivity array A -
-	m_dot = 1.25 	# units: kg/s
-	ηₜ = 0.70 		# units: dimensionless
+	# setup process connectivity array A - change for γ and δ
+	m_dot = 1.5 	# units: kg/s
+	ηₜ = 0.75 		# units: dimensionless
 	A = [-m_dot m_dot 0; 0 -m_dot m_dot ; m_dot 0 -m_dot];
 	
 	# get the H's
@@ -172,7 +211,7 @@ md"""
 begin
 	
 	# what is the fraction of heat that we are going to recycle?
-	α = 0.15
+	α = 0.10
 	
 	# What is the amount of recycled heat -
 	Q_dot_recycled = α*abs(bV[3])
@@ -362,7 +401,8 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 # ╟─796a9adb-7573-4ec1-881f-ab39d98032ae
 # ╟─d65087c7-1b55-4aeb-bda6-fd4039b64863
 # ╟─1d0dbac8-8a12-4ba0-862b-e7a2860e2b6e
-# ╟─f561e6bd-63d0-43db-9bcb-5135afdfe7d4
+# ╠═f561e6bd-63d0-43db-9bcb-5135afdfe7d4
+# ╠═2cef6853-6624-428a-81c4-4e8fdb8727f7
 # ╠═50bcce4a-981b-4b70-9fa6-98ad9f7b39e4
 # ╠═d2bd39f1-8d81-404d-bea6-70ea8e19cea1
 # ╠═37101508-f1a7-42ed-b446-a9b21001c7b0
