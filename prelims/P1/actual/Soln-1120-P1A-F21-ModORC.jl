@@ -110,7 +110,7 @@ begin
 	# row 3:
 	state_table_data_array[3,1] = -90.0
 	state_table_data_array[3,2] = 90.0
-	state_table_data_array[3,3] = 249.0
+	state_table_data_array[3,3] = 249.
 	state_table_data_array[3,4] = 1.4038
 	state_table_data_array[3,5] = 0.99
 	
