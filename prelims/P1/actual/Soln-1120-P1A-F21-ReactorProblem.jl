@@ -210,13 +210,13 @@ begin
 	mass_data_table[1,1] = 1
 	mass_data_table[1,2] = 1.2
 	mass_data_table[1,3] = m1_dot
-	mass_data_table[1,4] = 120.9
+	mass_data_table[1,4] = 120.0
 
 	# row 2
 	mass_data_table[2,1] = 2
 	mass_data_table[2,2] = 1.2
 	mass_data_table[2,3] = m2_dot
-	mass_data_table[2,4] = 200.9
+	mass_data_table[2,4] = 200.0
 
 	# row 3
 	mass_data_table[3,1] = 3
@@ -482,7 +482,7 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 # ╟─51cf0922-fa58-4335-9f34-ae033203f4df
 # ╟─ccee2491-9a2e-45d2-a607-f27b54ad66ae
 # ╠═c3967197-6c0c-4f7f-ac02-20a95ba921ca
-# ╟─230abf7b-db83-49b9-a0d0-124aa2b328e5
+# ╠═230abf7b-db83-49b9-a0d0-124aa2b328e5
 # ╟─00a50f4a-838e-4f5a-b01d-0a754ca5a256
 # ╠═1f41d0db-abb1-48c6-8651-655ba4f73686
 # ╟─ddaabaaa-f1dd-4853-9412-f7972dc4dc6d

@@ -49,7 +49,8 @@ You get the $H$, $S$, $T$ and $P$ values from the problem statement, and from th
 
 # ╔═╡ f561e6bd-63d0-43db-9bcb-5135afdfe7d4
 begin
-	
+
+# 	# Version: δ
 # 	# setup the state table -
 # 	state_table_data_array = zeros(4,5)
 	
@@ -88,6 +89,8 @@ end
 
 # ╔═╡ 2cef6853-6624-428a-81c4-4e8fdb8727f7
 begin
+	
+	# Version: γ (don't forget to change mdot, ηₜ and α)
 	
 	# setup the state table -
 	state_table_data_array = zeros(4,5)
