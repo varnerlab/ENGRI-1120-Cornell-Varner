@@ -11,9 +11,45 @@ begin
 	using Plots
 end
 
+# ╔═╡ 96b18fdb-057c-4937-a560-46691472c30b
+html"<button onclick='present()'>present</button>"
+
+# ╔═╡ 36c7d953-89a5-4e42-bb94-eacb9c89c1d6
+md"""
+#### Example: Direct Calculation of the Total Gibbs Energy for a Reaction Mixture
+"""
+
 # ╔═╡ 3b5be900-2f53-11ec-1477-d93bea95f307
 md"""
-Explnation goes here. We lookup data from [eQuilibrator](https://equilibrator.weizmann.ac.il)
+One method to compute the equilibrium extent of reaction is to _directly_ compute the Gibbs energy for the reaction mixture, and the search over the reaction extent $\epsilon$ that minimizes the Gibbs energy. For a reaction mixture of $\mathcal{M}$ chemical components, the Gbbs energy can be written as the sum of the partial molar Gibbs energies (what we called G-bar) at constant T,P:
+
+$$\hat{G} = \sum_{i=1}^{\mathcal{M}}\bar{G}_{i}n_{i}$$
+
+where $\hat{G}$ denotes the total Gibbs energy for the reaction mixture (units: kJ), $\bar{G}_{i}$ denotes the partial molar Gibbs energy for chemical component $i$ (units: kJ/mol) and $n_{i}$ denotes the number of mols of chemical component $i$. From lecture we know that:
+
+$$\bar{G}_{i} = G_{i}^{\circ} + RT\ln\hat{a}_{i}$$
+
+where $G_{i}^{\circ}$ denotes the Gibbs energy for pure component $i$ at a reference state, and $\hat{a}_{i}$ denotes the ratio of fugacities (mixture at reaction T,P/pure component $i$ at reference conditions). We can subsitute $\bar{G}_{i}$ into the expression for $\hat{G}$, and after some algebraic magic, we get:
+
+$$\epsilon_{1}\frac{\Delta{G}^{\circ}}{RT}+\sum_{i=1}^{\mathcal{M}}\left(n_{i}^{\circ}+\sigma_{i1}\epsilon_{1}\right)\ln\hat{a}_{i} = \frac{1}{RT}\left(\hat{G}-\sum_{i=1}^{\mathcal{M}}n_{i}^{\circ}G_{i}^{\circ}\right)$$
+
+We need to search for $\epsilon_{1}$ such that the total Gibbs energy $\hat{G}$ is small.
+"""
+
+# ╔═╡ 252aaa18-90c6-4204-b599-5cd897cd99e3
+
+
+# ╔═╡ c080346b-7c29-4d8e-84b8-6d14e0725ca4
+md"""
+Example reaction:
+"""
+
+# ╔═╡ f0a0cf9e-f908-4a4c-8be1-4bcdd0d8d572
+md"""$(PlutoUI.LocalResource("./figs/Fig-G6P-F6P.png"))"""
+
+# ╔═╡ 4c165241-5170-4398-869f-4afd92d517c7
+md"""
+To illustrate this idea, let's consider the liquid phase conversion of Glucose-6-Phosphate (G6P) to Fructose-6-Phosphate (F6P) in which we assume _ideal_ liquid phase behavior. We lookup thermodynamic data (the $G_{i}^{\circ}$ values) from [eQuilibrator](https://equilibrator.weizmann.ac.il), and use Julia to compute the total Gibbs energy $\hat{G}$.
 """
 
 # ╔═╡ fb87455c-7dcb-4a6b-8596-479261cbd6e6
@@ -55,6 +91,11 @@ begin
 	# show -
 	nothing
 end
+
+# ╔═╡ 549509d9-3779-456e-8a62-bd0f08cacb7b
+md"""
+Let's use the [Optim.jl](https://github.com/JuliaNLSolvers/Optim.jl) package to recast that as a _constrained_ optimization problem 
+"""
 
 # ╔═╡ 79de0ffd-43f0-4bee-98d5-5712ae2f6a46
 function objective_function(epsilon,parameters)
@@ -129,7 +170,7 @@ end
 begin
 	
 	# Use the answer from Method 2 as a starting point 
-	xinitial = [0.01]
+	xinitial = [0.9999]
 	
 	# setup bounds -
 	L = 0.00001
@@ -1147,13 +1188,20 @@ version = "0.9.1+5"
 """
 
 # ╔═╡ Cell order:
-# ╠═3b5be900-2f53-11ec-1477-d93bea95f307
+# ╟─96b18fdb-057c-4937-a560-46691472c30b
+# ╟─36c7d953-89a5-4e42-bb94-eacb9c89c1d6
+# ╟─3b5be900-2f53-11ec-1477-d93bea95f307
+# ╟─252aaa18-90c6-4204-b599-5cd897cd99e3
+# ╟─c080346b-7c29-4d8e-84b8-6d14e0725ca4
+# ╟─f0a0cf9e-f908-4a4c-8be1-4bcdd0d8d572
+# ╟─4c165241-5170-4398-869f-4afd92d517c7
 # ╠═fb87455c-7dcb-4a6b-8596-479261cbd6e6
 # ╠═f53e354a-a90e-4479-bc41-56c948168b9a
 # ╠═7ee8a50e-96bf-4c21-b1c1-a980e2901dea
 # ╟─d3c93901-0ddb-4443-aa33-a0e5910bb418
 # ╟─7d87d812-70ed-4d1a-bdc7-e192211e8c74
 # ╟─3bb7e4f9-b807-4646-9845-45626298db2b
+# ╟─549509d9-3779-456e-8a62-bd0f08cacb7b
 # ╠═0e90ee0d-1ef4-49c8-97d5-1ade387d1520
 # ╠═cef46f2e-106e-41a7-b820-03b73b9d4cb8
 # ╠═79de0ffd-43f0-4bee-98d5-5712ae2f6a46
