@@ -32,7 +32,7 @@ __Assumptions__:
 __Compute__:
   * (a) Compute all state (mol) values at the reaction conditions
   * (b) Starting from the general equilibrium expression for a single vapor phase reaction, estimate a value for $K$ for R1 at T = 298.15 K and system pressure.
-  * (c) Estimate the value of the Gibbs energy of reaction $\Delta{G}^{\circ}$ (J/mol) from the equilibrium constant $K$. Is the reaction: favorable or not favorable?
+  * (c) Estimate the value of the Gibbs energy of reaction $\Delta{G}^{\circ}$ (kJ/mol) from the equilibrium constant $K$. Is the reaction: favorable or not favorable?
 """
 
 # ╔═╡ 861c1cf4-ce56-43ec-bca1-6974d72240f5
@@ -174,8 +174,8 @@ begin
 	# use the IGL to estimate the equilibrium pressure -
 	V = 20.0 					# units: L
 	T = 298.15 					# units: K
-	R = (8.314)*10^(-2)			# units: L bar mol$^{-1}$ K$^{-1}$
-	P = (n_total*R*T)/(V)		# units: bar
+	R_bar = (8.314)*10^(-2)			# units: L bar mol$^{-1}$ K$^{-1}$
+	P = (n_total*R_bar*T)/(V)		# units: bar
 	
 	# display the pressure -
 	with_terminal() do
@@ -221,9 +221,9 @@ $$\Delta{G}^{\circ} = RT\ln K$$
 
 # ╔═╡ 22ce61af-1a3d-4214-8b98-dc463e3d61b8
 with_terminal() do
-	
+	R = 8.314*(1/1000) # units: kJ/mol-K
 	ΔG = -R*T*log(K)
-	println("ΔG = $(ΔG) J/mol")
+	println("ΔG = $(ΔG) kJ/mol")
 end
 
 # ╔═╡ 7bfe56b8-3639-11ec-1f61-9d52526c146d
