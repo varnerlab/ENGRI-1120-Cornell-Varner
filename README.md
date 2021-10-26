@@ -24,11 +24,17 @@ This repository holds example problems discussed in lecture. The problems are st
 1. From Pluto, open one of the `.jl` notebook files located in the `ENGRI-1120-Cornell-Varner/notebooks/` directory—enjoy!
 
 ### Notebooks for Lecture Examples
+
+#### Material/mass balance examples
+
  * [Example notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-HFCS.jl.html): 
 High-Fructose Corn Syrup (HFCS) example develops mass balances around a reactor in which a sugar S is converted to a product P by Enzyme E. 
 
 * [Example notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-Chip.jl.html):
 High-Fructose Corn Syrup (HFCS) example uses concentration balances and kinetic expressions for the reaction rates to model the performance of a reactor in which a sugar S is converted to a product P by Enzyme E. 
+
+
+#### Net Present Value (NPV) and the Time Value of Money (TVM) examples
 
 * [Example notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-DiscountRate.jl.html):
 Discount rate example which discusses the time value of money (a dollar today is worth more than a dollar T days in the future).
@@ -36,14 +42,26 @@ Discount rate example which discusses the time value of money (a dollar today is
 * [Example notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-NPV.jl.html):
 Net Present Value (NPV) example taken from [MIT 15.401](https://ocw.mit.edu/courses/sloan-school-of-management/15-401-finance-theory-i-fall-2008/). Should we install that new computer controlled lighting system? I don't know, let's compute the NPV and find out. 
 
+#### Power Generation and Cooling Cycle examples
+
 * [Example notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-LostWork-Turbine.jl.html): Lost work example for an adiabatic turbine in the [Rankine Power Generation Cycle](https://en.wikipedia.org/wiki/Rankine_cycle). 
 We use the open first and second law balances to compute the work lost from an inefficient turbine. 
 
 * [Example notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-ThrottleValve.jl.html): Analysis of the throttle valve operation in the [vapor compression refrigeration cycle (VCRC)](https://en.wikipedia.org/wiki/Vapor-compression_refrigeration).
 
+#### Flash Separation and VLE examples
+
 * [Example notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-FlashSeparation.jl.html): How can we separate a mixture with no moving parts? We use a [Flash Drum](https://en.wikipedia.org/wiki/Vapor–liquid_separator) which works in a similar way to the throttle valve of the VCRC. Its not magic, its just physics!
 
 * [Example notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-GraphicalFlash.jl.html): We revisit the previous flash separation problem and develop the solution graphically using a Pressure composition (Pxy) phase diagram.
+
+#### Chemical Reaction Equilibrium (CRE) examples
+
+* [Example notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-LiqEqConstant.jl.html): In this example we compute the equilibrium extent of reaction for several ideal liquid phase reactions in central carbon metabolism.
+
+* [Example notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-GasEqConstant.jl.html): In this example we compute the composition, equilibrium constant and Gibbs reaction energy for a single ideal reaction in the gas phase.
+  
+* [Example notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-DirectGibbsMin.jl.html): In this example we compute the equilibrium extent of reaction in a single ideal liquid phase reaction by directly minimizing the total Gibbs energy.
 
 ### Solution Notebooks for Practice Prelim 1
 The notebooks for practice prelim 1 solutions can be found in the `prelims/P1/practice` directory.
