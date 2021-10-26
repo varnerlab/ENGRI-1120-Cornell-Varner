@@ -182,7 +182,7 @@ end
 begin
 	
 	# which example are we doing?
-	example_index = 3
+	example_index = 1
 	
 	# Setup an initial guess for ϵ -
 	ϵ_initial_guess = [0.9999]
