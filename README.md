@@ -73,5 +73,8 @@ Static HTML versions of the notebooks can be found here:
 
 ### Solution Notebooks for Actual Prelim 1
 The notebooks for actual prelim 1 solutions can be found in the `prelims/P1/actual` directory.
-Static HTML versions of the notebooks will be posted coming soon.
+Static HTML versions of the notebooks can be found here:
 
+* [Solution notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Soln-1120-P1A-ReactorProblem.jl.html) Reactor problem for Prelim 1
+* [Solution notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Soln-1120-P1A-ModORC.jl.html) Modified organic Rankine Cycle problem from Prelim 1
+* [Solution notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Soln-1120-P1A-CycleProblem.jl.html) Three component cycle analysis question for Prelim 1
