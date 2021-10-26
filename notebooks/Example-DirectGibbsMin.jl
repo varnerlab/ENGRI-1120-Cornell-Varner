@@ -11,9 +11,6 @@ begin
 	using Plots
 end
 
-# ╔═╡ 96b18fdb-057c-4937-a560-46691472c30b
-html"<button onclick='present()'>present</button>"
-
 # ╔═╡ 36c7d953-89a5-4e42-bb94-eacb9c89c1d6
 md"""
 #### Example: Direct Calculation of the Total Gibbs Energy for a Reaction Mixture
@@ -1188,7 +1185,6 @@ version = "0.9.1+5"
 """
 
 # ╔═╡ Cell order:
-# ╟─96b18fdb-057c-4937-a560-46691472c30b
 # ╟─36c7d953-89a5-4e42-bb94-eacb9c89c1d6
 # ╟─3b5be900-2f53-11ec-1477-d93bea95f307
 # ╟─252aaa18-90c6-4204-b599-5cd897cd99e3
