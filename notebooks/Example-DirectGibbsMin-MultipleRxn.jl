@@ -66,8 +66,8 @@ begin
 	parameters_dict = Dict{String,Any}()
 
 	# what is my system dimensions?
-	ℳ = 8 
-	ℛ = 5
+	ℳ = 8 # number of metabolites
+	ℛ = 5 # number of reactions
 
 	# ΔG_formation data -
 	G_formation_array = zeros(ℳ) 
@@ -109,12 +109,14 @@ end
 
 # ╔═╡ ae759f56-8a6d-4ef6-8aba-5ceb2c77a270
 glucose_data = [
+
+	# time (hr)		# mean (mM) 	# σ (mM)
 	0.0000000e+00   3.5900000e+01   2.8800000e+00 	;
-   2.5000000e-01   2.5010000e+01   3.1600000e+00 	;
-   7.5000000e-01   8.1600000e+00   2.7200000e+00 	;
-   1.0000000e+00   1.7700000e+00   1.8700000e+00  	;
-   2.0000000e+00   0.0000000e+00   0.0000000e+00 	;
-   3.0000000e+00   0.0000000e+00   0.0000000e+00 	;
+   	2.5000000e-01   2.5010000e+01   3.1600000e+00 	;
+   	7.5000000e-01   8.1600000e+00   2.7200000e+00 	;
+   	1.0000000e+00   1.7700000e+00   1.8700000e+00  	;
+   	2.0000000e+00   0.0000000e+00   0.0000000e+00 	;
+   	3.0000000e+00   0.0000000e+00   0.0000000e+00 	;
 ]
 
 # ╔═╡ f628eec6-906a-4ab9-b9e7-8df3e5667380
@@ -280,16 +282,24 @@ n_final_array_loop[:,1]
 
 # ╔═╡ 05c4c0a7-4ba1-44c8-948d-e0b4537eb984
 begin
-	
-	
-	species_label_array = ["glucose","g6p","atp","adp","f6p","f16bp","dhap","ga3p"]
+
+	# plot the data -
+	data_time_index = 5
+	species_label_array = ["glucose (simulation)","g6p","atp","adp","f6p","f16bp","dhap","ga3p"]
 	c_array = (1/V)*n_final_array_loop[:,2:end]*(1e3)*(1/ΔG_sf)
-	plot(n_final_array_loop[:,1], c_array[:,1],label=species_label_array[1],legend=:right,lw=2)
+	plot(n_final_array_loop[:,1], c_array[:,1],label=species_label_array[1],legend=:right,lw=2, color="red")
 	for index = 2:ℳ
 		#plot!(n_final_array_loop[:,1], c_array[:,index],label=species_label_array[index],lw=2)
 	end
 
-	scatter!(glucose_data[1:4,1], glucose_data[1:4,2],lw=4,mc="black", ms=4, label="glucose (measured)")
+	# data_lb = glucose_data[1:data_time_index,2] .- glucose_data[1:data_time_index,3]
+	# data_ub = glucose_data[1:data_time_index,2] .+ glucose_data[1:data_time_index,3]
+	# plot!(glucose_data[1:data_time_index,1],data_lb, fillrange = data_ub, fillalpha = 0.10, fillcolor="lightgray")
+	# plot!(glucose_data[1:data_time_index,1],data_lb,lw=1,color="darkgray",label="upper bound")
+	# plot!(glucose_data[1:data_time_index,1],data_ub,lw=1,color="darkgray", label="lower bound")
+
+	scatter!(glucose_data[1:data_time_index,1], glucose_data[1:data_time_index,2],lw=4,mc="black", ms=4, 
+		label="glucose (measured)", yerr=glucose_data[1:data_time_index,3])
 	
 	xlabel!("Time (hr)")
 	ylabel!("Concentration (mM)")
