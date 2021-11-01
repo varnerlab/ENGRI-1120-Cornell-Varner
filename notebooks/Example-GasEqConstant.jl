@@ -215,7 +215,7 @@ $$\ln K = -\frac{\Delta{G}^{\circ}}{RT}$$
 
 which we can use to solve for ΔG$^{\circ}$ given that we know the equilibrium constant $K$:
 
-$$\Delta{G}^{\circ} = RT\ln K$$
+$$\Delta{G}^{\circ} = -RT\ln K$$
 
 """
 
