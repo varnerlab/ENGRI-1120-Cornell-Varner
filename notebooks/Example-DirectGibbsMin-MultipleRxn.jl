@@ -30,7 +30,7 @@ begin
 	# ΔG_formation data -
 	G_formation_array = zeros(8)
 	G_formation_array[1] = -409.4 	# 1 gluc kJ/mol
-	G_formation_array[2] = -1302.7 	# 2 gluc-6-p kJ/mol
+	G_formation_array[2] = -1304.7 	# 2 gluc-6-p kJ/mol
 	G_formation_array[3] = -2280.7 	# 3 atp kJ/mol
 	G_formation_array[4] = -1405.9 	# 4 adp kJ/mol
 	G_formation_array[5] = -1302.1 	# 5 fruc-6-p kJ/mol
@@ -127,11 +127,16 @@ with_terminal() do
 	S = parameters_dict["S"]
 	n_initial_array = parameters_dict["n_initial_array"]
 	n = n_initial_array + S*ϵ
-	println("Optim composition n = $(n)")
+	println("gluc = $(n[1]) mmol")
+	println("g6p = $(n[2]) mmol")
+	println("atp = $(n[3]) mmol")
+	println("adp = $(n[4]) mmol")
+	println("f6p = $(n[5]) mmol")
+	println("f16bp = $(n[6]) mmol")
+	println("dhap = $(n[7]) mmol")
+	println("ga3p = $(n[8]) mmol")
+	
 end
-
-# ╔═╡ 9cf6bc48-f2a6-4bb6-bcb6-112279c8d005
-objective_function(xinitial, parameters_dict)
 
 # ╔═╡ b15a83b0-3a9c-11ec-13e6-97c42e449ea5
 html"""
@@ -577,7 +582,6 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╠═72f0bca2-19ab-4a54-9f4d-acaf4e60174b
 # ╠═bc3a0eea-4dcd-4d4e-afaf-d859a7a2c170
 # ╠═03d54b0c-8ddf-4d51-8482-41d6d7b19500
-# ╠═9cf6bc48-f2a6-4bb6-bcb6-112279c8d005
 # ╠═f628eec6-906a-4ab9-b9e7-8df3e5667380
 # ╠═e4a751d6-b150-40fa-86b0-8e9be1db514c
 # ╟─b15a83b0-3a9c-11ec-13e6-97c42e449ea5
