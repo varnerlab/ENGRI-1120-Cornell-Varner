@@ -21,9 +21,10 @@ Calculate the equilibrium extent of reaction and the equilibrium concentrations 
 The pathway we are exploring can be found [here](https://www.genome.jp/kegg-bin/show_pathway?eco00010).
 
 __Assumption__
-* The extract has a constant V = 30.0μL
-* The extract acts like an _ideal_ solution
-* The _default_ metabolic settings on [eQuilibrator](https://equilibrator.weizmann.ac.il) are valid 
+* The cell free extract has a constant V = 30.0μL
+* The cell free extract acts like an _ideal_ liqud solution
+* The cell free reaction is at a constant T, P
+* The _default_ metabolic settings used by [eQuilibrator](https://equilibrator.weizmann.ac.il) are valid for this system
 """
 
 # ╔═╡ 44ee8543-b940-42c8-b4d7-6c98035617f2
@@ -35,7 +36,7 @@ $$\hat{G} = \sum_{i=1}^{\mathcal{M}}\bar{G}_{i}n_{i}$$
 
 becomes:
 
-$$\frac{\left(\hat{G}-\sum_{i=1}^{\mathcal{M}}n_{i}^{\circ}G_{i}^{\circ}\right)}{RT} = \sum_{j=1}^{\mathcal{R}}\left(\frac{\Delta{G}_{j}^{\circ}}{RT}\right) + \sum_{i=1}^{\mathcal{M}}n_{i}\ln\hat{a}_{i}$$
+$$\frac{\left(\hat{G}-\sum_{i=1}^{\mathcal{M}}n_{i}^{\circ}G_{i}^{\circ}\right)}{RT} = \sum_{j=1}^{\mathcal{R}}\epsilon_{j}\left(\frac{\Delta{G}_{j}^{\circ}}{RT}\right) + \sum_{i=1}^{\mathcal{M}}n_{i}\ln\hat{a}_{i}$$
 
 where the number of mol for species _i_ is given by:
 
@@ -54,17 +55,14 @@ T = 37.0 + 273.15; # units: K
 # ╔═╡ a2b97bbf-22c5-4590-af9c-817845b021eb
 V = 30*(1/1e6); # units: L
 
-# ╔═╡ 51519086-016a-4138-a20e-1e0466050e5d
-ΔG_sf = 1e9; # convert to mol to *mol
-
-# ╔═╡ e10fd2f0-ec19-4102-809c-2c8c40f63186
-R = 8.314*(1/1000)*(1/ΔG_sf); # units: kJ/nmol-K
-
 # ╔═╡ c87754ae-abec-495c-90df-c226b551cd19
 begin
 	# setup problem parameters -
 	parameters_dict = Dict{String,Any}()
 
+	# conversion factor -
+	ΔG_sf = 1e9; # convert to mol to *mol
+	
 	# what is my system dimensions?
 	ℳ = 8 # number of metabolites
 	ℛ = 5 # number of reactions
@@ -107,6 +105,9 @@ begin
 	nothing
 end
 
+# ╔═╡ e10fd2f0-ec19-4102-809c-2c8c40f63186
+R = 8.314*(1/1000)*(1/ΔG_sf); # units: kJ/nmol-K
+
 # ╔═╡ ae759f56-8a6d-4ef6-8aba-5ceb2c77a270
 glucose_data = [
 
@@ -148,7 +149,7 @@ function objective_function(ϵ,parameters)
 	end
 	
 	# return -
-	return (term_1 + term_2 + 1000000000.0*sum(penalty_terms_array))
+	return (term_1 + term_2)
 end
 
 # ╔═╡ 72f0bca2-19ab-4a54-9f4d-acaf4e60174b
@@ -235,7 +236,7 @@ begin
 	should_run_this_block = true
 	if (should_run_this_block == true)
 
-		number_of_steps = 120
+		number_of_steps = 100
 		eps_array = zeros(number_of_steps,ℛ)
 		n_final_array_loop = zeros(number_of_steps,ℳ+1)
 		
@@ -252,7 +253,7 @@ begin
 		# main -
 		for step_index = 1:number_of_steps
 
-			UL = 10.0*(step_index)*ones(ℛ)
+			UL = 20.0*(step_index)*ones(ℛ)
 			xinitial_loop[1] = 0.5*maximum(UL)	
 			
 			# call the optimizer -
@@ -269,7 +270,7 @@ begin
 			end
 
 			# add time -
-			n_final_array_loop[step_index,1] = (1.1/number_of_steps)*step_index
+			n_final_array_loop[step_index,1] = (2.0/number_of_steps)*step_index
 		end
 	end
 end
@@ -289,7 +290,7 @@ begin
 	c_array = (1/V)*n_final_array_loop[:,2:end]*(1e3)*(1/ΔG_sf)
 	plot(n_final_array_loop[:,1], c_array[:,1],label=species_label_array[1],legend=:right,lw=2, color="red")
 	for index = 2:ℳ
-		#plot!(n_final_array_loop[:,1], c_array[:,index],label=species_label_array[index],lw=2)
+		# plot!(n_final_array_loop[:,1], c_array[:,index],label=species_label_array[index],lw=2)
 	end
 
 	# data_lb = glucose_data[1:data_time_index,2] .- glucose_data[1:data_time_index,3]
@@ -299,7 +300,7 @@ begin
 	# plot!(glucose_data[1:data_time_index,1],data_ub,lw=1,color="darkgray", label="lower bound")
 
 	scatter!(glucose_data[1:data_time_index,1], glucose_data[1:data_time_index,2],lw=4,mc="black", ms=4, 
-		label="glucose (measured)", yerr=glucose_data[1:data_time_index,3])
+	 	label="glucose (measured)", yerr=glucose_data[1:data_time_index,3])
 	
 	xlabel!("Time (hr)")
 	ylabel!("Concentration (mM)")
@@ -1320,12 +1321,11 @@ version = "0.9.1+5"
 """
 
 # ╔═╡ Cell order:
-# ╠═214d3f8b-31da-4c13-b860-4377dadee766
+# ╟─214d3f8b-31da-4c13-b860-4377dadee766
 # ╟─44ee8543-b940-42c8-b4d7-6c98035617f2
 # ╠═e10fd2f0-ec19-4102-809c-2c8c40f63186
 # ╠═c35511cc-d00b-4f53-8472-6458e02ad60c
 # ╠═a2b97bbf-22c5-4590-af9c-817845b021eb
-# ╠═51519086-016a-4138-a20e-1e0466050e5d
 # ╠═c87754ae-abec-495c-90df-c226b551cd19
 # ╠═72f0bca2-19ab-4a54-9f4d-acaf4e60174b
 # ╠═ca29cd4e-4666-4352-b84f-43f349373bf7
