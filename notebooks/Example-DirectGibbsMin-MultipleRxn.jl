@@ -84,7 +84,7 @@ begin
 
 	# what are my initial condtions?
 	n_initial_array = 1.0*ones(ℳ)
-	n_initial_array[1] = 40.0*(V)*(1e9/1e3) 		# 1 gluc nmol
+	n_initial_array[1] = 35.9*(V)*(1e9/1e3) 		# 1 gluc nmol
 	n_initial_array[3] = 2000.0 					# 3 atp nmol
 	parameters_dict["n_initial_array"] = n_initial_array
 
@@ -108,7 +108,14 @@ begin
 end
 
 # ╔═╡ ae759f56-8a6d-4ef6-8aba-5ceb2c77a270
-
+glucose_data = [
+	0.0000000e+00   3.5900000e+01   2.8800000e+00 	;
+   2.5000000e-01   2.5010000e+01   3.1600000e+00 	;
+   7.5000000e-01   8.1600000e+00   2.7200000e+00 	;
+   1.0000000e+00   1.7700000e+00   1.8700000e+00  	;
+   2.0000000e+00   0.0000000e+00   0.0000000e+00 	;
+   3.0000000e+00   0.0000000e+00   0.0000000e+00 	;
+]
 
 # ╔═╡ f628eec6-906a-4ab9-b9e7-8df3e5667380
 function objective_function(ϵ,parameters)
@@ -226,7 +233,7 @@ begin
 	should_run_this_block = true
 	if (should_run_this_block == true)
 
-		number_of_steps = 170
+		number_of_steps = 120
 		eps_array = zeros(number_of_steps,ℛ)
 		n_final_array_loop = zeros(number_of_steps,ℳ+1)
 		
@@ -260,7 +267,7 @@ begin
 			end
 
 			# add time -
-			n_final_array_loop[step_index,1] = (1/120)*step_index
+			n_final_array_loop[step_index,1] = (1.1/number_of_steps)*step_index
 		end
 	end
 end
@@ -281,6 +288,8 @@ begin
 	for index = 2:ℳ
 		plot!(n_final_array_loop[:,1], c_array[:,index],label=species_label_array[index],lw=2)
 	end
+
+	scatter!(glucose_data[1:3,1], glucose_data[1:3,2],lw=4,mc="black", ms=4, label="glucose (measured)")
 	
 	xlabel!("Time (hr)")
 	ylabel!("Concentration (mM)")
