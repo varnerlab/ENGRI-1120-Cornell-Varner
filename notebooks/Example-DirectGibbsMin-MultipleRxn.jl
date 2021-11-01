@@ -28,7 +28,7 @@ begin
 	parameters_dict = Dict{String,Any}()
 
 	# ΔG_formation data -
-	G_formation_array = zeros(8)
+	G_formation_array = zeros(8) 
 	G_formation_array[1] = -409.4 	# 1 gluc kJ/mol
 	G_formation_array[2] = -1304.7 	# 2 gluc-6-p kJ/mol
 	G_formation_array[3] = -2280.7 	# 3 atp kJ/mol
@@ -48,15 +48,15 @@ begin
 	# setup stoichiometric array -
 	S = [
 
-		# ϵ₁ ϵ₂  ϵ₃  ϵ₄  ϵ₅    
+		# ϵ₁ ϵ₂  ϵ₃  ϵ₄  ϵ₅ 
 		-1.0 0.0 0.0 0.0 0.0 	; # 1 gluc
 		1.0 -1.0 0.0 0.0 0.0 	; # 2 gluc-6-p
 		-1.0 0.0 -1.0 0.0 0.0 	; # 3 atp
 		1.0 0.0 1.0 0.0 0.0 	; # 4 adp
 		0.0 1.0 -1.0 0.0 0.0 	; # 5 fruc-6-p
 		0.0 0.0 1.0 -1.0 0.0 	; # 6 fruc-1,6-bis-p
-		0.0 0.0 0.0 1.0 1.0 	; # 7 dhap
-		0.0 0.0 0.0 1.0 -1.0 	; # 8 ga3p
+		0.0 0.0 0.0 1.0 1.0		; # 7 dhap
+		0.0 0.0 0.0 1.0 -1.0	; # 8 ga3p
 	];
 	parameters_dict["S"] = S
 	
