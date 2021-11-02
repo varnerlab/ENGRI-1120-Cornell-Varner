@@ -118,7 +118,7 @@ glucose_data = [
    	1.0000000e+00   1.7700000e+00   1.8700000e+00  	;
    	2.0000000e+00   0.0000000e+00   0.0000000e+00 	;
    	3.0000000e+00   0.0000000e+00   0.0000000e+00 	;
-]
+];
 
 # ╔═╡ f628eec6-906a-4ab9-b9e7-8df3e5667380
 function objective_function(ϵ,parameters)
@@ -273,13 +273,13 @@ begin
 			n_final_array_loop[step_index,1] = (2.0/number_of_steps)*step_index
 		end
 	end
+
+	# show -
+	nothing
 end
 
 # ╔═╡ edbcb4ba-efae-4952-9b17-1129c00e5805
 eps_array
-
-# ╔═╡ cd5e5fe0-0c42-49b4-8215-117a4deafe6b
-n_final_array_loop[:,1]
 
 # ╔═╡ 05c4c0a7-4ba1-44c8-948d-e0b4537eb984
 begin
@@ -290,7 +290,7 @@ begin
 	c_array = (1/V)*n_final_array_loop[:,2:end]*(1e3)*(1/ΔG_sf)
 	plot(n_final_array_loop[:,1], c_array[:,1],label=species_label_array[1],legend=:right,lw=2, color="red")
 	for index = 2:ℳ
-		# plot!(n_final_array_loop[:,1], c_array[:,index],label=species_label_array[index],lw=2)
+		plot!(n_final_array_loop[:,1], c_array[:,index],label=species_label_array[index],lw=2)
 	end
 
 	# data_lb = glucose_data[1:data_time_index,2] .- glucose_data[1:data_time_index,3]
@@ -1330,7 +1330,6 @@ version = "0.9.1+5"
 # ╠═72f0bca2-19ab-4a54-9f4d-acaf4e60174b
 # ╠═ca29cd4e-4666-4352-b84f-43f349373bf7
 # ╟─edbcb4ba-efae-4952-9b17-1129c00e5805
-# ╠═cd5e5fe0-0c42-49b4-8215-117a4deafe6b
 # ╠═ae759f56-8a6d-4ef6-8aba-5ceb2c77a270
 # ╠═05c4c0a7-4ba1-44c8-948d-e0b4537eb984
 # ╠═bc3a0eea-4dcd-4d4e-afaf-d859a7a2c170
