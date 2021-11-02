@@ -25,7 +25,7 @@ This repository holds example problems discussed in lecture. The problems are st
 
 ### Notebooks for Lectures
 
-* [Lecture notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-HFCS.jl.html): Lecture material for continuous stirred tank reactors (CSTR) mole balances lecture
+* [Lecture notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Lecture-CSTR-MaterialBalances.jl.html): Lecture material for continuous stirred tank reactors (CSTR) mole balances lecture
 
 ### Notebooks for Lecture Examples
 
