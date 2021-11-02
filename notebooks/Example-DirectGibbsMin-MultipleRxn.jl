@@ -290,7 +290,7 @@ begin
 	c_array = (1/V)*n_final_array_loop[:,2:end]*(1e3)*(1/ΔG_sf)
 	plot(n_final_array_loop[:,1], c_array[:,1],label=species_label_array[1],legend=:right,lw=2, color="red")
 	for index = 2:ℳ
-		plot!(n_final_array_loop[:,1], c_array[:,index],label=species_label_array[index],lw=2)
+		#plot!(n_final_array_loop[:,1], c_array[:,index],label=species_label_array[index],lw=2)
 	end
 
 	# data_lb = glucose_data[1:data_time_index,2] .- glucose_data[1:data_time_index,3]
