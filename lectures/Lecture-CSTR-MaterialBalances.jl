@@ -9,9 +9,12 @@ begin
 	using PlutoUI
 end
 
+# ╔═╡ 1c28d260-29e7-401a-b551-eb88bff9b2a7
+PlutoUI.TableOfContents(depth=4)
+
 # ╔═╡ 6ab6a977-13ec-412f-b80e-09cd9252624c
 md"""
-## Material Balances for Single and Multiple Continuous Stirred Tank Reactors (CSTR) 
+# Material Balances for Single and Multiple Continuous Stirred Tank Reactors (CSTR) 
 Continuous stirred tank reactors (CSTR) are one of the two most common types of reactors (the other being tubular or plug-flow reactors) used in chemical engineering processes. In this lecture, we'll use our understanding of the material balances (mass and mol) to write down equations that govern the behavior of these reactors.  
 
 __Objectives__: at the end of this week(ish), you should be able to:
@@ -30,7 +33,7 @@ __Assumptions__
 
 # ╔═╡ 7debf40c-5e61-4ac6-a1d5-4b82927d3dbc
 md"""
-### Objective 1: Total Mass and Species Balance Equations for a Single CSTR
+## Species Mole Balances for a Single CSTR
 If we consider a single liquid well-mixed CSTR as our system, then we can use the species mols balances that we have already developed to describe the steady-state behavior of the reactor. The steady-state species mole balance for component $i=1,2,\dots\mathcal{M}$ is given by:
 
 $$\sum_{s=1}^{\mathcal{S}}v_{s}\dot{n}_{is} + \left(\sum_{k=1}^{\mathcal{R}}\sigma_{ik}\hat{r}_{k} + \sum_{j=1}^{\mathcal{T}}\tau_{ij}q_{j}X\right)V = 0$$
@@ -47,7 +50,7 @@ The quantity $\hat{r}_{k}$ denotes the rate per unit volume of chemical reaction
 
 # ╔═╡ bad7bc52-bece-4d40-aa23-dbc6e268a546
 md"""
-### Objective 2: Relationship between the fractional conversion and extent $\dot{\epsilon}$ for a Single CSTR
+## Fractional Conversion and Extent
 The fractional conversion is a relationship between the number of mol of _reactant_ species _i_ that is entering the reactor (or series of reactors) and the number of moles of species _i_ that are leaving the reactor (or series of reactors). Let's consider a single well-mixed liquid phase CSTR are steady-state, that has a single input and a single output. Then, we can write the fractional conversion of _reactant_ species _i_ as (single in and out consecutively numbered):
 
 $$f_{i} = \frac{\dot{n}_{i,j-1} - \dot{n}_{i,j}}{\dot{n}_{i,j-1}}\qquad \dot{n}_{i,j-1}\neq{0}$$
@@ -58,7 +61,6 @@ $$\dot{n}_{i,j} = \dot{n}_{i,j-1}\left(1-f_{i}\right)$$
 
 where $\dot{n}_{i,j-1}$ denotes the mol flow rate of species _i_ in-stream $j-1$ (inlet), and $\dot{n}_{i,j}$ denotes the mol flow rate of species _i_ in-stream $j$ (outlet). The fractional conversion $f_{i}$ gives additional information about the chemical reactions that are occurring in the reactor. Alternatively, we could also think about the extent of the reaction. 
 
-###### Is there a relationship between the extent and fractional conversion?
 To understand the relationship between the extent of reaction, and the fractional conversion let's consider a simple example. Suppose we wanted to model a well-mixed liquid CSTR with a single input (s=0) and a single output (s=1) at steady-state.  Further, suppose this CSTR had no biological reactions and a single bulk-phase chemical reaction. In this case, the species mole balance for species _i_ is given by:
 
 $$\dot{n}_{i,0} - \dot{n}_{i,1}+\sigma_{i1}\hat{r}_{1}V = 0$$
@@ -73,7 +75,7 @@ $$f_{i}=-\sigma_{i1}\left(\frac{\dot{\epsilon}_{1}}{\dot{n}_{i,0}}\right)\qquad 
 
 where the dot $\dot{\star}$ on the extent denotes that we are in an open system (and the extent has units of $\star$mol/time).
 
-###### What happens if there is more than one reaction?
+### Multiple chemical reactions
 If there is more than one reaction $\hat{r}_{j}$ where $j=1,2,\dots\mathcal{R}$, then the species mole balance is given by:
 
 $$\dot{n}_{i,0} - \dot{n}_{i,1}+\sum_{j=1}^{\mathcal{R}}\sigma_{ij}\hat{r}_{j}V = 0$$
@@ -90,49 +92,77 @@ where $\hat{r}_{j}V=\dot{\epsilon}_{i}$.
 
 """
 
+# ╔═╡ 8ea74767-bad8-48ac-a1bf-e612bf6a7e6a
+# JV will setup an example in lecture (and then add to the notebook): Degradation of ethanol
+
 # ╔═╡ b7333440-ab75-471d-b932-2c8b8de12706
 
 
 # ╔═╡ d4b785d8-7871-4993-a0c2-a71dfccf59ad
 md"""
-### Objective 3: What are the _kinetics_ of a chemical reaction?
+## Chemical Reaction Kinetics
 The _kinetics_ of a chemical reaction describes the _rate_ at which the reaction proceeds as a function of the conditions in the reactor vessel. Kinetic rate laws have units of $\star$mol/volume-time, and their mathematical form varies significantly with the type of reaction being considered. Let's start by considering the simple non-enzymatic (no catalyst) _reversible_ reaction:
 
 $$A+B\leftrightharpoons{C}$$
 
 A general form for the _net_ rate of this reaction ($\hat{r}_{1}$) is given by:
 
-$$\hat{r}_{1} = k_{1}\prod_{i=1}^{\mathcal{M}}\left[C_{i}\right]^{\alpha_{i1}} - k_{1}^{\prime}\prod_{j=1}^{\mathcal{M}}\left[C_{j}\right]^{\beta_{i1}}$$
+$$\hat{r}_{1} = k_{1}\prod_{i=1}^{\mathcal{M}}\left[X_{i}\right]^{\alpha_{i1}} - k_{1}^{\prime}\prod_{j=1}^{\mathcal{M}}\left[X_{j}\right]^{\beta_{i1}}$$
 
-where $\left[C_{i}\right]$ denotes the concentration of component $i=1,2,\dots,\mathcal{M}$, and $\alpha_{i1}$ and $\beta_{i1}$ denote the _reaction order_ of component $i$ in reaction $\hat{r}_{1}$. The values of the reation orders $\alpha_{i1}$ and $\beta_{i1}$ depend upon the reaction, and may _not_ always be integer values. 
+where $\left[X_{i}\right]$ denotes the concentration of component $i=1,2,\dots,\mathcal{M}$, and $\alpha_{i1}$ and $\beta_{i1}$ denote the _reaction order_ of component $i$ in reaction $\hat{r}_{1}$. The values of the reation orders $\alpha_{i1}$ and $\beta_{i1}$ depend upon the reaction, and may _not_ always be integer values. 
 Lastly, the quantities $k_{1}$ and $k_{1}^{\prime}$ denote the rate constant for the forward and reverse directions, respectively. Rate constants have various units depending upon the values of $\alpha_{i1}$
 and $\beta_{i1}$. 
 
 There is no requirement that $\alpha_{i1}$ and $\beta_{i1}$ be integers (or the stoichiometric coefficients). This is often only true when we have a complete (or simplified) picture of the chemistry that is occurring. In real-life, fractional values for $\alpha_{i1}$ and $\beta_{i1}$ are common in many application areas.  
 
-__Confused?__
 Another way to think about the kinetic rate laws and rate constants is that the overall rate of a reaction is proportional to the concentrations of the species that are participating in the reaction (raised to some power). Given this perspective, the rate constants are then simply constants of proportionality for each direction of the rate. The reaction orders ($\alpha_{i1}$ and $\beta_{i1}$) depend upon our understanding of the chemistry that is occurring, but in a simplified universe we can assume the [Law of Mass Action](https://en.wikipedia.org/wiki/Law_of_mass_action).
 """
 
 # ╔═╡ 8d737835-7442-46a6-bb96-858cce538a77
 md"""
-###### The Law of Mass Action and Mass Action Kinetics
+### Mass action kinetics
 
 The [law of mass action](https://en.wikipedia.org/wiki/Law_of_mass_action) assumes that the net rate of a chemical reaction is proportional to the concentration of the components raised to the $-{1}\times$ the stoichiometric coefficient of that component in _a particular reaction direction_. For example, for the reaction $A+B\leftrightharpoons{C}$, the mass action rate law would be:
 
 $$\hat{r}_{1} = k_{1}\left[A\right]\left[B\right] - k^{\prime}_{1}\left[C\right]$$
 
-Thus, a general statement of the law of mass action is for reaction $j$ (that could involve autocatalysis):
+Thus, a general statement of the law of mass action for reaction $j$ (that could involve autocatalysis) is given by:
 
-$$\hat{r}_{j} = k_{j}\prod_{i=1}^{\mathcal{M}}\left[C_{i}\right]^{-\sigma_{ij}} - 
-k^{\prime}_{j}\prod_{i=1}^{\mathcal{M}}\left[C_{i}\right]^{-\sigma_{ij}}$$
+$$\hat{r}_{j} = k_{j}\prod_{i=1}^{\mathcal{M}}\left[X_{i}\right]^{-\sigma_{ij}} - 
+k^{\prime}_{j}\prod_{i=1}^{\mathcal{M}}\left[X_{i}\right]^{-\sigma_{ij}}$$
 
 """
+
+# ╔═╡ 9f8ac34c-9f3b-4247-bd89-7fbb8b555523
+md"""
+#### Example: Mass-action kinetics
+
+Suppose we had the reaction ([Haber process](https://en.wikipedia.org/wiki/Haber_process)) : $$N_{2}+3H_{2}~{\rightleftharpoons}~2NH_{3}$$
+
+If this reaction followed mass action kinetics, then the net-rate would be:
+
+$$\hat{r}_{1} = k_{1}\left[N_{2}\right]\left[H_{2}\right]^{3} - k^{\prime}_{1}\left[NH_{3}\right]^{2}$$
+
+However, not all chemical reaction rates can be described using mass-action kinetics. For example, consider the production of [Phosgene](https://en.wikipedia.org/wiki/Phosgene): $$CO+Cl_{2}~{\rightleftharpoons}~COCl_{2}$$.
+
+If mass-action kinetics were valid, you would expect the net reaction rate to be given by:
+
+$$\hat{r}_{1} = k_{1}\left[CO\right]\left[Cl_{2}\right] - k^{\prime}_{1}\left[COCl_{2}\right]$$
+
+However, this rate law has been found experimentally to be:
+
+$$\hat{r}_{1} = k_{1}\left[CO\right]\left[Cl_{2}\right]^{3/2} - k^{\prime}_{1}\left[COCl_{2}\right]\left[Cl_{2}\right]^{1/2}$$
+
+Thus, mass-action kinetics may not always be true!
+"""
+
+# ╔═╡ fec2cd39-8805-41c3-9ffd-c7dbc901bfb8
+
 
 # ╔═╡ 21a1f45f-1b5c-406c-b88a-ac3ee194f0b4
 md"""
 
-###### Temperature dependence of rate constants $k_{i}^{\star}$
+### Temperature dependence of rate constants $k_{i}^{\star}$
 
 The rate constants for some reaction $\hat{r}_{i}$ denoted by $k_{i}$ and $k_{i}^{\prime}$ are functions of temperature in the reactor $T$. One way to model this dependece is:
 
@@ -152,7 +182,7 @@ html"""
 <style>
 main {
     max-width: 1200px;
-    width: 90%;
+    width: 65%;
     margin: auto;
     font-family: "Roboto, monospace";
 }
@@ -165,7 +195,38 @@ a {
 .H1 {
     padding: 0px 30px;
 }
-</style>"""
+</style>
+<script>
+var section = 0;
+var subsection = 0;
+var headers = document.querySelectorAll('h2, h3, h4');
+for (var i=0; i < headers.length; i++) {
+    var header = headers[i];
+    var text = header.innerText;
+    var original = header.getAttribute("text-original");
+    if (original === null) {
+        // Save original header text
+        header.setAttribute("text-original", text);
+    } else {
+        // Replace with original text before adding section number
+        text = header.getAttribute("text-original");
+    }
+    var numbering = "";
+    switch (header.tagName) {
+        case 'H2':
+            section += 1;
+            numbering = section + ".";
+            subsection = 0;
+            break;
+        case 'H3':
+            subsection += 1;
+            numbering = section + "." + subsection;
+            break;
+    }
+    header.innerText = numbering + " " + text;
+};
+</script>
+"""
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -344,15 +405,19 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 """
 
 # ╔═╡ Cell order:
+# ╟─1c28d260-29e7-401a-b551-eb88bff9b2a7
 # ╟─6ab6a977-13ec-412f-b80e-09cd9252624c
 # ╟─7debf40c-5e61-4ac6-a1d5-4b82927d3dbc
 # ╟─148be56c-7926-43b7-b120-f39b252a3380
 # ╟─bad7bc52-bece-4d40-aa23-dbc6e268a546
+# ╠═8ea74767-bad8-48ac-a1bf-e612bf6a7e6a
 # ╟─b7333440-ab75-471d-b932-2c8b8de12706
 # ╟─d4b785d8-7871-4993-a0c2-a71dfccf59ad
 # ╟─8d737835-7442-46a6-bb96-858cce538a77
+# ╟─9f8ac34c-9f3b-4247-bd89-7fbb8b555523
+# ╟─fec2cd39-8805-41c3-9ffd-c7dbc901bfb8
 # ╟─21a1f45f-1b5c-406c-b88a-ac3ee194f0b4
-# ╟─a3ef3e3e-81ce-4645-b5a4-1e816803a7fc
+# ╠═a3ef3e3e-81ce-4645-b5a4-1e816803a7fc
 # ╟─1bf20268-3bbd-11ec-352b-55a41c839578
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
