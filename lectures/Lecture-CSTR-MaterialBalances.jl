@@ -111,12 +111,12 @@ and $\beta_{i1}$.
 There is no requirement that $\alpha_{i1}$ and $\beta_{i1}$ be integers (or the stoichiometric coefficients). This is often only true when we have a complete (or simplified) picture of the chemistry that is occurring. In real-life, fractional values for $\alpha_{i1}$ and $\beta_{i1}$ are common in many application areas.  
 
 __Confused?__
-Another way to think about the kinetic rate laws and rate constants is that the overall rate of a reaction is proportional to the concentrations of the species that are participating in the reaction (raised to some power). Given this perspective, the rate constants are then simply constants of proportionality for each direction of the rate. 
+Another way to think about the kinetic rate laws and rate constants is that the overall rate of a reaction is proportional to the concentrations of the species that are participating in the reaction (raised to some power). Given this perspective, the rate constants are then simply constants of proportionality for each direction of the rate. The reaction orders ($\alpha_{i1}$ and $\beta_{i1}$) depend upon our understanding of the chemistry that is occurring, but in a simplified universe we can assume the [Law of Mass Action](https://en.wikipedia.org/wiki/Law_of_mass_action).
 """
 
 # ╔═╡ 8d737835-7442-46a6-bb96-858cce538a77
 md"""
-##### The Law of Mass Action and Mass Action Kinetics
+###### The Law of Mass Action and Mass Action Kinetics
 
 The [law of mass action](https://en.wikipedia.org/wiki/Law_of_mass_action) assumes that the net rate of a chemical reaction is proportional to the concentration of the components raised to the $-{1}\times$ the stoichiometric coefficient of that component in _a particular reaction direction_. For example, for the reaction $A+B\leftrightharpoons{C}$, the mass action rate law would be:
 
@@ -132,7 +132,7 @@ k^{\prime}_{j}\prod_{i=1}^{\mathcal{M}}\left[C_{i}\right]^{-\sigma_{ij}}$$
 # ╔═╡ 21a1f45f-1b5c-406c-b88a-ac3ee194f0b4
 md"""
 
-##### Temperature dependence of rate constants $k_{i}^{\star}$
+###### Temperature dependence of rate constants $k_{i}^{\star}$
 
 The rate constants for some reaction $\hat{r}_{i}$ denoted by $k_{i}$ and $k_{i}^{\prime}$ are functions of temperature in the reactor $T$. One way to model this dependece is:
 
