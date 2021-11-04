@@ -69,6 +69,7 @@ We use the open first and second law balances to compute the work lost from an i
 
 * [Example notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-DirectGibbsMin-MultipleRxn.jl.html): In this example we compute the equilibrium extents of reaction for multiple reactions from _E.coli_ central carbon metabolism in an ideal liquid. 
 
+## Practice Prelim Solutions 
 ### Solution Notebooks for Practice Prelim 1
 The notebooks for practice prelim 1 solutions can be found in the `prelims/P1/practice` directory.
 Static HTML versions of the notebooks can be found here:
@@ -77,6 +78,14 @@ Static HTML versions of the notebooks can be found here:
 * [Notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Soln-PracticePrelim-FlashProblem.html) Flash separation problem practice prelim 1
 * [Notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Soln-PracticePrelim-ModVCRR.html) Modified VCRC problem practice prelim 1
 
+### Solution Notebooks for Practice Prelim 2
+The notebooks for practice prelim 2 questions/solutions can be found in the `prelims/P2/practice` directory. Static HTML versions of the notebooks can be found here:
+
+* [Notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Soln-1120-PracticePrelim-2-CRE-F21.jl.html) Chemical reaction equilibrium problem for practice prelim 2
+* [Notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Soln-1120-PracticePrelim-2-CSTR-F21.jl.html) Single CSTR problem for practice prelim 2
+
+
+## Actual Prelim Solutions
 ### Solution Notebooks for Actual Prelim 1
 The notebooks for actual prelim 1 solutions can be found in the `prelims/P1/actual` directory.
 Static HTML versions of the notebooks can be found here:
@@ -84,3 +93,4 @@ Static HTML versions of the notebooks can be found here:
 * [Solution notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Soln-1120-P1A-ReactorProblem.jl.html) Reactor problem for Prelim 1
 * [Solution notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Soln-1120-P1A-ModORC.jl.html) Modified organic Rankine Cycle problem from Prelim 1
 * [Solution notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Soln-1120-P1A-CycleProblem.jl.html) Three component cycle analysis question for Prelim 1
+* 
