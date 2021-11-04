@@ -83,6 +83,8 @@ The notebooks for practice prelim 2 questions/solutions can be found in the `pre
 
 * [Notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Soln-1120-PracticePrelim-2-CRE-F21.jl.html) Chemical reaction equilibrium problem for practice prelim 2
 * [Notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Soln-1120-PracticePrelim-2-CSTR-F21.jl.html) Single CSTR problem for practice prelim 2
+* [Notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Soln-1120-PracticePrelim-2-Kinetics-F21.jl.html) Various questions about kinetics, steady-state and equilibrium
+
 
 
 ## Actual Prelim Solutions
@@ -93,4 +95,4 @@ Static HTML versions of the notebooks can be found here:
 * [Solution notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Soln-1120-P1A-ReactorProblem.jl.html) Reactor problem for Prelim 1
 * [Solution notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Soln-1120-P1A-ModORC.jl.html) Modified organic Rankine Cycle problem from Prelim 1
 * [Solution notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Soln-1120-P1A-CycleProblem.jl.html) Three component cycle analysis question for Prelim 1
-* 
+
