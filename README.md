@@ -69,7 +69,7 @@ We use the open first and second law balances to compute the work lost from an i
 
 * [Example notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-DirectGibbsMin-MultipleRxn.jl.html): In this example we compute the equilibrium extents of reaction for multiple reactions from _E.coli_ central carbon metabolism in an ideal liquid. 
 
-## Practice Prelim Solutions 
+## Practice Prelim Questions/Solutions 
 ### Solution Notebooks for Practice Prelim 1
 The notebooks for practice prelim 1 solutions can be found in the `prelims/P1/practice` directory.
 Static HTML versions of the notebooks can be found here:
