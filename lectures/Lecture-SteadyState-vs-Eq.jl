@@ -13,18 +13,83 @@ end
 
 # ╔═╡ ddaf7fe6-0b1a-4983-a0a6-b82dea16a160
 md"""
-### Which parameters control the steady-state behavior in a CSTR?
+### Steady-state versus Equilibrium: Can you have Equilibrium in an open system?
+We started this unit by introducing two seemingly similar, but in actuality significantly different, concepts: steady-state versus equilibrium. Let's further explore these concepts by considering an example. 
+
+Suppose we wanted to produce an _unstable_ product $B$ from precursor compound $A$ in a continuous stirred tank reactor (CSTR)  according to the reaction scheme:
+
+$$A~{\rightleftharpoons}~B~{\rightleftharpoons}~{C}$$
+
+where the compound $C$ is an _undesired_ degradation product. Further, suppose that no reaction can occur outside of the reactor (e.g., there is a catalyst resident in the reactor that is required for reaction).
+
+__Assumptions__
+* Ideal liquid phase behavior
+* Constant T,P in the reactor
+* Reactor is well-mixed
+* The CSTR has a single input ($s=1$) and a single output ($s=2$)
+
+__Objectives__: By the end of this lecture you should be able to:
+* Reason about the time constants of transport versus reaction in a continuous stirred tank reactor (CSTR)
+* Understand the difference between equilibrium and steady-state in an open system
+* Have a _basic_ understanding of how to numerically solve systems of Ordinary Differential Equations (ODEs)
+
 """
+
+# ╔═╡ b9f8c24b-642c-4940-a8a4-82d4c57d25ad
+md"""
+#### Objective 1: Time constants in a CSTR
+
+The concentration balance for species $i=1,2,\cdots,\mathcal{M}$ in a CSTR with up to $j=1,2,\cdots,\mathcal{R}$ reactions is given by:
+
+$$V\frac{dC_{i}}{dt} = \dot{F}C_{i,1} - \dot{F}C_{i,2} +\sum_{j=1}^{\mathcal{R}}\sigma_{ij}\hat{r}_{j}V$$
+
+Dividing both sides by $\dot{F}$ and introducing the Dilution rate $D=\dot{F}/V$ gives the expression:
+
+$$\tau\frac{dC_{i}}{dt} = \left(C_{i,1}-C_{i,2}\right) + \tau\sum_{j=1}^{\mathcal{R}}\sigma_{ij}\hat{r}_{j}$$
+
+where $\tau\equiv{D}^{-1}$ is the _transport_ time constant (units: time). Let's consider limiting cases for $\tau$:
+
+###### Case 1: $\tau\gg{1}$
+In the limit of $\tau\gg{1}$ the concentration balance behaves like a _batch_ reactor (no inputs or outputs):
+
+$$\frac{dC_{i}}{dt}\sim\sum_{j=1}^{\mathcal{R}}\sigma_{ij}\hat{r}_{j}$$
+
+When $\tau\gg{1}$, the volume $V$ is large compared to the volumetric flow rate $\dot{F}$, thus particles of fluid that enter the reactor stay nearly forever.
+
+###### Case 2: $\tau\sim{1}$
+When $\tau\sim{1}$ we consider both the reaction terms and the transport terms in the balance equations:
+
+$$\frac{dC_{i}}{dt} \sim \left(C_{i,1}-C_{i,2}\right) + \sum_{j=1}^{\mathcal{R}}\sigma_{ij}\hat{r}_{j}$$
+
+In case 2, both the transport and reaction terms are important.
+
+###### Case 3: $\tau\ll{1}$
+In the limit of $\tau\ll{1}$ the system behaves like:
+
+$$C_{i,1} \sim C_{i,2}$$
+
+In other words, the volumetric flow rate $\dot{F}$ is large compared to the volume, so particles of fluid carrying the chemical components enter the reactor and quickly leave (giving them little time to react).
+
+"""
+
+# ╔═╡ 8d23ab99-6b7f-4212-991b-0d51c93b961d
+md"""
+#### Objective 2: Steady-state versus equilibrium and the role of $\tau$
+"""
+
+# ╔═╡ 45903db9-2b98-4cb8-8bcb-cdceef733383
+begin
+	# Setup the problem parameters -
+	volumetric_flow_rate = 0.001 	# units: L/hr
+	V = 14.0 						# units: L
+	τ = V/volumetric_flow_rate 		# units: hr
+end
 
 # ╔═╡ 668d00a7-3f7f-43a8-8aa3-8c33d04d6e37
 begin
 
 	# initialize -
 	parameter_dictionary = Dict{String,Any}()
-
-	# Setup the problem parameters -
-	volumetric_flow_rate = 2.0 	# units: L/hr
-	V = 14.0 					# units: L
 
 	# What is the composition of the feed?
 	A₀ = 10.0 	# 1 units: mmol/L
@@ -41,10 +106,21 @@ begin
 	# rate constants -
 	rate_constant_array = [
 		2.0 	; 	# 1: k1+ units: hr^-1
-		0.1 	; 	# 2: k1- units: hr^-1
+		1.1 	; 	# 2: k1- units: hr^-1
 		10.0 	; 	# 3: k2+ units: hr^-1
-		1.4 	; 	# 4: k2- units: hr-1
+		6.0 	; 	# 4: k2- units: hr-1
 	];
+
+	# let's create the stoichiometric matrix -
+	# Rxn 1: A = B
+	# Rxn 2: B -> C (optional)
+	S = [
+
+		# r₁ r₂ 
+		-1.0 0.0 ; # A
+		1.0 -1.0 ; # B
+		0.0  1.0 ; # C
+	]
 
 	# put data in the parameter_dictionary -
 	parameter_dictionary["F_dot"] = volumetric_flow_rate
@@ -54,13 +130,61 @@ begin
 	parameter_dictionary["C₀"] = C₀
 	parameter_dictionary["initial_condition_array"] = initial_condition_array
 	parameter_dictionary["rate_constant_array"] = rate_constant_array
+	parameter_dictionary["stoichiometric_matrix"] = S
+	parameter_dictionary["number_of_species"] = length(initial_condition_array)
 	
 	# show -
 	nothing
 end
 
-# ╔═╡ 6b0f4437-dfba-4c60-85fc-1b4d314adbff
-function concentration_balances(dx, x, problem_dictionary, t)
+# ╔═╡ 74e2338b-619d-465e-8da8-14d9e089eb7d
+md"""
+##### Ok: so we may be at steady-state, but are we at equilibrium?
+Steady-state requires that all the time derivatives for all the chemical species, volume, temperature etc are equal to zero. In other words, nothing is changing in time. Equilibrium on the other hand requires this __and__ one additional condition: the net reaction rate for all chemical reactions is equal to zero, ie., there is no net chemical reaction. In our example system, is this true?
+"""
+
+# ╔═╡ c5b78908-00dc-4ab8-98ef-6ee9cbe5aa14
+md"""
+#### Objective 3: Numerical solution of Ordinary Differential Equations (ODEs)
+Suppose we had a _scalar_ ordinary differential equation of the form (initial value problem):
+
+$$\frac{dx}{dt} = f\left(x,k\right)$$
+
+where $x$ denotes what we are trying to estimate e.g., a concentration, 
+$k$ denotes parameters (e.g., rate constants), $t$ denotes time and 
+$f\left(\cdot\right)$ denotes the right-hand side of the differential equation e.g., a mole or mass balance. 
+The differential equation above is subject to the initial condition $x\left(t_{0}\right)=x_{o}$.
+
+To estimate the time behavior of the variable $x$, we multiply through by $dt$, and integrate both sides from some time $t_{1}$ $\rightarrow$ $t_{2} = t_{1}+\Delta{t}$:
+
+$$\int_{t_{1}}^{t_{1}+\Delta{t}}dx = \int_{t_{1}}^{t_{1}+\Delta{t}}f\left(x,k\right)dt$$
+
+The left-hand side becomes:
+
+$$\int_{t_{i}}^{t_{i}+\Delta{t}}dx = x_{t_{i}+\Delta{t}} - x_{t_{i}}$$
+
+which gives:
+
+$$x_{t_{i}+\Delta{t}} = x_{t_{i}} + \int_{t_{i}}^{t_{i}+\Delta{t}}f\left(x,k\right)dt$$
+
+This is the basis for _most_ numerical methods for the solution of ordinary differential equations; these methods differ in how they approximate the integral of $f\left(\cdot\right)$ on the right-hand side. One simple approach (which is not accurate unless the step-size $\Delta{t}$ is small) is to assume $f\left(\cdot\right)$ is constant across the time interval $\Delta{t}$ which gives:
+
+$$x_{t_{i}+\Delta{t}} \simeq x_{t_{i}} + f\left(x_{t_i},k\right)\Delta{t}$$
+
+This is known as the [forward Euler method](https://en.wikipedia.org/wiki/Euler_method) and it has error (at each step) of order $\mathcal{O}\left(\Delta{t}^{2}\right)$. Other more sophisticated methods do a better job at approximating the integral, thus they have better error performance.
+
+"""
+
+# ╔═╡ ba11e8aa-3d4a-41d8-ac8d-ed53d37a94e7
+
+
+# ╔═╡ 9bc6e553-32af-4086-8b32-2674a21661ff
+md"""
+ODE solution code below here (if you are interested)
+"""
+
+# ╔═╡ d94d3b0c-b551-41bd-ba78-03c11a373472
+function compute_kinetics(x,parameter_dictionary)
 
 	# which phase r we?
 	does_reaction_occur_flag = parameter_dictionary["does_reaction_occur"]
@@ -69,16 +193,6 @@ function concentration_balances(dx, x, problem_dictionary, t)
 	A = x[1]
 	B = x[2]
 	C = x[3]
-
-	# feed et al -
-	F = parameter_dictionary["F_dot"]
-	V = parameter_dictionary["V"]
-	A₀ = parameter_dictionary["A₀"]
-	B₀ = parameter_dictionary["B₀"] 
-	C₀ = parameter_dictionary["C₀"]
-
-	# what is D?
-	D = F/V
 	
 	# get some data from the problem_dictionary -
 	rate_constant_array = parameter_dictionary["rate_constant_array"];
@@ -92,13 +206,52 @@ function concentration_balances(dx, x, problem_dictionary, t)
 	r2_net = 0.0
 	if (does_reaction_occur_flag == true)
 		r1_net = k1f*A - k1r*B
-		r2_net = k2f*A - k2r*C
+		r2_net = k2f*B - k2r*C
 	end
+	rV = [r1_net ; r2_net]
 
-	# setup the balances -
-	dx[1] = D*(A₀ - A) - (r1_net + r2_net) 	# 1 A balance
-	dx[2] = D*(B₀ - B) + (r1_net) 			# 2 B balance
-	dx[3] = D*(C₀ - C) + (r2_net) 			# 3 C balance
+	# return -
+	return rV
+end
+
+# ╔═╡ 6b0f4437-dfba-4c60-85fc-1b4d314adbff
+function concentration_balances(dx, x, problem_dictionary, t)
+
+	# alias -
+	A = x[1]
+	B = x[2]
+	C = x[3]
+
+	# feed et al -
+	F = parameter_dictionary["F_dot"]
+	V = parameter_dictionary["V"]
+	A₀ = parameter_dictionary["A₀"]
+	B₀ = parameter_dictionary["B₀"] 
+	C₀ = parameter_dictionary["C₀"]
+	S = parameter_dictionary["stoichiometric_matrix"]
+	number_of_species = parameter_dictionary["number_of_species"]
+
+	# what is D? units: 1/hr
+	D = F/V
+
+	# compute the kinetics - 
+	rV = compute_kinetics(x, parameter_dictionary)
+
+	# transport terms -
+	transport_terms = [
+		D*(A₀ - A) ;
+		D*(B₀ - B) ;
+		D*(C₀ - C) ;
+	]
+
+	# reaction terms -
+	reaction_terms = S*rV
+
+	# compute the balances -
+	dxdt = transport_terms .+ reaction_terms
+	for species_index = 1:number_of_species
+		dx[species_index] = dxdt[species_index]
+	end
 end
 
 # ╔═╡ fd731a95-9cf6-4e27-b035-10ceb8251dd5
@@ -172,14 +325,17 @@ begin
 	end
 end
 
-# ╔═╡ dc256f3b-18f6-4444-9c41-09e3879928eb
-typeof(X)
-
-# ╔═╡ 41209c02-626c-442c-87b2-bbb5a4c168c4
-X[1][1]
-
 # ╔═╡ 875e2cb4-3a91-4f7e-b1b4-2356f8a46b98
-plot(x_soln_array[:,1], x_soln_array[:, 2:end], lw=2)
+begin
+	plot(x_soln_array[:,1], x_soln_array[:, 2], lw=2, label="A", legend=:topright)
+	plot!(x_soln_array[:,1], x_soln_array[:, 3], lw=2, label="B")
+	plot!(x_soln_array[:,1], x_soln_array[:, 4], lw=2, label="C")
+	xlabel!("Time (hr)",fontsize=18)
+	ylabel!("Concentration (mmol/L)",fontsize=18)
+end
+
+# ╔═╡ 77778548-adf6-408e-917c-00611ace230f
+rV = compute_kinetics(x_soln_array[end,2:end], parameter_dictionary)
 
 # ╔═╡ 5f65d268-40db-11ec-318e-4bb375e1410b
 html"""
@@ -1792,14 +1948,21 @@ version = "0.9.1+5"
 
 # ╔═╡ Cell order:
 # ╟─ddaf7fe6-0b1a-4983-a0a6-b82dea16a160
-# ╠═668d00a7-3f7f-43a8-8aa3-8c33d04d6e37
+# ╟─b9f8c24b-642c-4940-a8a4-82d4c57d25ad
+# ╟─8d23ab99-6b7f-4212-991b-0d51c93b961d
+# ╠═45903db9-2b98-4cb8-8bcb-cdceef733383
+# ╟─668d00a7-3f7f-43a8-8aa3-8c33d04d6e37
+# ╠═875e2cb4-3a91-4f7e-b1b4-2356f8a46b98
+# ╠═74e2338b-619d-465e-8da8-14d9e089eb7d
+# ╠═77778548-adf6-408e-917c-00611ace230f
+# ╟─c5b78908-00dc-4ab8-98ef-6ee9cbe5aa14
+# ╟─ba11e8aa-3d4a-41d8-ac8d-ed53d37a94e7
+# ╟─9bc6e553-32af-4086-8b32-2674a21661ff
+# ╠═d94d3b0c-b551-41bd-ba78-03c11a373472
+# ╠═6b0f4437-dfba-4c60-85fc-1b4d314adbff
 # ╠═fd731a95-9cf6-4e27-b035-10ceb8251dd5
 # ╠═653936dd-8eba-47c7-a515-b1431ed35087
-# ╠═dc256f3b-18f6-4444-9c41-09e3879928eb
-# ╠═41209c02-626c-442c-87b2-bbb5a4c168c4
 # ╠═3d2901ff-34bc-45c3-adae-71d730ed0e32
-# ╠═875e2cb4-3a91-4f7e-b1b4-2356f8a46b98
-# ╠═6b0f4437-dfba-4c60-85fc-1b4d314adbff
 # ╠═c7b4078a-5508-4a7c-9c4f-faf1e49d34ff
 # ╟─5f65d268-40db-11ec-318e-4bb375e1410b
 # ╟─00000000-0000-0000-0000-000000000001
