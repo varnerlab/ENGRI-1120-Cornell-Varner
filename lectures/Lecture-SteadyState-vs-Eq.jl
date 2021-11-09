@@ -13,7 +13,7 @@ end
 
 # ╔═╡ ddaf7fe6-0b1a-4983-a0a6-b82dea16a160
 md"""
-### Steady-state versus Equilibrium: Can you have Equilibrium in an open system?
+### Steady-state versus Equilibrium: Can we have equilibrium in an open system?
 We started this unit by introducing two seemingly similar, but in actuality significantly different, concepts: steady-state versus equilibrium. Let's further explore these concepts by considering an example. 
 
 Suppose we wanted to produce an _unstable_ product $B$ from precursor compound $A$ in a continuous stirred tank reactor (CSTR)  according to the reaction scheme:
@@ -26,7 +26,7 @@ __Assumptions__
 * Ideal liquid phase behavior
 * Constant T,P in the reactor
 * Reactor is well-mixed
-* The CSTR has a single input ($s=1$) and a single output ($s=2$)
+* The CSTR has a single input ($s=1$), a single output ($s=2$) and constant V
 * All reactions follow mass-action kinetics and are _first_ order
 
 __Objectives__: By the end of this lecture you should be able to:
@@ -85,7 +85,7 @@ md"""
 # ╔═╡ 45903db9-2b98-4cb8-8bcb-cdceef733383
 begin
 	# Setup the problem parameters -
-	volumetric_flow_rate = 2.0 	# units: L/hr
+	volumetric_flow_rate = 0.0 		# units: L/hr
 	V = 14.0 						# units: L
 	τ = V/volumetric_flow_rate 		# units: hr
 
@@ -344,6 +344,18 @@ begin
 	plot!(x_soln_array[:,1], x_soln_array[:, 4], lw=2, label="C")
 	xlabel!("Time (hr)",fontsize=18)
 	ylabel!("Concentration (mmol/L)",fontsize=18)
+end
+
+# ╔═╡ d1952491-6c26-4403-900b-cd67a969b72b
+with_terminal() do
+
+	# get the steady-state values from the soln array -
+	A_ss = x_soln_array[end,2]
+	B_ss = x_soln_array[end,3]
+	C_ss = x_soln_array[end,4]
+
+	# display -
+	println("A_ss = $(A_ss) mmol/L B_ss = $(B_ss) mmol/L C_ss=$(C_ss) mmol/L")
 end
 
 # ╔═╡ 77778548-adf6-408e-917c-00611ace230f
@@ -1965,6 +1977,7 @@ version = "0.9.1+5"
 # ╟─8d23ab99-6b7f-4212-991b-0d51c93b961d
 # ╠═45903db9-2b98-4cb8-8bcb-cdceef733383
 # ╟─875e2cb4-3a91-4f7e-b1b4-2356f8a46b98
+# ╟─d1952491-6c26-4403-900b-cd67a969b72b
 # ╟─74e2338b-619d-465e-8da8-14d9e089eb7d
 # ╠═77778548-adf6-408e-917c-00611ace230f
 # ╟─0264f8da-d3c5-4702-8520-9ad64b687532
