@@ -101,7 +101,7 @@ Next, as we approach eqilibrium we could measure the concentration of A (or B) a
 
 $$\frac{d\left[A\right]}{dt} = -\hat{r}_{1}$$
 
-meaning the slope of an $\left[A\right]$ versus time plot would give the reaction rate. Futher since rate constants are only functions of temperature, we could use _measurements_ of the equilibrium constant, and $\left[A\right]$ and $\left[B\right]$ concentrations at the same temperature $T$ to arrive at something like (when we are near equilibrium):
+meaning the slope of an $\left[A\right]$ versus time plot would give the reaction rate. Futher since rate constants are only functions of temperature, we could use _measurements_ of the equilibrium constant, and $\left[A\right]$ and $\left[B\right]$ concentrations at the same temperature $T$ to arrive at the expression (when we are near equilibrium):
 
 $$\hat{r}_{1}\simeq k_{1}^{+}\left(\left[A\right] - \frac{\left[B\right]}{K}\right)$$
 
@@ -137,5 +137,5 @@ a {
 # ╟─64a749bc-423b-413a-afb3-c4e32d53da04
 # ╟─9abaaaaa-8bfb-45a2-8da2-c53e7310ba0a
 # ╟─36bf5490-13b5-4da8-8ef9-00e519983c11
-# ╟─85eaab6b-b7fe-421a-a2e7-f2634b7eca25
+# ╠═85eaab6b-b7fe-421a-a2e7-f2634b7eca25
 # ╟─6a67ec88-3d92-11ec-0fca-f5f1f3e769b3
