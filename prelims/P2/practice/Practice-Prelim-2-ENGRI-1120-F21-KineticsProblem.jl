@@ -32,7 +32,7 @@ md"""
 
 # ╔═╡ cf9767ca-133c-4322-959d-3eb680013f63
 md"""
-a) Starting from the mass-action kinetic expression for the _net_ rate of reaction of $j$ denoted by $\hat{r}_{j}$:
+###### a) Starting from the mass-action kinetic expression for the _net_ rate of reaction of $j$ denoted by $\hat{r}_{j}$:
 
 $$\hat{r}_{j} = k^{+}_{j}\prod_{i\in\mathcal{M}^{+}}\left[X_{i}\right]^{-\sigma_{ij}} - 
 k^{-}_{j}\prod_{i\in\mathcal{M}^{-}}\left[X_{i}\right]^{-\sigma_{ij}}$$ show that equilibrium constant for reaction $j$, denoted by $K_{j}$, equals:
@@ -58,7 +58,7 @@ $$\frac{k_{j}^{+}}{k_{j}^{-}}=K_{j}$$
 
 # ╔═╡ 64a749bc-423b-413a-afb3-c4e32d53da04
 md"""
-b) If $k_{j}^{-}\rightarrow{0}$, what does that say about the $\Delta{G}$ of the reaction $j$?\
+###### b) If $k_{j}^{-}\rightarrow{0}$, what does that say about the $\Delta{G}$ of the reaction $j$?
 
 As the rate of the back reaction goes to zero, the reaction becomes irreversible. To link this to $\Delta{G}$ of the reaction, we know that:
 
@@ -68,12 +68,46 @@ or (after substitution) of the ratio of rate constants:
 
 $$\Delta{G} = -RT\ln\left({\frac{k_{j}^{+}}{k_{j}^{-}}}\right)$$
 
-The 
+As $k_{j}^{-}\rightarrow{0}$ the $\Delta{G}\rightarrow{-\infty}$, thus reaction becomes incresingly energetically favorable.  
 
 """
 
-# ╔═╡ e5d99c88-8f12-42b0-baec-28ad19a692fa
+# ╔═╡ 9abaaaaa-8bfb-45a2-8da2-c53e7310ba0a
 
+
+# ╔═╡ 36bf5490-13b5-4da8-8ef9-00e519983c11
+md"""
+###### c) Can chemical equilibrium occur in an open system? 
+
+Open an system can reach steady-state, but equilibrium has the additional constraint that all net reactions are equal to zero. Thus, let's consider the case when we have a CSTR with a single input ($s=1$) and a single output ($s=2$) and a reversible single reaction $\hat{r}_{1}$. The species mole balance for component $i$ would be:
+
+$$\dot{n}_{i1} - \dot{n}_{i2} + \sigma_{i1}\hat{r}_{1}V = 0$$
+
+If an open system were at equilibrium (as opposed to steady-state), then $\hat{r}=0$ which implies:
+
+$$\dot{n}_{i1} = \dot{n}_{i2}$$
+
+which is clearly not true in general. Thus, an open system can not reach equilibrium, but rather operates at a steady-state.
+
+"""
+
+# ╔═╡ 85eaab6b-b7fe-421a-a2e7-f2634b7eca25
+md"""
+###### d) Estimation of kinetic parameters from data
+
+If we have a closed system, we could wait until the system reached equilibrium and then get the ratio of the rate constants from the value of the equilibrium constant. 
+
+Next, as we approach eqilibrium we could measured the concentration of A (or B) as a function of time. Becuase we are a closed system we know that:
+
+$$\frac{d\left[A\right]}{dt} = -\hat{r}_{1}$$
+
+meaning the slope of an $\left[A\right]$ versus time plot would give the reaction rate. Futher since rate constants are only functions of temperature, we could use _measurements_ of the equilibrium constant, and $\left[A\right]$ and $\left[B\right]$ concentrations at the same temperature $T$ to arrive at something like (when we are near equilibrium):
+
+$$\hat{r}_{1}\simeq k_{1}^{+}\left(\left[A\right] - \frac{\left[B\right]}{K}\right)$$
+
+where $k_{1}^{-} = k_{1}^{+}K^{-1}$ to estimate the forward rate constant. Lastly, to get frequency factor and the activation energy we could use the linearized version of the [Arrhenius equation](https://en.wikipedia.org/wiki/Arrhenius_equation) in combination with the required measurements.
+
+"""
 
 # ╔═╡ 6a67ec88-3d92-11ec-0fca-f5f1f3e769b3
 html"""
@@ -96,10 +130,12 @@ a {
 </style>"""
 
 # ╔═╡ Cell order:
-# ╠═2bb195db-311f-4191-95a1-04d6a4b75d74
+# ╟─2bb195db-311f-4191-95a1-04d6a4b75d74
 # ╟─40f90c69-76c9-41fa-9fe5-2c3410d6bc43
-# ╠═cf9767ca-133c-4322-959d-3eb680013f63
+# ╟─cf9767ca-133c-4322-959d-3eb680013f63
 # ╟─bd2184c1-a656-4e54-9f0d-fcc9009e4b04
-# ╠═64a749bc-423b-413a-afb3-c4e32d53da04
-# ╠═e5d99c88-8f12-42b0-baec-28ad19a692fa
+# ╟─64a749bc-423b-413a-afb3-c4e32d53da04
+# ╟─9abaaaaa-8bfb-45a2-8da2-c53e7310ba0a
+# ╟─36bf5490-13b5-4da8-8ef9-00e519983c11
+# ╟─85eaab6b-b7fe-421a-a2e7-f2634b7eca25
 # ╟─6a67ec88-3d92-11ec-0fca-f5f1f3e769b3
