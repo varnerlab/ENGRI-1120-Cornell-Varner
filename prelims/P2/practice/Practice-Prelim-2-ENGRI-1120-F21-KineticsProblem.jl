@@ -97,7 +97,7 @@ md"""
 
 If we have a closed system, we could wait until the system reached equilibrium and then get the ratio of the rate constants from the value of the equilibrium constant. 
 
-Next, as we approach eqilibrium we could measured the concentration of A (or B) as a function of time. Becuase we are a closed system we know that:
+Next, as we approach eqilibrium we could measure the concentration of A (or B) as a function of time. Becuase we are in a closed system we know that:
 
 $$\frac{d\left[A\right]}{dt} = -\hat{r}_{1}$$
 
