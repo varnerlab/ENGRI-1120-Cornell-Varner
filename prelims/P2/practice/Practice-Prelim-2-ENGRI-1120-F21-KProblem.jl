@@ -163,7 +163,7 @@ $$\prod_{i=1}^{\mathcal{M}}\left(y_{i}\hat{\phi}_{i}^{v}\right)^{\sigma_{i1}} = 
 To compute the equlibrium constant using the extent. Becuase we have assumed ideality, all the fugacity coefficient terms $\hat{\phi}^{v}_{i}\rightarrow\forall{i}$. In addition the pressure term is 1 becuase $\sigma_{1} = 0$ (the number of moles is conserved). 
 Thus, the equilibrium constant is given by:
 
-$$K = \frac{y_{3}}{y_{1}y_{2}}$$
+$$K = \frac{y_{3}^2}{y_{1}y_{2}}$$
 """
 
 # ╔═╡ b7c489c1-513b-4c1c-b22a-9c0738e4a62e
@@ -443,7 +443,7 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╠═4e10a9b5-cb5e-4b4a-87b4-0ce024a1ad6f
 # ╟─9f253794-d773-48bc-a1b5-94ca242ff798
 # ╠═47e684a6-773b-4009-b7cc-23dc2fbf4a4b
-# ╟─8dca4509-6d6b-41c2-9d22-81c4563a5136
+# ╠═8dca4509-6d6b-41c2-9d22-81c4563a5136
 # ╠═b7c489c1-513b-4c1c-b22a-9c0738e4a62e
 # ╟─9ce4fb80-a6da-4a3d-88f2-83092be1f340
 # ╠═b787a8ca-7bd4-40a7-8574-334c72eda77d
