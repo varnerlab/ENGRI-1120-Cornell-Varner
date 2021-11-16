@@ -105,5 +105,5 @@ The notebooks for actual prelim 1 solutions can be found in the `prelims/P2/actu
 Static HTML versions of the notebooks can be found here:
 
 * [Solution notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Soln-ENGRI-1120-P2-Actual-EqProblem.jl.html) Equilibrium problem from Prelim 2
-* [Solution notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Soln-1120-P1A-ModORC.jl.html) Modified organic Rankine Cycle problem from Prelim 1
+* [Solution notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Soln-ENGRI-1120-P2-Actual-FractionalConversion.jl) Open fractional conversion problem from Prelim 2
 * [Solution notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Soln-1120-P1A-CycleProblem.jl.html) Three component cycle analysis question for Prelim 1
