@@ -29,6 +29,8 @@ This repository holds example problems discussed in lecture. The problems are st
 
 * [Lecture notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Lecture-SteadyState-vs-Eq.jl.html): Lecture material for continuous stirred tank reactors (CSTR) steady-state versus equilibrium lecture
 
+* [Bioprocess-I lecture: Outside of the cell.](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Lecture-SteadyState-vs-Eq.jl.html): Introduction to _unstructured_ bioprocess models which describe reactor conditions outside of cells (if we knew nothing about the cells).
+
 ### Notebooks for Lecture Examples
 
 #### Material/mass balance examples
