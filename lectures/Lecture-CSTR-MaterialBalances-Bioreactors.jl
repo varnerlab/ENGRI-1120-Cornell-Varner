@@ -60,7 +60,7 @@ Let's consider a simple case to better understand the structure and properties o
 $$\begin{eqnarray}
 V\frac{dM_{1}}{dt} & = & \dot{F}_{1}M_{11} - \dot{F}_{2}M_{12} +\left(\tau_{11}q_{1}+\tau_{12}q_{2}\right)XV \\
 V\frac{dM_{2}}{dt} & = & \dot{F}_{1}M_{21} - \dot{F}_{2}M_{22} +\tau_{22}q_{2}XV \\
-V\frac{dX}{dt} & = & 	\dot{F}_{1}X_{1} - \dot{F}_{2}X_{1} +\left(\tau_{31}q_{1} - d\right)XV
+V\frac{dX}{dt} & = & 	\dot{F}_{1}X_{1} - \dot{F}_{2}X_{2} +\left(\tau_{31}q_{1} - d\right)XV
 \end{eqnarray}$$
 
 To describe the chemistry that is occurring in reactions $q_{1}$ (which in this case equals the specific growth rate $\mu$) and $q_{2}$, the specific rate of product formation (which is proportional to the growth rate), we formulate a _pseudo_ reaction(s) of the form:
@@ -2044,8 +2044,8 @@ version = "0.9.1+5"
 # ╟─6a7021ce-780f-4ee0-aeca-014208adcf3a
 # ╟─84091166-c516-4767-bf9c-cf6b6a80ceb8
 # ╟─d6a12732-fc18-43c8-85d3-72bdb4ebfe5f
-# ╠═705d9977-a155-478b-9a3f-5d3d749c1970
-# ╠═e30672df-f442-4d23-af15-fbd93644f014
+# ╟─705d9977-a155-478b-9a3f-5d3d749c1970
+# ╟─e30672df-f442-4d23-af15-fbd93644f014
 # ╠═b71c2696-0d8c-4e4e-8b79-9a0e1cb41c4f
 # ╠═a64ccefd-cda0-4147-951c-45e4fb344325
 # ╠═115aec36-898b-45af-b790-534b8703ab07
