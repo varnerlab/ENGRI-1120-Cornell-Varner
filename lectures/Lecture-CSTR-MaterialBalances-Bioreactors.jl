@@ -58,9 +58,9 @@ _stoichiometric_ coefficient for species $i$ in rate process $j$, where $q_{j}$ 
 Let's consider a simple case to better understand the structure and properties of the general balances shown above: a single substrate $S$ = 1, a single _growth associated_ product $P$ = 2, and cells $X$ in a well-mixed bioreactor with a single input ($s=1$) and a single output ($s=2$). The balances for $S$, $P$, and $X$, in this case, are given by:
 
 $$\begin{eqnarray}
-V\frac{dM_{1}}{dt} & = & \dot{F}\left(M_{11} - M_{12}\right) +\left(\tau_{11}q_{1}+\tau_{12}q_{2}\right)XV \\
-V\frac{dM_{2}}{dt} & = & \dot{F}\left(M_{21} - M_{22}\right) +\tau_{22}q_{2}XV \\
-V\frac{dX}{dt} & = & \dot{F}\left(X_{1}-X_{2}\right) +\left(\tau_{31}q_{1} - d\right)XV
+V\frac{dM_{1}}{dt} & = & \dot{F}_{1}M_{11} - \dot{F}_{2}M_{12} +\left(\tau_{11}q_{1}+\tau_{12}q_{2}\right)XV \\
+V\frac{dM_{2}}{dt} & = & \dot{F}_{1}M_{21} - \dot{F}_{2}M_{22} +\tau_{22}q_{2}XV \\
+V\frac{dX}{dt} & = & 	\dot{F}_{1}X_{1} - \dot{F}_{2}X_{1} +\left(\tau_{31}q_{1} - d\right)XV
 \end{eqnarray}$$
 
 To describe the chemistry that is occurring in reactions $q_{1}$ (which in this case equals the specific growth rate $\mu$) and $q_{2}$, the specific rate of product formation (which is proportional to the growth rate), we formulate a _pseudo_ reaction(s) of the form:
@@ -70,18 +70,33 @@ $$\tau_{11}S+X~{\longrightarrow}~\tau_{21}P + \left(1+\tau_{31}\right)X$$
 However, this is __not__ an elementary reaction, meaning we do not know _a priori_ the values for the stoichiometric coefficients $\tau_{ij}$ _if_ cells are treated as _magical unknowable boxes_ in which we have no mechanistic knowledge or insight. 
 
 ##### Where do the $\tau_{ij}$ in the bioreactor balances come from? 
-If we have no insight into what is going on inside the cells, then the value of $\tau_{ij}$ (stoichiometric coefficient connecting bioprocess $j$ with substrate $i$) has to be estimated from data. These are called Yields in the bioprocess world and they have units of g/g. The yield of cells on the substrate $S$ is defined as:
+If we have no insight into what is going on inside the cells, then the values of the $\tau_{ij}$ (stoichiometric coefficients connecting bioprocess $j$ with substrate $i$) have to be estimated from data. These are called Yields in the bioprocess world and they have units of g-$\star$/g-$\star$. For example, the yield of cells on the substrate $S$ is defined as:
 
-$$Y_{X/S} \equiv -\frac{\Delta{X}}{\Delta{S}}$$
+$$Y_{X/S} \equiv -\frac{\Delta{X}}{\Delta{S}} = \frac{1}{\tau_{11}}$$
 
 where $\Delta{X}$ denotes the cell mass that is produced in the reactor, and $\Delta{S}$ denotes the amount of substrate consumed to produce the cells. In a similar way, we can define the yield of product on substrate $S$ as:
 
-$$Y_{P/S} \equiv -\frac{\Delta{P}}{\Delta{S}}$$
+$$Y_{P/S} \equiv -\frac{\Delta{P}}{\Delta{S}} = \frac{1}{\tau_{12}}$$
 
-where $\Delta{P}$ denotes the product produced and $\Delta{S}$ denotes the amount substrate consumed. The yields can be related through the species mass balance to the stoichiometric coefficients $\tau_{ij}$. Of course, these yields are _not_ independent: because total mass must be conserved, $Y_{X/S}$ and $Y_{P/S}$ must be related to one another. How?
+where $\Delta{P}$ denotes the product produced per substrate consumed. Of course, these yields are _not_ independent: because total mass must be conserved, $Y_{X/S}$ and $Y_{P/S}$ must be related to one another. Furthermore, it's easy to show the relationship:
 
-###### Yeilds and $\tau_{ij}$
+$$-Y_{X/S}{\times}-Y_{S/P}{\times}Y_{P/X} = 1$$
 
+Lastly, by convention $\tau_{31} = 1$. 
+
+##### What is the specific rate of product formation $q_{2}$ and $\tau_{22}$? 
+The last issue that we need to consider is the rate of product formation $q_{2}$ and the value of $\tau_{22}$. Because product $P$ is growth associated (is only formed if the cells are growing e.g., ethanol or CO$_{2}$) we might expect $q_{2}$ to be proportional to the growth rate where the proportionality constant is a measurable yield:
+
+$$\tau_{22}q_{2} = Y_{P/X}\mu$$
+
+Putting all these ideas together gives the system of equations (including the volume balance):
+
+$$\begin{eqnarray}
+V\frac{dM_{1}}{dt} & = & \dot{F}_{1}M_{11} - \dot{F}_{2}M_{12} - \left(\frac{1}{Y_{S/X}}+\frac{1}{Y_{P/S}}\right)\mu XV \\
+V\frac{dM_{2}}{dt} & = & \dot{F}_{1}M_{21} - \dot{F}_{2}M_{22} + \left(Y_{P/X}\right)\mu{XV} \\
+V\frac{dX}{dt} & = & \dot{F}_{1}X_{1} - \dot{F}_{2}X_{2} +\left(\mu - d\right)XV\\
+\rho\frac{dV}{dt} & = &  \dot{F}_{1}\rho_{11} - \dot{F}_{2}\rho_{12}
+\end{eqnarray}$$
 
 """
 
@@ -94,7 +109,7 @@ Models for the kinetics of processes that occur in the _magical unknowable box_ 
 
 $$\mu = \frac{{\mu_{g}^{max}}S}{K_{S}+S}$$
 
-where $\mu$ denotes the specific growth rate (units: 1/time, $\mu_{g}^{max}$ denotes the _maximum specific growth rate_ (units: 1/time), $S$ denote the _mass or mole concentration_ of growth substrate $S$, and $K_{S}$ denotes the saturation constant of growth on substrate $S$ (units: mass or mole concentration).
+where $\mu$ denotes the specific growth rate (units: 1/time), $\mu_{g}^{max}$ denotes the _maximum specific growth rate_ (units: 1/time), $S$ denote the _mass or mole concentration_ of growth substrate $S$, and $K_{S}$ denotes the saturation constant of growth on substrate $S$ (units: mass or mole concentration).
 
 """
 
@@ -127,8 +142,6 @@ begin
 		8.0 	# 4 V units: L 	
 	];
 	
-	# setup the yields -
-
 	# setup rate parameters -
 	# Data taken from BIND: 102533 for K-12 E. coli
 	μ_g_max = 0.76 								# units: 1/hr
@@ -152,6 +165,14 @@ begin
 		F2_dot = 4.0
 	end
 
+	# Setup yeilds -
+	Ypx = 1.961 # units g/g
+	Yxs = 0.51 	# units g/g BIND: 105318
+	Yps = Yxs*Ypx
+
+	# set the death constant -
+	k_d = 0.0;  # units: 1/hr
+
 	# package -
 	model_parameters_dict["S_in"] = S_in
 	model_parameters_dict["P_in"] = P_in
@@ -161,9 +182,28 @@ begin
 	model_parameters_dict["F2_dot"] = F2_dot
 	model_parameters_dict["μ_g_max"] = μ_g_max 	
 	model_parameters_dict["Kₛ"] = Kₛ
-
+	model_parameters_dict["Ypx"] = Ypx
+	model_parameters_dict["Yxs"] = Yxs
+	model_parameters_dict["Yps"] = Yps
+	model_parameters_dict["k_d"] = k_d
+	
 	# show -
 	nothing
+end
+
+# ╔═╡ a0949df6-a328-489a-8e3b-acd28cb05128
+with_terminal() do
+	a = -(1/Yxs + 1/Yps)
+	b = Ypx
+	c = 1
+	r_sum = a+b+c - (k_d/μ_g_max)
+	println("Check: sum of generation terms = $(r_sum)")
+end
+
+# ╔═╡ 4b4bb0cf-5b53-408b-a719-02fc31eedf22
+with_terminal() do
+	yld_product = Yxs*(1/Yps)*Ypx
+	println("Check: yield product = $(yld_product)")
 end
 
 # ╔═╡ aecf1437-4060-4560-ad79-cd3193b82e99
@@ -225,17 +265,18 @@ function balances(dx, x, parameter_dict, t)
 	P_in = parameter_dict["P_in"]
 	X_in = parameter_dict["X_in"]
 
-	Ypx = 0.87 # units g/g
-	Yxs = 0.72 # units g/g
-	Yps = Yxs*(1/Ypx)
+	# yields -
+	Ypx = parameter_dict["Ypx"]
+	Yxs = parameter_dict["Yxs"]
+	Yps = parameter_dict["Yps"]
+
+	# cell death -
+	k_d = parameter_dict["k_d"]
 
 	# setup rates -
 	q₁ = μ(S, parameter_dict)
-	q₂ = Yps*μ(S, parameter_dict)
+	q₂ = Ypx*μ(S, parameter_dict)
 		
-	# get death constant -
-	k_d = 0.001;  # units: 1/hr
-	
 	# compute D -
 	D₁ = F1_dot/V # units: 1/hr
 	D₂ = F2_dot/V # units: 1/hr
@@ -247,14 +288,14 @@ function balances(dx, x, parameter_dict, t)
 	dx[1] = D₁*S_in - D₂*S - ((1/Yxs) + (1/Yps))*q₁*X
 	dx[2] = D₁*P_in - D₂*P + q₂*X
 	dx[3] = D₁*X_in - D₂*X + (q₁ - k_d)*X
-	dx[4] = F1_dot - F2_dot
+	dx[4] = F1_dot - F2_dot # assumed constant density 
 end
 
 # ╔═╡ e30672df-f442-4d23-af15-fbd93644f014
 begin
 
 	# setup the calculation -
-	T_end_phase_1 = 16.0
+	T_end_phase_1 = 36.0
 	tspan = (0.0, T_end_phase_1)
 	
 	# get the initial conditions -
@@ -299,7 +340,15 @@ begin
 end
 
 # ╔═╡ 115aec36-898b-45af-b790-534b8703ab07
-x_soln_array
+with_terminal() do
+
+	if (isequal(case_flag,"first") == true)
+		S_ic = x_soln_array[end,3] + x_soln_array[end,4] - x_soln_array[1,4]
+		println("Batch check: Batch mass S initial = $(S_ic) g/L")
+	else
+		println("Test form not valid. Rewrite for this case")
+	end
+end
 
 # ╔═╡ a0aa5eee-4601-11ec-1d3c-2d0230a4a0a3
 html"""
@@ -2000,6 +2049,8 @@ version = "0.9.1+5"
 # ╠═b71c2696-0d8c-4e4e-8b79-9a0e1cb41c4f
 # ╠═a64ccefd-cda0-4147-951c-45e4fb344325
 # ╠═115aec36-898b-45af-b790-534b8703ab07
+# ╠═a0949df6-a328-489a-8e3b-acd28cb05128
+# ╠═4b4bb0cf-5b53-408b-a719-02fc31eedf22
 # ╠═11ec1381-560a-450c-a78c-d9f4b2485422
 # ╠═aecf1437-4060-4560-ad79-cd3193b82e99
 # ╠═bb1927c5-54b7-4457-aa85-56e689bb38df
