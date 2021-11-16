@@ -23,12 +23,12 @@ end
 
 # ╔═╡ 215136d6-9313-4849-81e1-b269f699aa33
 md"""
-## Processes with Cells: Outside the Cell
+## Bioprocesses I: Outside the Cell
 
-Up to now, we have not considered chemical transformations and processes involving cells (called Bioprocesses). However, bioreactors and bioprocesses are important areas for Chemical Engineering. Toward this point, by the end of this lecture you should be able to:
+Up to now, we have not considered chemical transformations and processes involving cells (called Bioprocesses). However, bioreactors and bioprocesses are important areas for Chemical Engineering because of the unique chemistries that can occur in the natural world. Many things that we take for granted every day are produced directly by or are associated with bioprocesses. For example, [the enzymes in laundry detergents](https://iubmb.onlinelibrary.wiley.com/doi/full/10.1002/bmb.20488), food products, wine or beer. Thus, let's begin to discuss some bioprocess basics. Toward this, by the end of this lecture you should be able to:
 
 __Objectives__ 
-* Write the species mole and mass balances for substrate $S$, product $P$ and cells $X$ in a bioreactor
+* Write the species mass balances for substrate $S$, product $P$ and cells $X$ in a bioreactor
 * Formulate _simple_ models for the rate of cell growth and product formation
 * Solve _simple_ models of cell growth and product formation in different types of well-mixed continuous stirred tank reactors 
 
@@ -52,10 +52,10 @@ $M_{is}$ denotes the number of mass concentration of species $i$ in stream $s$ p
 $v_{s}$ denotes the direction parameter for stream $s$. 
 There are $s=1,2,\dots,\mathcal{S}$ total possible streams into and from the bioreactor. 
 The second set of terms on the right-hand side of the first equation are the (bio)reaction terms: the symbol $\tau_{ij}$ denotes the 
-_stoichiometric_ coefficient for species $i$ in rate process $j$, where $q_{j}$ denotes the _specific_ rate of biotransformation $j$ (units: $\star$mol/gDW-time), $X$ denotes the cell mass concentration (units: gDW/L) and $V$ denotes the volume of the reacting fluid in the reactor. The second equation is the cell mass balance, where the first term on the right-hand side if the transport of cells into and from the bioreactor in the streams, and the second term is the _net_ rate of cell growth, where $\mu$ denotes the specific growth rate (units: 1/time), $d$ denotes the specific rate of cell death (units: 1/time) and $X_{s}$ denotes the cell mass in the stream $s$ (units: gDW/L). Lastly, the term $\tau_{X}$ denotes the stoichiometric coefficient governing the growth of cells.   
+_stoichiometric_ coefficient for species $i$ in rate process $j$, where $q_{j}$ denotes the _specific_ rate of biotransformation $j$ (units: $\star$/gDW-time), $X$ denotes the cell mass concentration (units: gDW/L) and $V$ denotes the volume of the reacting fluid in the reactor. The second equation is the cell mass balance, where the first term on the right-hand side if the transport of cells into and from the bioreactor in the streams, and the second term is the _net_ rate of cell growth, where $\mu$ denotes the specific growth rate (units: 1/time), $d$ denotes the specific rate of cell death (units: 1/time) and $X_{s}$ denotes the cell mass in the stream $s$ (units: gDW/L). Lastly, the term $\tau_{X}$ denotes the stoichiometric coefficient governing the growth of cells.   
 
-##### Single substrate $S$, product $P$ and cell mass $X$
-Let's consider a simple case to better understand the structure and properties of the general balances shown above: a single substrate $S$ = 1, a single _growth associated_ product $P$ = 2, and cells $X$ in a well-mixed bioreactor with a single input ($s=1$) and a single output ($s=2$). The balances for $S$, $P$ and $X$, in this case, are given by:
+##### Single substrate $S$, growth product $P$ and cell mass $X$
+Let's consider a simple case to better understand the structure and properties of the general balances shown above: a single substrate $S$ = 1, a single _growth associated_ product $P$ = 2, and cells $X$ in a well-mixed bioreactor with a single input ($s=1$) and a single output ($s=2$). The balances for $S$, $P$, and $X$, in this case, are given by:
 
 $$\begin{eqnarray}
 V\frac{dM_{1}}{dt} & = & \dot{F}\left(M_{11} - M_{12}\right) +\left(\tau_{11}q_{1}+\tau_{12}q_{2}\right)XV \\
@@ -63,7 +63,7 @@ V\frac{dM_{2}}{dt} & = & \dot{F}\left(M_{21} - M_{22}\right) +\tau_{22}q_{2}XV \
 V\frac{dX}{dt} & = & \dot{F}\left(X_{1}-X_{2}\right) +\left(\tau_{31}q_{1} - d\right)XV
 \end{eqnarray}$$
 
-To describe the chemistry that is occurring in reactions $q_{1}$ (which in this case equals the specific growth rate $\mu$) and $q_{2}$, the specific rate of product formation, we formulate a _pseudo_ reaction(s) of the form:
+To describe the chemistry that is occurring in reactions $q_{1}$ (which in this case equals the specific growth rate $\mu$) and $q_{2}$, the specific rate of product formation (which is proportional to the growth rate), we formulate a _pseudo_ reaction(s) of the form:
 
 $$\tau_{11}S+X~{\longrightarrow}~\tau_{21}P + \left(1+\tau_{31}\right)X$$
 
@@ -115,15 +115,15 @@ begin
 	model_parameters_dict = Dict{String,Any}()
 
 	# general parameters -
-	S_in = 2.0 	# units: μmol/L
-	P_in = 0.0  # units: μmol/L
-	X_in = 0.0 	# units: μmol/L
+	S_in = 40.0 # units: g/L
+	P_in = 0.0  # units: g/L
+	X_in = 0.0 	# units: g/L
 
 	# setup initial conditions -
 	initial_condition_array = [
-		5.0 	# 1 S units: g/L
+		36.0 	# 1 S units: g/L
 		0.0 	# 2 P units: g/L
-		1.0 	# 3 X units: gDW/L
+		0.1 	# 3 X units: gDW/L
 		8.0 	# 4 V units: L 	
 	];
 	
@@ -143,7 +143,7 @@ begin
 	elseif (isequal(case_flag,"second") == true)
 
 		# setup fed batch-specific parameters -
-		F1_dot = 4.0
+		F1_dot = 2.0
 		F2_dot = 0.0
 	elseif (isequal(case_flag, "third") == true)
 
@@ -165,9 +165,6 @@ begin
 	# show -
 	nothing
 end
-
-# ╔═╡ 5b1641cb-8af5-4693-814c-86c94eabadb9
-100*(1/1e3)*180.156
 
 # ╔═╡ aecf1437-4060-4560-ad79-cd3193b82e99
 function μ(x, parameters_dict)
@@ -228,16 +225,16 @@ function balances(dx, x, parameter_dict, t)
 	P_in = parameter_dict["P_in"]
 	X_in = parameter_dict["X_in"]
 
-	Yxs = 0.75
-	Yps = 0.5
-	Ypx = Yxs*((Yps)^-1)
+	Ypx = 0.87 # units g/g
+	Yxs = 0.72 # units g/g
+	Yps = Yxs*(1/Ypx)
 
 	# setup rates -
 	q₁ = μ(S, parameter_dict)
-	q₂ = Ypx*μ(S, parameter_dict)
+	q₂ = Yps*μ(S, parameter_dict)
 		
 	# get death constant -
-	k_d = 0.01;  # units: 1/hr
+	k_d = 0.001;  # units: 1/hr
 	
 	# compute D -
 	D₁ = F1_dot/V # units: 1/hr
@@ -257,7 +254,7 @@ end
 begin
 
 	# setup the calculation -
-	T_end_phase_1 = 20.0
+	T_end_phase_1 = 16.0
 	tspan = (0.0, T_end_phase_1)
 	
 	# get the initial conditions -
@@ -272,7 +269,37 @@ begin
 end
 
 # ╔═╡ b71c2696-0d8c-4e4e-8b79-9a0e1cb41c4f
-plot(soln_phase_1)
+begin
+	plot(soln_phase_1, vars=(1:4), label=["S (g/L)" "P (g/L)" "X (gDW/L)" "V (L)"], lw=2)
+	xlabel!("Time (hr)", fontsize=18)
+	ylabel!("Concentration (g/L -or- gDW/L)", fontsize=18)
+end
+
+# ╔═╡ a64ccefd-cda0-4147-951c-45e4fb344325
+begin
+
+	# convert soln to array -
+	n_t_steps_phase_1 = length(soln_phase_1.t)
+	total_number_t_steps = n_t_steps_phase_1
+
+	# buld the T and X structures -
+	T = vcat(soln_phase_1.t)
+	X = vcat(soln_phase_1.u)
+
+	# build the state array -
+	x_soln_array = zeros(total_number_t_steps,5)
+	for step_index = 1:total_number_t_steps
+
+		x_soln_array[step_index,1] = T[step_index]
+		x_soln_array[step_index,2] = X[step_index][1]
+		x_soln_array[step_index,3] = X[step_index][2]
+		x_soln_array[step_index,4] = X[step_index][3]
+		x_soln_array[step_index,5] = X[step_index][4]
+	end
+end
+
+# ╔═╡ 115aec36-898b-45af-b790-534b8703ab07
+x_soln_array
 
 # ╔═╡ a0aa5eee-4601-11ec-1d3c-2d0230a4a0a3
 html"""
@@ -1968,10 +1995,11 @@ version = "0.9.1+5"
 # ╟─6a7021ce-780f-4ee0-aeca-014208adcf3a
 # ╟─84091166-c516-4767-bf9c-cf6b6a80ceb8
 # ╟─d6a12732-fc18-43c8-85d3-72bdb4ebfe5f
-# ╟─705d9977-a155-478b-9a3f-5d3d749c1970
+# ╠═705d9977-a155-478b-9a3f-5d3d749c1970
 # ╠═e30672df-f442-4d23-af15-fbd93644f014
 # ╠═b71c2696-0d8c-4e4e-8b79-9a0e1cb41c4f
-# ╠═5b1641cb-8af5-4693-814c-86c94eabadb9
+# ╠═a64ccefd-cda0-4147-951c-45e4fb344325
+# ╠═115aec36-898b-45af-b790-534b8703ab07
 # ╠═11ec1381-560a-450c-a78c-d9f4b2485422
 # ╠═aecf1437-4060-4560-ad79-cd3193b82e99
 # ╠═bb1927c5-54b7-4457-aa85-56e689bb38df
