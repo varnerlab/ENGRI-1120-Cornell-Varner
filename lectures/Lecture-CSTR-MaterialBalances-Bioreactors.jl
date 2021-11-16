@@ -115,9 +115,9 @@ begin
 
 	# setup initial conditions -
 	initial_condition_array = [
-		1.0 	# 1 S units: μmol/L
+		100.0 	# 1 S units: μmol/L
 		0.0 	# 2 P units: μmol/L
-		0.1 	# 3 X units: gDW/L
+		1.0 	# 3 X units: gDW/L
 		8.0 	# 4 V units: L 	
 	];
 	
@@ -165,9 +165,6 @@ md"""
 ##### Obj 3: Simulate cell growth and product formation in a well-mixed bioreactor
 """
 
-# ╔═╡ e30672df-f442-4d23-af15-fbd93644f014
-
-
 # ╔═╡ aecf1437-4060-4560-ad79-cd3193b82e99
 function μ(x, parameters_dict)
 
@@ -210,7 +207,7 @@ begin
 end
 
 # ╔═╡ 11ec1381-560a-450c-a78c-d9f4b2485422
-function balances(dx,x, parameter_dict,t)
+function balances(dx, x, parameter_dict, t)
 
 	# alias -
 	S = x[1] # 1 units: μmol/L
@@ -223,9 +220,12 @@ function balances(dx,x, parameter_dict,t)
 	F2_dot = parameter_dict["F2_dot"]
 
 	# input -
-	S_in = model_parameters_dict["S_in"]
-	P_in = model_parameters_dict["P_in"]
-	X_in = model_parameters_dict["X_in"]
+	S_in = parameter_dict["S_in"]
+	P_in = parameter_dict["P_in"]
+	X_in = parameter_dict["X_in"]
+
+	Yxs = 0.5
+	Yps = 1.0
 
 	# get death constant -
 	k_d = 0.01;  # units: 1/hr
@@ -241,8 +241,29 @@ function balances(dx,x, parameter_dict,t)
 	dx[1] = D₁*S_in - D₂*S - ((1/Yxs) + (1/Yps))*μ(S,parameter_dict)*X
 	dx[2] = D₁*P_in - D₂*P + μ(S,parameter_dict)*X
 	dx[3] = D₁*X_in - D₂*X + (μ(S,parameter_dict) - k_d)*X
-	dx[4] = F_in - F_out
+	dx[4] = F1_dot - F2_dot
 end
+
+# ╔═╡ e30672df-f442-4d23-af15-fbd93644f014
+begin
+
+	# setup the calculation -
+	T_end_phase_1 = 20.0
+	tspan = (0.0, T_end_phase_1)
+	
+	# get the initial conditions -
+	xinitial = model_parameters_dict["initial_condition_array"]
+	ode_prob = ODEProblem(balances,xinitial,tspan,model_parameters_dict)
+
+	# solve the ODEs numerically -
+	soln_phase_1 = solve(ode_prob, Tsit5(), reltol=1e-8, abstol=1e-8)
+
+	# show -
+	nothing
+end
+
+# ╔═╡ b2b2c06c-e440-43c8-8c38-d631e42a9bbc
+soln_phase_1
 
 # ╔═╡ a0aa5eee-4601-11ec-1d3c-2d0230a4a0a3
 html"""
@@ -1940,6 +1961,7 @@ version = "0.9.1+5"
 # ╟─6a7021ce-780f-4ee0-aeca-014208adcf3a
 # ╟─84091166-c516-4767-bf9c-cf6b6a80ceb8
 # ╠═e30672df-f442-4d23-af15-fbd93644f014
+# ╠═b2b2c06c-e440-43c8-8c38-d631e42a9bbc
 # ╠═11ec1381-560a-450c-a78c-d9f4b2485422
 # ╠═aecf1437-4060-4560-ad79-cd3193b82e99
 # ╠═bb1927c5-54b7-4457-aa85-56e689bb38df
