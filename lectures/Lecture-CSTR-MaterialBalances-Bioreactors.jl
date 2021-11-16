@@ -40,16 +40,17 @@ md"""
 This is the easy part: we've sort of seen these balance equations before. Let's consider a bioprocess in a well-mixed continuous stirred tank reactor that may (or may not) be at a steady state. Substrates (starting materials) $S_{1},S_{2},\dots,S_{A}$ are transformed to product(s) $P_{1},P_{2},\dots,P_{\mathcal{P}}$ and cells $X$ in the bioreactor.  
 
 ##### General case
-Let's start with the species mole balances around substrates, products and cells where we number the substrate and product species $i=1,2,\dots,\mathcal{M}$ and denote cell concentration by X (units: gDW/L):
+Let's start with the species mass balances around substrates, products and cells where we number the substrate and product species $i=1,2,\dots,\mathcal{M}$ and denote cell concentration by X (units: gDW/L):
 
 $$\begin{eqnarray}
-\frac{dn_{i}}{dt} & = & \sum_{s=1}^{\mathcal{S}}v_{s}n_{is} + \left(\sum_{j=1}^{\mathcal{T}}\tau_{ij}q_{j}X\right)V\qquad{i=1,2,\dots,\mathcal{M}}\\
-V\frac{dX}{dt} & = & \sum_{s=1}^{\mathcal{S}}v_{s}\dot{F}_{s}X_{s} + \tau_{X}\left(\mu-d\right)XV
+V\frac{dM_{i}}{dt} & = & \sum_{s=1}^{\mathcal{S}}v_{s}\dot{F}_{s}M_{is} + \left(\sum_{j=1}^{\mathcal{T}}\tau_{ij}q_{j}X\right)V\qquad{i=1,2,\dots,\mathcal{M}}\\
+V\frac{dX}{dt} & = & \sum_{s=1}^{\mathcal{S}}v_{s}\dot{F}_{s}X_{s} + \left(\tau_{X}\mu-d\right)XV
 \end{eqnarray}$$
 
-where $n_{i}$ denotes the number of moles of species $i$ in the reactor, $n_{is}$ denotes the number of moles of species $i$ in stream $s$ per time (mole flow rate), where
+where $M_{i}$ denotes the _mass concentration_ of species $i$ in the reactor (units: g/L), 
+$M_{is}$ denotes the number of mass concentration of species $i$ in stream $s$ per time (units: g/L), where
 $v_{s}$ denotes the direction parameter for stream $s$. 
-There are $s=1,2,\dots,\mathcal{S}$ possible streams into and from the bioreactor. 
+There are $s=1,2,\dots,\mathcal{S}$ total possible streams into and from the bioreactor. 
 The second set of terms on the right-hand side of the first equation are the (bio)reaction terms: the symbol $\tau_{ij}$ denotes the 
 _stoichiometric_ coefficient for species $i$ in rate process $j$, where $q_{j}$ denotes the _specific_ rate of biotransformation $j$ (units: $\star$mol/gDW-time), $X$ denotes the cell mass concentration (units: gDW/L) and $V$ denotes the volume of the reacting fluid in the reactor. The second equation is the cell mass balance, where the first term on the right-hand side if the transport of cells into and from the bioreactor in the streams, and the second term is the _net_ rate of cell growth, where $\mu$ denotes the specific growth rate (units: 1/time), $d$ denotes the specific rate of cell death (units: 1/time) and $X_{s}$ denotes the cell mass in the stream $s$ (units: gDW/L). Lastly, the term $\tau_{X}$ denotes the stoichiometric coefficient governing the growth of cells.   
 
@@ -57,12 +58,12 @@ _stoichiometric_ coefficient for species $i$ in rate process $j$, where $q_{j}$ 
 Let's consider a simple case to better understand the structure and properties of the general balances shown above: a single substrate $S$ = 1, a single _growth associated_ product $P$ = 2, and cells $X$ in a well-mixed bioreactor with a single input ($s=1$) and a single output ($s=2$). The balances for $S$, $P$ and $X$, in this case, are given by:
 
 $$\begin{eqnarray}
-\frac{dn_{1}}{dt} & = & \dot{n}_{11} - \dot{n}_{12} +\tau_{11}q_{1}XV \\
-\frac{dn_{2}}{dt} & = & \dot{n}_{21} - \dot{n}_{22} +\tau_{21}q_{1}XV \\
-V\frac{dX}{dt} & = & \dot{F}\left(X_{1}-X\right) +\tau_{31}(q_{1} - d)XV
+V\frac{dM_{1}}{dt} & = & \dot{F}\left(M_{11} - M_{12}\right) +\left(\tau_{11}q_{1}+\tau_{12}q_{2}\right)XV \\
+V\frac{dM_{2}}{dt} & = & \dot{F}\left(M_{21} - M_{22}\right) +\tau_{22}q_{2}XV \\
+V\frac{dX}{dt} & = & \dot{F}\left(X_{1}-X_{2}\right) +\left(\tau_{31}q_{1} - d\right)XV
 \end{eqnarray}$$
 
-To describe the chemistry that is occurring in reaction $q_{1}$ (which in this case equals the specific growth rate $\mu$), we formulate a _pseudo_ reaction of the form:
+To describe the chemistry that is occurring in reactions $q_{1}$ (which in this case equals the specific growth rate $\mu$) and $q_{2}$, the specific rate of product formation, we formulate a _pseudo_ reaction(s) of the form:
 
 $$\tau_{11}S+X~{\longrightarrow}~\tau_{21}P + \left(1+\tau_{31}\right)X$$
 
@@ -93,8 +94,13 @@ Models for the kinetics of processes that occur in the _magical unknowable box_ 
 
 $$\mu = \frac{{\mu_{g}^{max}}S}{K_{S}+S}$$
 
-where $\mu$ denotes the specific growth rate (units: 1/time, $\mu_{g}^{max}$ denotes the _maximum specific growth rate_ (units: 1/time), $S$ denote the _concentration_ of growth substrate $S$, and $K_{S}$ denotes the saturation constant of growth on substrate $S$ (units: concentration).
+where $\mu$ denotes the specific growth rate (units: 1/time, $\mu_{g}^{max}$ denotes the _maximum specific growth rate_ (units: 1/time), $S$ denote the _mass or mole concentration_ of growth substrate $S$, and $K_{S}$ denotes the saturation constant of growth on substrate $S$ (units: mass or mole concentration).
 
+"""
+
+# ╔═╡ 84091166-c516-4767-bf9c-cf6b6a80ceb8
+md"""
+##### Obj 3: Simulate cell growth and product formation in a well-mixed bioreactor
 """
 
 # ╔═╡ d6a12732-fc18-43c8-85d3-72bdb4ebfe5f
@@ -115,8 +121,8 @@ begin
 
 	# setup initial conditions -
 	initial_condition_array = [
-		100.0 	# 1 S units: μmol/L
-		0.0 	# 2 P units: μmol/L
+		5.0 	# 1 S units: g/L
+		0.0 	# 2 P units: g/L
 		1.0 	# 3 X units: gDW/L
 		8.0 	# 4 V units: L 	
 	];
@@ -126,7 +132,7 @@ begin
 	# setup rate parameters -
 	# Data taken from BIND: 102533 for K-12 E. coli
 	μ_g_max = 0.76 								# units: 1/hr
-	Kₛ = 40.0 									# units: μmol/L
+	Kₛ = 0.00716 								# units: g/L
 	
 	# case specific parameters -
 	if (isequal(case_flag, "first") == true)
@@ -160,10 +166,8 @@ begin
 	nothing
 end
 
-# ╔═╡ 84091166-c516-4767-bf9c-cf6b6a80ceb8
-md"""
-##### Obj 3: Simulate cell growth and product formation in a well-mixed bioreactor
-"""
+# ╔═╡ 5b1641cb-8af5-4693-814c-86c94eabadb9
+100*(1/1e3)*180.156
 
 # ╔═╡ aecf1437-4060-4560-ad79-cd3193b82e99
 function μ(x, parameters_dict)
@@ -187,7 +191,7 @@ begin
 	N = 10000
 	
 	# setup a substrate array -
-	S_array = range(0.0,stop=1000.0,length=N) |> collect
+	S_array = range(0.0,stop=0.5,length=N) |> collect
 
 	# compute the rate at diff S values, put in array
 	for S in S_array
@@ -201,8 +205,8 @@ begin
 	
 	# plot -
 	plot(S_array, μ_array, legend=:right, label="specific growth rate μ", lw=2, color=:red)
-	plot!(S_array, μ_g_max*ones(N), label="μ_G_max",lw=2,color=:black)
-	xlabel!("Substrate S concentration (μmol/L)",fontsize=18)
+	plot!(S_array, μ_g_max*ones(N), label="μ_G_max",lw=2,color=:blue)
+	xlabel!("Substrate S concentration (g/L)",fontsize=18)
 	ylabel!("Specific growth rate μ(S) (1/hr)",fontsize=18)	
 end
 
@@ -210,9 +214,9 @@ end
 function balances(dx, x, parameter_dict, t)
 
 	# alias -
-	S = x[1] # 1 units: μmol/L
-	P = x[2] # 2 units: μmol/L
-	X = x[3] # 3 units: gDW/L
+	S = x[1] # 1 units: g/L
+	P = x[2] # 2 units: g/L
+	X = x[3] # 3 units: g/L
 	V = x[4] # 1 units: L
 	
 	# get stuff from the parameter_dict -
@@ -224,12 +228,17 @@ function balances(dx, x, parameter_dict, t)
 	P_in = parameter_dict["P_in"]
 	X_in = parameter_dict["X_in"]
 
-	Yxs = 0.5
-	Yps = 1.0
+	Yxs = 0.75
+	Yps = 0.5
+	Ypx = Yxs*((Yps)^-1)
 
+	# setup rates -
+	q₁ = μ(S, parameter_dict)
+	q₂ = Ypx*μ(S, parameter_dict)
+		
 	# get death constant -
 	k_d = 0.01;  # units: 1/hr
-
+	
 	# compute D -
 	D₁ = F1_dot/V # units: 1/hr
 	D₂ = F2_dot/V # units: 1/hr
@@ -238,9 +247,9 @@ function balances(dx, x, parameter_dict, t)
 	μ_val = μ(x,parameter_dict)
 
 	# setup balances -
-	dx[1] = D₁*S_in - D₂*S - ((1/Yxs) + (1/Yps))*μ(S,parameter_dict)*X
-	dx[2] = D₁*P_in - D₂*P + μ(S,parameter_dict)*X
-	dx[3] = D₁*X_in - D₂*X + (μ(S,parameter_dict) - k_d)*X
+	dx[1] = D₁*S_in - D₂*S - ((1/Yxs) + (1/Yps))*q₁*X
+	dx[2] = D₁*P_in - D₂*P + q₂*X
+	dx[3] = D₁*X_in - D₂*X + (q₁ - k_d)*X
 	dx[4] = F1_dot - F2_dot
 end
 
@@ -262,8 +271,8 @@ begin
 	nothing
 end
 
-# ╔═╡ b2b2c06c-e440-43c8-8c38-d631e42a9bbc
-soln_phase_1
+# ╔═╡ b71c2696-0d8c-4e4e-8b79-9a0e1cb41c4f
+plot(soln_phase_1)
 
 # ╔═╡ a0aa5eee-4601-11ec-1d3c-2d0230a4a0a3
 html"""
@@ -1954,14 +1963,15 @@ version = "0.9.1+5"
 
 # ╔═╡ Cell order:
 # ╟─215136d6-9313-4849-81e1-b269f699aa33
-# ╠═4464cb96-2778-4946-978d-50961869d59a
+# ╟─4464cb96-2778-4946-978d-50961869d59a
 # ╟─3a0df0cc-b0aa-4232-9275-389d378114aa
-# ╟─d6a12732-fc18-43c8-85d3-72bdb4ebfe5f
-# ╠═705d9977-a155-478b-9a3f-5d3d749c1970
 # ╟─6a7021ce-780f-4ee0-aeca-014208adcf3a
 # ╟─84091166-c516-4767-bf9c-cf6b6a80ceb8
+# ╟─d6a12732-fc18-43c8-85d3-72bdb4ebfe5f
+# ╟─705d9977-a155-478b-9a3f-5d3d749c1970
 # ╠═e30672df-f442-4d23-af15-fbd93644f014
-# ╠═b2b2c06c-e440-43c8-8c38-d631e42a9bbc
+# ╠═b71c2696-0d8c-4e4e-8b79-9a0e1cb41c4f
+# ╠═5b1641cb-8af5-4693-814c-86c94eabadb9
 # ╠═11ec1381-560a-450c-a78c-d9f4b2485422
 # ╠═aecf1437-4060-4560-ad79-cd3193b82e99
 # ╠═bb1927c5-54b7-4457-aa85-56e689bb38df
