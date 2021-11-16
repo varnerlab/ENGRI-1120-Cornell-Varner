@@ -261,7 +261,7 @@ begin
 
 	# display -
 	with_terminal() do
-		println("k₁_f = $(k_vec_estimate[1]) units: hmmmm and k₁_f = $(k_vec_estimate[2]) units: hmmmm.")
+		println("k₁_f = $(k_vec_estimate[1]) units: hmmmm and k₁_r = $(k_vec_estimate[2]) units: hmmmm.")
 	end
 end
 
