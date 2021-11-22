@@ -6,6 +6,7 @@ using InteractiveUtils
 
 # ╔═╡ 671157cc-350a-457f-98a0-c2b7440fe7e8
 begin
+	using DataFrames
 	using CSV
 	using Optim
 	using GLPK
@@ -64,8 +65,8 @@ begin
 	nothing
 end
 
-# ╔═╡ acc31757-ed62-4cd0-9cbf-ec8f84d7e479
-project.load_bson_model_file(joinpath(_PATH_TO_MODEL,"ENGRI-1120-model-F21.bson"))
+# ╔═╡ 244eb90f-0d8c-4096-a273-855d65dc1dd7
+BSON.load("./model/ENGRI-1120-model-F21.bson")
 
 # ╔═╡ bc1d1380-a319-4861-9777-3b32a2d3fdc2
 function ingredients(path::String; module_name::Symbol = :model)
@@ -89,12 +90,6 @@ function ingredients(path::String; module_name::Symbol = :model)
 	# return code as module - 
 	m
 end
-
-# ╔═╡ 9da30667-f5b3-4699-82ee-3513374fc58a
-M = ingredients("./src/Project.jl"; module_name = :project)
-
-# ╔═╡ 3641c19f-75e3-4858-9764-79be088383a0
-typeof(M)
 
 # ╔═╡ 18b29a1a-4787-11ec-25e3-5f29ebd21430
 html"""
@@ -1279,9 +1274,7 @@ version = "0.9.1+5"
 # ╟─836e69f7-9a2d-4674-8c20-51b07d13b7ab
 # ╠═671157cc-350a-457f-98a0-c2b7440fe7e8
 # ╠═d737e861-3da6-4696-837c-aaa1f9c54a81
-# ╠═9da30667-f5b3-4699-82ee-3513374fc58a
-# ╠═3641c19f-75e3-4858-9764-79be088383a0
-# ╠═acc31757-ed62-4cd0-9cbf-ec8f84d7e479
+# ╠═244eb90f-0d8c-4096-a273-855d65dc1dd7
 # ╠═bc1d1380-a319-4861-9777-3b32a2d3fdc2
 # ╟─18b29a1a-4787-11ec-25e3-5f29ebd21430
 # ╟─16dca67c-f280-4a6f-bd79-308cf63dabf6
