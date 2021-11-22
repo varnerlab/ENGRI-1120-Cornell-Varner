@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.17.1
+# v0.17.2
 
 using Markdown
 using InteractiveUtils
@@ -76,7 +76,8 @@ begin
 	
 	# what reactions do we need?
 	reaction_id_array = [
-		
+
+		# upper glycolysis -
 		"rn:R00299" 	; # 1
 		"rn:R00771" 	; # 2
 		"rn:R00756" 	; # 3
@@ -88,6 +89,31 @@ begin
 		"rn:R01518" 	; # 9
 		"rn:R00658" 	; # 10
 		"rn:R00200" 	; # 11
+
+		# AcCoA formation -
+		"rn:R00199" 	; # 12
+		#"rn:R01699" 	; # 13 - issues
+		#"rn:R02569" 	; # 14
+		#"rn:R08550" 	; # 15
+		"rn:R00235" 	; # 16
+		"rn:R00229" 	; # 17
+
+		# TCA cycle -
+		"rn:R00351" 	; # 18
+		"rn:R01324" 	; # 19
+		"rn:R00267" 	; # 20
+		#"rn:R01700" 	; # 21 - issues
+		#"rn:R02570" 	; # 22
+		#"rn:R08550" 	; # 23
+		"rn:R00405" 	; # 24
+		"rn:R01082" 	; # 25
+		"rn:R00342" 	; # 26
+
+		# OxPhos - hmmm ... going to have to add by hand .. man, come on KEGG ..
+		# "rn:R11945" 	; # 27 - replace
+		# "rn:R00081" 	; # 28 - replace
+		# "rn:R00004" 	; # 29
+	
 	];
 
 	# build the stm (function included from project code lib) -
@@ -112,12 +138,6 @@ begin
 	# show -
 	nothing
 end
-
-# ╔═╡ 82a2823f-3f9f-466a-bfe0-c3b3bf56277e
-size(S)
-
-# ╔═╡ 797b25f9-88e5-4897-af58-e854c9f83c53
-metabolite_name_array[1:10,:]
 
 # ╔═╡ 533a6751-d5f7-46c3-832f-2f204a5b38b2
 MODEL[:compounds]
@@ -1309,8 +1329,6 @@ version = "0.9.1+5"
 # ╠═671157cc-350a-457f-98a0-c2b7440fe7e8
 # ╠═d737e861-3da6-4696-837c-aaa1f9c54a81
 # ╠═b5acd239-fda4-4313-adcd-69f94a8363dd
-# ╠═82a2823f-3f9f-466a-bfe0-c3b3bf56277e
-# ╠═797b25f9-88e5-4897-af58-e854c9f83c53
 # ╠═533a6751-d5f7-46c3-832f-2f204a5b38b2
 # ╠═91fa000a-2ab8-4d09-8079-926b1671baef
 # ╟─18b29a1a-4787-11ec-25e3-5f29ebd21430
