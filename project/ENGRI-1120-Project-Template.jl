@@ -72,6 +72,7 @@ md"""
 begin
 
 	# load the model file -
+	# MODEL is type Dict{Symbol,DataFrame} => holds the global reaction table, and the species table and the ΔG table 
 	MODEL = load_bson_model_file("./model/ENGRI-1120-model-F21.bson", @__MODULE__)
 	
 	# what reactions do we need?
@@ -138,12 +139,6 @@ begin
 	# show -
 	nothing
 end
-
-# ╔═╡ 533a6751-d5f7-46c3-832f-2f204a5b38b2
-MODEL[:compounds]
-
-# ╔═╡ 91fa000a-2ab8-4d09-8079-926b1671baef
-MODEL
 
 # ╔═╡ 18b29a1a-4787-11ec-25e3-5f29ebd21430
 html"""
@@ -1329,8 +1324,6 @@ version = "0.9.1+5"
 # ╠═671157cc-350a-457f-98a0-c2b7440fe7e8
 # ╠═d737e861-3da6-4696-837c-aaa1f9c54a81
 # ╠═b5acd239-fda4-4313-adcd-69f94a8363dd
-# ╠═533a6751-d5f7-46c3-832f-2f204a5b38b2
-# ╠═91fa000a-2ab8-4d09-8079-926b1671baef
 # ╟─18b29a1a-4787-11ec-25e3-5f29ebd21430
 # ╟─16dca67c-f280-4a6f-bd79-308cf63dabf6
 # ╟─00000000-0000-0000-0000-000000000001
