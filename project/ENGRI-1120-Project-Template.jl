@@ -17,6 +17,21 @@ begin
 	using Plots
 end
 
+# ╔═╡ d737e861-3da6-4696-837c-aaa1f9c54a81
+begin
+
+	# setup paths so we can load stuff -
+	_PATH_TO_ROOT = pwd()
+	_PATH_TO_SRC = joinpath(_PATH_TO_ROOT,"src")
+	_PATH_TO_MODEL = joinpath(_PATH_TO_ROOT, "model")
+
+	# load my utility methods into the workspace -
+	include(joinpath(_PATH_TO_SRC, "Include.jl"))
+
+	# show -
+	nothing
+end
+
 # ╔═╡ 4855467c-3670-4e0b-a64e-0e09effa6e0d
 md"""
 ## ENGRI 1120: Design and Analysis of a Sustainable Cell-Free Production Process for Industrially Important Small Molecules
@@ -53,43 +68,62 @@ md"""
 ### References
 """
 
-# ╔═╡ d737e861-3da6-4696-837c-aaa1f9c54a81
+# ╔═╡ b5acd239-fda4-4313-adcd-69f94a8363dd
 begin
 
-	# setup paths so we can load stuff -
-	_PATH_TO_ROOT = pwd()
-	_PATH_TO_SRC = joinpath(_PATH_TO_ROOT,"src")
-	_PATH_TO_MODEL = joinpath(_PATH_TO_ROOT, "model")
+	# load the model file -
+	MODEL = load_bson_model_file("./model/ENGRI-1120-model-F21.bson", @__MODULE__)
+	
+	# what reactions do we need?
+	reaction_id_array = [
+		
+		"rn:R00299" 	; # 1
+		"rn:R00771" 	; # 2
+		"rn:R00756" 	; # 3
+		"rn:R00762" 	; # 4
+		"rn:R01068" 	; # 5
+		"rn:R01015" 	; # 6
+		"rn:R01061" 	; # 7
+		"rn:R01512" 	; # 8
+		"rn:R01518" 	; # 9
+		"rn:R00658" 	; # 10
+		"rn:R00200" 	; # 11
+	];
+
+	# build the stm (function included from project code lib) -
+	(species, reactions, S) = build_stoichiometric_matrix_from_reaction_id_array(MODEL, reaction_id_array)
+
+	# convert the species symbols into "human" readable format -
+	metabolite_name_array = Array{String,2}(undef, length(species),2)
+	compound_table = MODEL[:compounds]
+	for (index, metabolite_symbol) in enumerate(species)
+
+		# find -
+		df_row = filter(:compound_id => x-> x==metabolite_symbol, compound_table)
+
+		# get the name -
+		compound_name = df_row[1,:compound_name]
+
+		# grab -
+		metabolite_name_array[index,1] = metabolite_symbol
+		metabolite_name_array[index,2] = compound_name
+	end
 
 	# show -
 	nothing
 end
 
-# ╔═╡ 244eb90f-0d8c-4096-a273-855d65dc1dd7
-BSON.load("./model/ENGRI-1120-model-F21.bson",@__MODULE__)
+# ╔═╡ 82a2823f-3f9f-466a-bfe0-c3b3bf56277e
+size(S)
 
-# ╔═╡ bc1d1380-a319-4861-9777-3b32a2d3fdc2
-function ingredients(path::String; module_name::Symbol = :model)
-	
-	# this is from the Julia source code (evalfile in base/loading.jl)
-	# but with the modification that it returns the module instead of the last object
-	
-	# JV change
-	# name = Symbol(basename(path))
-	name = module_name
-	
-	# original -
-	m = Module(name)
-	Core.eval(m,
-        Expr(:toplevel,
-             :(eval(x) = $(Expr(:core, :eval))($name, x)),
-             :(include(x) = $(Expr(:top, :include))($name, x)),
-             :(include(mapexpr::Function, x) = $(Expr(:top, :include))(mapexpr, $name, x)),
-             :(include($path))))
-	
-	# return code as module - 
-	m
-end
+# ╔═╡ 797b25f9-88e5-4897-af58-e854c9f83c53
+metabolite_name_array[1:10,:]
+
+# ╔═╡ 533a6751-d5f7-46c3-832f-2f204a5b38b2
+MODEL[:compounds]
+
+# ╔═╡ 91fa000a-2ab8-4d09-8079-926b1671baef
+MODEL
 
 # ╔═╡ 18b29a1a-4787-11ec-25e3-5f29ebd21430
 html"""
@@ -1274,8 +1308,11 @@ version = "0.9.1+5"
 # ╟─836e69f7-9a2d-4674-8c20-51b07d13b7ab
 # ╠═671157cc-350a-457f-98a0-c2b7440fe7e8
 # ╠═d737e861-3da6-4696-837c-aaa1f9c54a81
-# ╠═244eb90f-0d8c-4096-a273-855d65dc1dd7
-# ╠═bc1d1380-a319-4861-9777-3b32a2d3fdc2
+# ╠═b5acd239-fda4-4313-adcd-69f94a8363dd
+# ╠═82a2823f-3f9f-466a-bfe0-c3b3bf56277e
+# ╠═797b25f9-88e5-4897-af58-e854c9f83c53
+# ╠═533a6751-d5f7-46c3-832f-2f204a5b38b2
+# ╠═91fa000a-2ab8-4d09-8079-926b1671baef
 # ╟─18b29a1a-4787-11ec-25e3-5f29ebd21430
 # ╟─16dca67c-f280-4a6f-bd79-308cf63dabf6
 # ╟─00000000-0000-0000-0000-000000000001
