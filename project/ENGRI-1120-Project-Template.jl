@@ -66,7 +66,7 @@ begin
 end
 
 # ╔═╡ 244eb90f-0d8c-4096-a273-855d65dc1dd7
-BSON.load("./model/ENGRI-1120-model-F21.bson")
+BSON.load("./model/ENGRI-1120-model-F21.bson",@__MODULE__)
 
 # ╔═╡ bc1d1380-a319-4861-9777-3b32a2d3fdc2
 function ingredients(path::String; module_name::Symbol = :model)
