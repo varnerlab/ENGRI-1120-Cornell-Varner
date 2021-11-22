@@ -17,7 +17,7 @@ This repository holds example problems discussed in lecture. The problems are st
     julia> using Pluto
     julia> Pluto.run()
     ```
-    _Or you can simply the following in a terminal:_
+    _Or you can simply type the following in a terminal:_
     ```bash
     julia -E "using Pluto; Pluto.run()"
     ```
