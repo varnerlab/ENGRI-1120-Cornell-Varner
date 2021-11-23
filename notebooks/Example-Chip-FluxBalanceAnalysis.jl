@@ -12,6 +12,7 @@ begin
 	using PlutoUI
 	using DataFrames
 	using GLPK
+	using PrettyTables
 	
 	# setup paths -
 	_PATH_TO_ROOT = pwd()
@@ -28,10 +29,52 @@ end
 # ╔═╡ 7bf3ac90-637d-4992-8835-6798d46f71f5
 md"""
 ### Example: Using Flux Balance Analysis to Compute Fractional Conversion
+
+We want to produce a product _P_ (desired product) by converting feedstock A₁ using a cell-free biochemical process operating in a well-mixed continuous microfluidic chip with a single input and a single output, and a liquid reaction volume of V = 100 μL. The reaction network is shown in Fig 1.
+
+__Assumptions__
+* Microfluidic chip is well-mixed and operates at steady-state
+* Constant T, P on the chip
+* Liquid phase is ideal
+
+__Compute__
+* Use flux balance analysis to compute the optimal open extent of reaction $\dot{\epsilon}_{i}$, where the objective function is to maximize _P_
+* Compute the state table for the mol flow rates into (you decide) and from the chip (requires FBA)
+* Compute the fractional conversion of the feedstock A₁
+
+"""
+
+# ╔═╡ 7aa00ab3-b105-415a-a7cf-111afc1829d7
+md"""
+__Fig. 1__ Schematic of the reaction network operating on the steady-state chip."
 """
 
 # ╔═╡ f2316c41-0c45-4dd2-8749-3d67256b08b4
+PlutoUI.LocalResource("./figs/Fig-FBA-ToyNetwork.png")
 
+# ╔═╡ 6a0c8767-6de3-44b2-9d84-04e504e43c1b
+md"""
+##### Compute the optimal open reaction extents using Flux Balance Analysis (FBA)
+
+The FBA problem is (traditinally) a Linear Programming (LP) problem in which a linear objective function $\mathcal{O}$:
+
+$$\mathcal{O} = \sum_{j=1}^{\mathcal{R}}c_{j}\dot{\epsilon}_{j}$$
+
+is minimized (or maximized) subject to a collection of linear constraints, and bound constraints on the permissible values of the extents $\dot{\epsilon}_{i}$. In this case, we know that the steady-state mol flow rate for species $i$ leaving the chip given (where $s=1$ denotes the inlet and $s=2$ denotes the outlet):
+
+$$\dot{n}_{i,2} = \dot{n}_{i,1} + \sum_{j=1}^{\mathcal{R}}\sigma_{ij}\dot{\epsilon}_{j}$$
+
+Thus, because $\dot{n}_{i,2}\geq{0}$, the FBA problem is subject to the mol constraints: 
+
+$$\dot{n}_{i,1} + \sum_{j=1}^{\mathcal{R}}\sigma_{ij}\dot{\epsilon}_{j}\geq{0}\qquad\forall{i}$$
+
+In other words, when searching for the optimal set of $\dot{\epsilon}_{j}$ we have to select values that give physically realistic answers (we can't have a negative mol flow rate). Next, the $\dot{\epsilon}_{j}$ terms are bounded from above and below: 
+
+$$\mathcal{L}_{j}\leq\dot{\epsilon}_{j}\leq\mathcal{U}_{j}\qquad{j=1,2\dots,\mathcal{R}}$$
+
+where the $\mathcal{L}_{j}$ and $\mathcal{U}_{j}$ denote the lower and upper bounds that $\dot{\epsilon}_{j}$ can take. Remember that the open extents are just reaction rates times the volume. Thus, the lower and upper bounds describe the permissible range that we expect the rate _could_ obtain.  
+
+"""
 
 # ╔═╡ 78eb6166-ac8a-4c28-8f8f-ae00b5c78b3f
 begin
@@ -39,71 +82,145 @@ begin
 	# setup the volume -
 	V = 100.0*(1.0/1.0e6)
 
+	# setup flow rate in
+	n_dot_in = [
+		10.0 	; # 1 A₁
+		3.0 	; # 2 A₂
+		0.0 	; # 3 B
+		0.0 	; # 4 P
+		1.0 	; # 5 C
+		0.0 	; # 6 x
+		0.0 	; # 7 y
+	]
 	
 	# Setup STM -
 	S = [
 
-		# r₁ r₂ r₃ r₄
-		-1.0 -1.0 0.0 0.0 	; # 1 A
-		1.0 0.0 -1.0 0.0 	; # 2 B
-		0.0 1.0 0.0 0.0 	; # 3 C
-		0.0 0.0 1.0 -1.0 	; # 4 D
-		0.0 0.0 0.0 -1.0 	; # 5 E
-		0.0 0.0 0.0 1.0 	; # 6 P
-		-1.0 1.0 0.0 0.0 	; # 7 x₁
-		1.0 -1.0 0.0 0.0 	; # 8 x₂
+		# r₁ r₂ r₃
+		-1.0 0.0 0.0 ; # 1 A₁
+		0.0 0.0 -1.0 ; # 2 A₂
+		1.0 -1.0 0.0 ; # 3 B
+		0.0 1.0 0.0  ; # 4 P
+		0.0 0.0 1.0  ; # 5 C
+		-1.0 0.0 1.0 ; # 6 x
+		1.0 0.0 -1.0 ; # 7 y 
 	];
+	(number_of_states, number_of_reactions) = size(S)
 
 	# set the flux bounds array -
 	flux_bounds_array = [
-		0.0 10.0 ; # 1 r₁
-		0.0 2.0  ; # 2 r₂
-		0.0 10.0 ; # 3 r₃
-		0.0 30.0 ; # 4 r₄
+
+		# ℒ 𝒰
+		0.0 10.0 	; # 1 r₁
+		0.0 10.0  	; # 2 r₂
+		0.0 20.0 	; # 3 r₃
 	];
 
-	n_dot_initial = [
-		10.0 	; # 1 A
-		2.0 	; # 2 B
-		1.0 	; # 3 C
-		1.0 	; # 4 D
-		1.0 	; # 5 E
-		0.0 	; # 6 P
-		0.0 	; # 7 x₁
-		0.0 	; # 8 x₂
-	]
-	
 	# set the species bounds array -
 	species_bounds_array = [
-		
-		-n_dot_initial[1] 100.0 				; # 1 A
-		-n_dot_initial[2] 100.0 				; # 2 B
-		-n_dot_initial[3] 100.0 				; # 3 C
-		-n_dot_initial[4] 100.0 				; # 4 D
-		-n_dot_initial[5] 100.0 				; # 5 E
-		-n_dot_initial[6] 100.0 				; # 6 P
-		-n_dot_initial[7] 100.0 				; # 7 x₁
-		-n_dot_initial[8] 100.0 				; # 8 x₂
+
+		# ℒ lower     𝒰 upper
+		-n_dot_in[1] 1000.0 				; # 1 A₁
+		-n_dot_in[2] 1000.0 				; # 2 A₂
+		-n_dot_in[3] 1000.0 				; # 3 B
+		-n_dot_in[4] 1000.0 				; # 4 P
+		-n_dot_in[5] 1000.0 				; # 5 C
+		-n_dot_in[6] 1000.0 				; # 6 x
+		-n_dot_in[7] 1000.0 				; # 7 y
 	];
 
 	# max P formation -
-	obj_vector = zeros(4)
-	obj_vector[4] = -1.0
+	obj_vector = zeros(3)
+	obj_vector[2] = -1.0
 
 	# show -
 	nothing 
 end
 
-# ╔═╡ 1b58203c-99f8-4322-9e08-4b551f0cb238
-# compute the optimal flux -
-result = calculate_optimal_flux_distribution(S, flux_bounds_array, species_bounds_array, obj_vector)
+# ╔═╡ f3efe4fa-c78d-42ab-bf9e-ecd7011874d9
+begin
+
+	# compute the optimal flux -
+	result = calculate_optimal_flux_distribution(S, flux_bounds_array, species_bounds_array, obj_vector)
+	
+	# initialize some storage -
+	flux_table = Array{Any,2}(undef,number_of_reactions,4)
+
+	# reactions -
+	reaction_strings = [
+		"A₁ + x => B + y" 	; # 1 r₁
+		"B => P" 			; # 2 r₂
+		"A₂ + y => C + x" 	; # 3 r₃
+	]
+
+	# populate the state table -
+	for reaction_index = 1:number_of_reactions
+		flux_table[reaction_index,1] = reaction_strings[reaction_index]
+		flux_table[reaction_index,2] = result.calculated_flux_array[reaction_index]
+		flux_table[reaction_index,3] = flux_bounds_array[reaction_index,1]
+		flux_table[reaction_index,4] = flux_bounds_array[reaction_index,2]
+	end
+
+	with_terminal() do
+		
+		# header row -
+		flux_table_header_row = (["Reaction","ϵᵢ_dot", "ϵ₁_dot LB", "ϵ₁_dot UB"],["","mol/time", "mol/time", "mol/time"]);
+		
+		# write the table -
+		pretty_table(flux_table; header=flux_table_header_row)
+	end
+	
+end
 
 # ╔═╡ 45740c44-a846-4b7d-acc1-9105aa67e786
 begin
 
 	# compute output -
 	ϵ_vector = result.calculated_flux_array
-	n_dot_final = n_dot_initial .+ S*ϵ_vector
+	n_dot_out = n_dot_in .+ S*ϵ_vector
+
+	# make a pretty table -
+	state_table = Array{Any,2}(undef, number_of_states,3)
+	species_array = ["A₁", "A₂", "B", "P", "C", "x","y"]
+	for state_index = 1:number_of_states
+
+		# populate -
+		state_table[state_index,1] = species_array[state_index]
+		state_table[state_index,2] = n_dot_in[state_index]
+		state_table[state_index,3] = n_dot_out[state_index]
+	end
+
+	with_terminal() do
+
+		# header row -
+		state_table_header_row = (["Species","nᵢ_dot_in","nᵢ_dot_out"],["","mol/time", "mol/time"]);
+		
+		# write the table -
+		pretty_table(state_table; header=state_table_header_row)
+	end
+end
+
+# ╔═╡ 05e4f243-4a1b-4962-a36a-7a931b8e7936
+md"""
+
+##### Compute the fractional conversion of A₁ and A₂
+The fractional conversion of a _reactant_ species for an _open_ system (with a single input and a single output) is given by:
+
+$$f_{i} = \frac{\dot{n}_{i,j-1} - \dot{n}_{i,j}}{\dot{n}_{i,j-1}}$$
+
+where $\dot{n}_{i,j-1}$ denotes the mol flow rate of species $i$ in stream $j-1$ (inlet), and $\dot{n}_{i,j}$ denotes the mol flow rate of species $i$ in stream $j$ (outlet). 
+
+"""
+
+# ╔═╡ 85db6161-58f6-4fea-ad00-7eb5aae85fd7
+with_terminal() do
+	
+	# compute fᵢ
+	f₁ = (n_dot_in[1] - n_dot_out[1])/(n_dot_in[1])
+	f₂ = (n_dot_in[2] - n_dot_out[2])/(n_dot_in[2])
+
+	# display -
+	println("Fraction conversion A₁ = $(f₁) and A₂ = $(f₂)")
 	
 end
 
@@ -134,12 +251,14 @@ BSON = "fbb218c0-5317-5bc6-957e-2ee96dd4b1f0"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 GLPK = "60bf3e95-4087-53dc-ae20-288a0d20c6a6"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
+PrettyTables = "08abe8d2-0d0c-5749-adfa-8a2ac140af0d"
 
 [compat]
 BSON = "~0.3.4"
 DataFrames = "~1.2.2"
 GLPK = "~0.15.1"
 PlutoUI = "~0.7.19"
+PrettyTables = "~1.2.3"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -518,12 +637,16 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 """
 
 # ╔═╡ Cell order:
-# ╠═7bf3ac90-637d-4992-8835-6798d46f71f5
-# ╠═f2316c41-0c45-4dd2-8749-3d67256b08b4
+# ╟─7bf3ac90-637d-4992-8835-6798d46f71f5
+# ╟─7aa00ab3-b105-415a-a7cf-111afc1829d7
+# ╟─f2316c41-0c45-4dd2-8749-3d67256b08b4
+# ╟─6a0c8767-6de3-44b2-9d84-04e504e43c1b
 # ╠═78eb6166-ac8a-4c28-8f8f-ae00b5c78b3f
-# ╠═1b58203c-99f8-4322-9e08-4b551f0cb238
+# ╟─f3efe4fa-c78d-42ab-bf9e-ecd7011874d9
 # ╟─45740c44-a846-4b7d-acc1-9105aa67e786
-# ╠═d3b9397f-5673-47ca-8a01-62fd985f121f
-# ╠═6c747a6e-4bf7-11ec-2b43-af47c5975080
+# ╟─05e4f243-4a1b-4962-a36a-7a931b8e7936
+# ╟─85db6161-58f6-4fea-ad00-7eb5aae85fd7
+# ╟─d3b9397f-5673-47ca-8a01-62fd985f121f
+# ╟─6c747a6e-4bf7-11ec-2b43-af47c5975080
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
