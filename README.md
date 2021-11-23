@@ -35,6 +35,10 @@ This repository holds example problems discussed in lecture. The problems are st
 
 ### Notebooks for Lecture Examples
 
+#### Flux balance analysis example
+* [Example notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-Chip-FluxBalanceAnalysis.jl.html): 
+Production of the rate of product _P_ formation in a steady-state micro-reactor using Flux Balance Analysis (FBA).
+
 #### Material/mass balance examples
 
  * [Example notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-HFCS.jl.html): 
