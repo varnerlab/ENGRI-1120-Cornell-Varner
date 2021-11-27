@@ -64,3 +64,11 @@ function build_stoichiometric_matrix(model::Dict{Symbol,Any})
 
     end
 end
+
+function find_compound_index(model::Dict{Symbol,DataFrame}, 
+    search::Pair{Symbol,String})
+end
+
+function find_reaction_index(model::Dict{Symbol,DataFrame}, 
+    search::Pair{Symbol,String})
+end

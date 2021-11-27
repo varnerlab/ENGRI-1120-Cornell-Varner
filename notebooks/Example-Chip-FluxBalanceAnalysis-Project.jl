@@ -33,6 +33,12 @@ md"""
 ### Example: Flux Balance Analysis and the ENGRI-1120 Project Networks
 """
 
+# ╔═╡ 2398a0a2-42ca-4b90-b844-601fc07edb10
+begin
+	tmp_array = MODEL[:compounds][!,:compound_name] |> collect
+	findfirst(x->x=="isoprene",tmp_array)
+end
+
 # ╔═╡ 98bc2535-9af1-4b0d-bdb9-ae5e51d4c982
 MODEL
 
@@ -451,7 +457,8 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 
 # ╔═╡ Cell order:
 # ╟─7d3b5c92-152f-416a-b82c-82682e61ab9d
-# ╟─98bc2535-9af1-4b0d-bdb9-ae5e51d4c982
+# ╠═2398a0a2-42ca-4b90-b844-601fc07edb10
+# ╠═98bc2535-9af1-4b0d-bdb9-ae5e51d4c982
 # ╠═f701a8a6-3a30-4d86-9018-f201276f9369
 # ╠═b7104f4a-99d2-42af-ab67-ceded6967659
 # ╟─5f0bd4a2-4f86-11ec-3402-0563716ffc85
