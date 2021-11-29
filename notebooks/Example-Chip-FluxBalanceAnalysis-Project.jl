@@ -23,7 +23,7 @@ begin
 	include(joinpath(_PATH_TO_SRC,"Include.jl"))
 
 	# load the model -
-	MODEL = BSON.load(joinpath(_PATH_TO_MODEL,"model.bson"), @__MODULE__)
+	MODEL = BSON.load(joinpath(_PATH_TO_MODEL,"model_v1.bson"), @__MODULE__)
 
 	# show -
 	nothing
@@ -38,6 +38,10 @@ md"""
 
 
 # ╔═╡ ada13751-776b-4664-9610-36d6fee06406
+# rn:R08199 = isoprene
+# rn:28235c0c-ec00-4a11-8acb-510b0f2e2687 = PGDN
+# rn:rn:R09799 = Hydrazine
+# rn:R03119 = 3G
 idx_target_rate = find_reaction_index(MODEL,:reaction_number=>"rn:R09799")
 
 # ╔═╡ 39b2b92f-4d6b-4f8c-b840-da2fb0dc79e2
@@ -57,6 +61,24 @@ begin
 	# What is the default mol flow input array => update specific elements
 	n_dot_input_stream_1 = ones(ℳ,1)	
 	n_dot_input_stream_2 = zeros(ℳ,1)
+
+	# Default: we don't supply the product in the feed -
+	n_dot_input_stream_1[67] = 0.0 # 3G
+	n_dot_input_stream_1[69] = 0.0 # Hydrazine
+	n_dot_input_stream_1[80] = 0.0 # isoprene
+	n_dot_input_stream_1[81] = 0.0 # PGDN
+
+	# Default: we only supply the specified carbon source -
+	n_dot_input_stream_1[14] = 0.0 # pyruvate
+	n_dot_input_stream_1[19] = 0.0 # oxaloacetate (OAA)
+	n_dot_input_stream_1[20] = 0.0 # succinate
+	n_dot_input_stream_1[22] = 0.0 # CTP
+	n_dot_input_stream_1[23] = 0.0 # phosphoenolpyruvate (PEP)
+
+	# example: hydrazine optimization 
+	n_dot_input_stream_1[5] = 10.0 	# nadph
+	n_dot_input_stream_1[8] = 10.0 	# adp
+	n_dot_input_stream_1[59] = 10.0 # nitric oxide
 	
 	# setup the species bounds array -
 	species_bounds = [-1.0*(n_dot_input_stream_1.+n_dot_input_stream_2) 1000.0*ones(ℳ,1)]
@@ -75,11 +97,10 @@ begin
 	# update the flux bounds -> which fluxes can can backwards? 
 	# do determine this: sgn(v) = -1*sgn(ΔG)
 	updated_flux_bounds = update_flux_bounds_directionality(MODEL,flux_bounds)
-	
-end
 
-# ╔═╡ 610e53eb-f0cf-4c58-9763-e7c090bc9e4f
-MODEL[:ΔG]
+	# show -
+	nothing
+end
 
 # ╔═╡ bd8f1a4a-61f8-406a-9015-c7841e0cc8d9
 begin
@@ -93,6 +114,9 @@ begin
 	# show -
 	nothing 
 end
+
+# ╔═╡ 5ed3ef45-bf72-4434-a3b9-3f5d69bc7922
+idx_test = findall(x->x==-1.0,result.uptake_array)
 
 # ╔═╡ 6068c779-9367-48d6-a134-b84d3d760ae8
 # compute the mol flow rate out of the device -
@@ -111,21 +135,55 @@ with_terminal() do
 	for reaction_index = 1:ℛ
 		flux_table[reaction_index,1] = reaction_index
 		flux_table[reaction_index,2] = reaction_strings[reaction_index]
-		flux_table[reaction_index,3] = ϵ_dot[reaction_index]
-		flux_table[reaction_index,4] = flux_bounds[reaction_index,1]
-		flux_table[reaction_index,5] = flux_bounds[reaction_index,2]
+		flux_table[reaction_index,3] = flux_bounds[reaction_index,1]
+		flux_table[reaction_index,4] = flux_bounds[reaction_index,2]
+		flux_table[reaction_index,5] = ϵ_dot[reaction_index]
 	end
 
 	# header row -
-	flux_table_header_row = (["i","R","ϵᵢ_dot", "ϵ₁_dot LB", "ϵ₁_dot UB"],
+	flux_table_header_row = (["i","R","ϵ₁_dot LB", "ϵ₁_dot UB", "ϵᵢ_dot"],
 		["","","mol/time", "mol/time", "mol/time"]);
 		
 	# write the table -
 	pretty_table(flux_table; header=flux_table_header_row)
 end
 
+# ╔═╡ bcab8188-9820-4bbc-9abb-5d43df9d5479
+with_terminal() do
+
+	# what are the compound names and code strings? -> we can get these from the MODEL object 
+	compound_name_strings = MODEL[:compounds][!,:compound_name]
+	compound_id_strings = MODEL[:compounds][!,:compound_id]
+
+	# how many molecules are in the state array?
+	ℳ_local = length(compound_id_strings)
+	
+	# initialize some storage -
+	state_table = Array{Any,2}(undef,ℳ_local,6)
+
+	# populate the state table -
+	for compound_index = 1:ℳ_local
+		state_table[compound_index,1] = compound_index
+		state_table[compound_index,2] = compound_name_strings[compound_index]
+		state_table[compound_index,3] = compound_id_strings[compound_index]
+		state_table[compound_index,4] = n_dot_input_stream_1[compound_index]
+		state_table[compound_index,5] = n_dot_input_stream_2[compound_index]
+		state_table[compound_index,6] = n_dot_output[compound_index]
+	end
+
+	# header row -
+	state_table_header_row = (["i","name","id","n₁_dot", "n₂_dot", "n₃_dot"],
+		["","","","mol/time", "mol/time", "mol/time"]);
+		
+	# write the table -
+	pretty_table(state_table; header=state_table_header_row)
+end
+
 # ╔═╡ fce7c3a7-a77a-488d-b6cd-a72631d3f19d
 MODEL
+
+# ╔═╡ d329594c-3c80-43ed-b51f-ca6a2efdd585
+MODEL[:reactions][52,:]
 
 # ╔═╡ b7104f4a-99d2-42af-ab67-ceded6967659
 
@@ -548,11 +606,13 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╠═ada13751-776b-4664-9610-36d6fee06406
 # ╠═39b2b92f-4d6b-4f8c-b840-da2fb0dc79e2
 # ╠═537e0c28-b2d7-4d29-9592-0bb35747cd81
-# ╠═610e53eb-f0cf-4c58-9763-e7c090bc9e4f
 # ╠═bd8f1a4a-61f8-406a-9015-c7841e0cc8d9
+# ╠═5ed3ef45-bf72-4434-a3b9-3f5d69bc7922
 # ╠═6068c779-9367-48d6-a134-b84d3d760ae8
 # ╠═05e503a8-10fb-45ce-bd65-78c5fe11dc60
+# ╠═bcab8188-9820-4bbc-9abb-5d43df9d5479
 # ╠═fce7c3a7-a77a-488d-b6cd-a72631d3f19d
+# ╠═d329594c-3c80-43ed-b51f-ca6a2efdd585
 # ╠═f701a8a6-3a30-4d86-9018-f201276f9369
 # ╠═b7104f4a-99d2-42af-ab67-ceded6967659
 # ╟─5f0bd4a2-4f86-11ec-3402-0563716ffc85

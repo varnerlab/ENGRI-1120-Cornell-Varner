@@ -5,28 +5,10 @@ function build_stoichiometric_matrix(model::Dict{Symbol,Any})
         # get the reaction table -
         reaction_table = model[:reactions]
         reaction_id_array = reaction_table[!, :reaction_number]
-
-        # initialize -
-        compound_symbol_array = Array{String,1}()
-
-        # create the list compounds from the reaction id in the model -
-        for reaction_id in reaction_id_array
-
-            # get the row -
-            df_reaction = filter(:reaction_number => x -> (x == reaction_id), reaction_table)
-
-            # grab the keys for the st dict -
-            compound_keys = keys(df_reaction[1, :stoichiometric_dictionary])
-            for compound_key in compound_keys
-                push!(compound_symbol_array, compound_key)
-            end
-        end
-
-        # we will have duplicates in the compound array, remove those -
-        unique!(compound_symbol_array)
+        compound_id_array = model[:compounds][!,:compound_id]
 
         # now - let's build the stm -
-        number_of_species = length(compound_symbol_array)
+        number_of_species = length(compound_id_array)
         number_of_reactions = length(reaction_id_array)
         stoichiometric_matrix = zeros(number_of_species, number_of_reactions)
 
@@ -46,7 +28,7 @@ function build_stoichiometric_matrix(model::Dict{Symbol,Any})
             for species_index = 1:number_of_species
 
                 # species code -
-                species_symbol = compound_symbol_array[species_index]
+                species_symbol = compound_id_array[species_index]
                 if (haskey(stm_dictionary, species_symbol) == true)
                     stm_coeff_value = stm_dictionary[species_symbol]
                     stoichiometric_matrix[species_index, reaction_index] = stm_coeff_value
@@ -55,7 +37,7 @@ function build_stoichiometric_matrix(model::Dict{Symbol,Any})
         end
 
         # return -
-        return (compound_symbol_array, reaction_id_array, stoichiometric_matrix)
+        return (compound_id_array, reaction_id_array, stoichiometric_matrix)
     catch error
 
         # what is our error policy? => for now, just print the message
