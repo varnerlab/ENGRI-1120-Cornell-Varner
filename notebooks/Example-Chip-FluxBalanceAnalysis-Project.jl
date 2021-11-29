@@ -12,7 +12,8 @@ begin
 	using DataFrames
 	using BSON
 	using GLPK
-
+	using PrettyTables
+	
 	# setup my paths (where are my files?)
 	_PATH_TO_ROOT = pwd() 
 	_PATH_TO_SRC = joinpath(_PATH_TO_ROOT,"src")
@@ -33,13 +34,97 @@ md"""
 ### Example: Flux Balance Analysis and the ENGRI-1120 Project Networks
 """
 
-# ╔═╡ 2398a0a2-42ca-4b90-b844-601fc07edb10
+# ╔═╡ af120aff-6436-430b-9a61-fe20176196a8
+
+
+# ╔═╡ ada13751-776b-4664-9610-36d6fee06406
+idx_target_rate = find_reaction_index(MODEL,:reaction_number=>"rn:R09799")
+
+# ╔═╡ 39b2b92f-4d6b-4f8c-b840-da2fb0dc79e2
 begin
-	tmp_array = MODEL[:compounds][!,:compound_name] |> collect
-	findfirst(x->x=="isoprene",tmp_array)
+
+	# setup the FBA calculation for the project -
+
+	# First, let's build the stoichiometric matrix from the model object -
+	(cia,ria,S) = build_stoichiometric_matrix(MODEL);
+
+	# Next, what is the size of the system? (ℳ = number of metabolites, ℛ = number of reactions)
+	(ℳ,ℛ) = size(S)
+
+	# Next, setup a default bounds array => update specific elements
+	flux_bounds = [-10*ones(ℛ,1) 10*ones(ℛ,1)]
+
+	# What is the default mol flow input array => update specific elements
+	n_dot_input_stream_1 = ones(ℳ,1)	
+	n_dot_input_stream_2 = zeros(ℳ,1)
+	
+	# setup the species bounds array -
+	species_bounds = [-1.0*(n_dot_input_stream_1.+n_dot_input_stream_2) 1000.0*ones(ℳ,1)]
+
+	# Lastly, let's setup the objective function -
+	c = zeros(ℛ)
+	c[idx_target_rate] = -1.0
+
+	# show -
+	nothing
 end
 
-# ╔═╡ 98bc2535-9af1-4b0d-bdb9-ae5e51d4c982
+# ╔═╡ 537e0c28-b2d7-4d29-9592-0bb35747cd81
+begin
+
+	# update the flux bounds -> which fluxes can can backwards? 
+	# do determine this: sgn(v) = -1*sgn(ΔG)
+	updated_flux_bounds = update_flux_bounds_directionality(MODEL,flux_bounds)
+	
+end
+
+# ╔═╡ 610e53eb-f0cf-4c58-9763-e7c090bc9e4f
+MODEL[:ΔG]
+
+# ╔═╡ bd8f1a4a-61f8-406a-9015-c7841e0cc8d9
+begin
+	
+	# compute the optimal flux -
+	result = calculate_optimal_flux_distribution(S, updated_flux_bounds, species_bounds, c);
+
+	# get the open extent vector -
+	ϵ_dot = result.calculated_flux_array
+
+	# show -
+	nothing 
+end
+
+# ╔═╡ 6068c779-9367-48d6-a134-b84d3d760ae8
+# compute the mol flow rate out of the device -
+n_dot_output = (n_dot_input_stream_1 + n_dot_input_stream_2 + S*ϵ_dot);
+
+# ╔═╡ 05e503a8-10fb-45ce-bd65-78c5fe11dc60
+with_terminal() do
+
+	# initialize some storage -
+	flux_table = Array{Any,2}(undef,ℛ,5)
+
+	# what are the reaction strings? -> we can get these from the MODEL object 
+	reaction_strings = MODEL[:reactions][!,:reaction_markup]
+
+	# populate the state table -
+	for reaction_index = 1:ℛ
+		flux_table[reaction_index,1] = reaction_index
+		flux_table[reaction_index,2] = reaction_strings[reaction_index]
+		flux_table[reaction_index,3] = ϵ_dot[reaction_index]
+		flux_table[reaction_index,4] = flux_bounds[reaction_index,1]
+		flux_table[reaction_index,5] = flux_bounds[reaction_index,2]
+	end
+
+	# header row -
+	flux_table_header_row = (["i","R","ϵᵢ_dot", "ϵ₁_dot LB", "ϵ₁_dot UB"],
+		["","","mol/time", "mol/time", "mol/time"]);
+		
+	# write the table -
+	pretty_table(flux_table; header=flux_table_header_row)
+end
+
+# ╔═╡ fce7c3a7-a77a-488d-b6cd-a72631d3f19d
 MODEL
 
 # ╔═╡ b7104f4a-99d2-42af-ab67-ceded6967659
@@ -72,12 +157,14 @@ BSON = "fbb218c0-5317-5bc6-957e-2ee96dd4b1f0"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 GLPK = "60bf3e95-4087-53dc-ae20-288a0d20c6a6"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
+PrettyTables = "08abe8d2-0d0c-5749-adfa-8a2ac140af0d"
 
 [compat]
 BSON = "~0.3.4"
 DataFrames = "~1.2.2"
 GLPK = "~0.15.1"
 PlutoUI = "~0.7.20"
+PrettyTables = "~1.2.3"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -457,8 +544,15 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 
 # ╔═╡ Cell order:
 # ╟─7d3b5c92-152f-416a-b82c-82682e61ab9d
-# ╠═2398a0a2-42ca-4b90-b844-601fc07edb10
-# ╠═98bc2535-9af1-4b0d-bdb9-ae5e51d4c982
+# ╠═af120aff-6436-430b-9a61-fe20176196a8
+# ╠═ada13751-776b-4664-9610-36d6fee06406
+# ╠═39b2b92f-4d6b-4f8c-b840-da2fb0dc79e2
+# ╠═537e0c28-b2d7-4d29-9592-0bb35747cd81
+# ╠═610e53eb-f0cf-4c58-9763-e7c090bc9e4f
+# ╠═bd8f1a4a-61f8-406a-9015-c7841e0cc8d9
+# ╠═6068c779-9367-48d6-a134-b84d3d760ae8
+# ╠═05e503a8-10fb-45ce-bd65-78c5fe11dc60
+# ╠═fce7c3a7-a77a-488d-b6cd-a72631d3f19d
 # ╠═f701a8a6-3a30-4d86-9018-f201276f9369
 # ╠═b7104f4a-99d2-42af-ab67-ceded6967659
 # ╟─5f0bd4a2-4f86-11ec-3402-0563716ffc85
