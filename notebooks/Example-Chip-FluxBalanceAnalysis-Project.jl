@@ -41,7 +41,7 @@ is subject to constraints on the reaction bounds (written in our case as the ope
 
 $$\begin{eqnarray}
 \mathcal{L}_{j}\leq&\dot{\epsilon}_{j}&\leq\mathcal{U}_{j}\qquad{j=1,2\dots,\mathcal{R}}\\
--\dot{n}_{i,i}\leq&\sum_{j=1}^{\mathcal{R}}\sigma_{ij}\dot{\epsilon}_{j}&\leq\infty\\
+-\dot{n}_{i,1}\leq&\sum_{j=1}^{\mathcal{R}}\sigma_{ij}\dot{\epsilon}_{j}&\leq\infty\\
 \end{eqnarray}$$
 
 Let's set up these bounds for the design project, and run some sample calculations to get a feel for the performance of the metabolic reaction network.
@@ -54,7 +54,7 @@ md"""
 """
 
 # ╔═╡ bbfe850c-1f2c-4efb-9a9c-61bb2261370c
-
+MODEL
 
 # ╔═╡ a1507115-b73d-482a-b66c-734f58463e49
 md"""
@@ -102,7 +102,7 @@ begin
 		10.0 ; # oxygen mmol/hr
 		20.0 ; # maltose mmol/hr
 		10.0 ; # nitric oxide mmol/hr
-		3.0  ; # ammonia mmol/hr
+		2.0  ; # ammonia mmol/hr
 	]
 
 	idx_supply = Array{Int64,1}()
@@ -127,6 +127,9 @@ begin
 	# show -
 	nothing
 end
+
+# ╔═╡ cf17b7dd-077a-494b-aaa7-d9476a8b9193
+idx_target_rate
 
 # ╔═╡ fe7efbdb-237c-4ac5-9e40-06df4264266c
 md"""
@@ -665,6 +668,7 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╠═bbfe850c-1f2c-4efb-9a9c-61bb2261370c
 # ╟─a1507115-b73d-482a-b66c-734f58463e49
 # ╠═39b2b92f-4d6b-4f8c-b840-da2fb0dc79e2
+# ╠═cf17b7dd-077a-494b-aaa7-d9476a8b9193
 # ╟─fe7efbdb-237c-4ac5-9e40-06df4264266c
 # ╠═537e0c28-b2d7-4d29-9592-0bb35747cd81
 # ╠═bd8f1a4a-61f8-406a-9015-c7841e0cc8d9
