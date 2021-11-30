@@ -69,12 +69,14 @@ begin
 
 	# setup the FBA calculation for the project -
 
+	# === SELECT YOUR PRODUCT HERE ==================================================== #
 	# What rate are trying to maximize? (select your product)
 	# rn:R08199 = isoprene
 	# rn:28235c0c-ec00-4a11-8acb-510b0f2e2687 = PGDN
 	# rn:rn:R09799 = Hydrazine
 	# rn:R03119 = 3G
 	idx_target_rate = find_reaction_index(MODEL,:reaction_number=>"rn:R09799")
+	# ================================================================================= #
 
 	# First, let's build the stoichiometric matrix from the model object -
 	(cia,ria,S) = build_stoichiometric_matrix(MODEL);
@@ -94,11 +96,12 @@ begin
 
 	# === YOU NEED TO CHANGE BELOW HERE ====================================================== #
 	# Let's lookup stuff that we want/need to supply to the chip to get the reactiont to go -
+	# what you feed *depends upon your product*
 	compounds_that_we_need_to_supply = [
 		"oxygen", "maltose", "nitric oxide", "ammonia"
 	]
 
-	# what are the amounts that we need to supply?
+	# what are the amounts that we need to supply to chip (units: mmol/hr)?
 	mol_flow_values = [
 		10.0 ; # oxygen mmol/hr
 		20.0 ; # maltose mmol/hr
@@ -118,9 +121,6 @@ begin
 	
 	# setup the species bounds array -
 	species_bounds = [-1.0*(n_dot_input_stream_1.+n_dot_input_stream_2) 1000.0*ones(ℳ,1)]
-
-	# how can we force the system to use a compound?
-	# species_bounds[40,2] = species_bounds[40,1]
 
 	# Lastly, let's setup the objective function -
 	c = zeros(ℛ)
