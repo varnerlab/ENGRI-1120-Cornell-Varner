@@ -1,0 +1,344 @@
+// Test VFF file for ENGRI 1120 projects
+
+// --------------------------------------------------------------------------------------------------------- //
+// FEEDSTOCK
+// --------------------------------------------------------------------------------------------------------- //
+
+// SUCROSE 
+// Sucrose + H2O <=> D-Fructose + D-Glucose
+// curl -X GET http://rest.kegg.jp/get/rn:R00801 
+// Notes: changed to D-Glucose => alpha-D-Glucose
+ec:3.2.1.10::ec:3.2.1.20::ec:3.2.1.26::ec:3.2.1.48,rn:R00801,sucrose glucohydrolase,C00089 + C00001 <=> C00095 + C00267
+
+// ATP + D-Fructose <=> ADP + D-Fructose 6-phosphate
+// curl -X GET http://rest.kegg.jp/get/rn:R00760
+// Notes: changed D-Fructose 6-phosphate => beta-D-Fructose 6-phosphate
+ec:2.7.1.1::ec:2.7.1.4,rn:R00760,ATP:D-fructose 6-phosphotransferase,C00002 + C00095 <=> C00008 + C05345
+
+// MALTOSE
+// Maltose + H2O <=> 2 D-Glucose
+// curl -X GET http://rest.kegg.jp/get/rn:R00028
+// Notes: changed D-Glucose => alpha-D-Glucose
+ec:3.2.1.20,rn:R00028,maltose glucohydrolase,C00208 + C00001 <=> 2 C00267
+
+// XYLOSE
+// D-Xylose + NADPH + H+ <=> Xylitol + NADP+
+// curl -X GET http://rest.kegg.jp/get/rn:R01431
+// Notes: reversed the KEGG reaction
+ec:1.1.1.21::ec:1.1.1.307,rn:R01431,xylitol:NADP+ oxidoreductase,C00181 + C00005 + C00080 <=> C00379 + C00006
+
+// Xylitol + NAD+ <=> D-Xylulose + NADH + H+
+// curl -X GET http://rest.kegg.jp/get/rn:R01896
+ec:1.1.1.15,rn:R01896,Xylitol:NAD oxidoreductase,C00379 + C00003 <=> C00310 + C00004 + C00080 
+
+// ATP + D-Xylulose <=> ADP + D-Xylulose 5-phosphate
+// curl -X GET http://rest.kegg.jp/get/rn:R01639
+ec:2.7.1.17,rn:R01901,ATP:D-xylulose 5-phosphotransferase,C00002 + C00310 <=> C00008 + C00231
+
+// --------------------------------------------------------------------------------------------------------- //
+// GLYCOLYSIS
+// --------------------------------------------------------------------------------------------------------- //
+// ATP + alpha-D-Glucose <=> ADP + alpha-D-Glucose 6-phosphate -
+// curl -X GET http://rest.kegg.jp/get/rn:R01786
+ec:2.7.1.1,rn:R01786,ATP:D-glucose 6-phosphotransferase,C00002 + C00267 <=> C00008 + C00668
+
+// alpha-D-Glucose 6-phosphate <=> beta-D-Fructose 6-phosphate
+// curl -X GET http://rest.kegg.jp/get/rn:R02740
+ec:5.3.1.9,rn:R02740,D-glucose-6-phosphate aldose-ketose-isomerase,C00668 <=> C05345
+
+// ATP + beta-D-Fructose 6-phosphate <=> ADP + beta-D-Fructose 1,6-bisphosphate -
+// curl -X GET http://rest.kegg.jp/get/rn:R04779
+ec:2.7.1.11,rn:R04779,ATP:D-fructose-6-phosphate 1-phosphotransferase,C00002 + C05345 <=> C00008 + C05378
+
+// beta-D-Fructose 1,6-bisphosphate <=> Glycerone phosphate + D-Glyceraldehyde 3-phosphate
+// curl -X GET http://rest.kegg.jp/get/rn:R01070
+ec:4.1.2.13,rn:R01070,beta-D-fructose-16-bisphosphate D-glyceraldehyde-3-phosphate-lyase,C05378 <=> C00111 + C00118
+
+// D-Glyceraldehyde 3-phosphate <=> Glycerone phosphate
+// curl -X GET http://rest.kegg.jp/get/rn:R01015
+ec:5.3.1.1,rn:R01015,D-glyceraldehyde-3-phosphate aldose-ketose-isomerase,C00118 <=> C00111
+
+// D-Glyceraldehyde 3-phosphate + NADP+ + H2O <=> 3-Phospho-D-glycerate + NADPH + H+
+// curl -X GET http://rest.kegg.jp/get/rn:R01058
+ec:1.2.1.9::ec:1.2.1.90,rn:R01058,D-glyceraldehyde 3-phosphate:NADP+ oxidoreductase,C00118 + C00006 + C00001 <=> C00197 + C00005 + C00080
+
+// D-Glyceraldehyde 3-phosphate + Orthophosphate + NAD+ <=> 3-Phospho-D-glyceroyl phosphate + NADH + H+
+// curl -X GET http://rest.kegg.jp/get/rn:R01061
+ec:1.2.1.12::ec:1.2.1.59,rn:R01061,D-glyceraldehyde-3-phosphate:NAD+ oxidoreductase,C00118 + C00009 + C00003 <=> C00236 + C00004 + C00080
+
+// ADP + 3-Phospho-D-glyceroyl phosphate <=> ATP + 3-Phospho-D-glycerate
+// curl -X GET http://rest.kegg.jp/get/rn:R01512
+// Notes: reversed the KEGG reaction string
+ec:2.7.2.3,rn:R01512,ATP:3-phospho-D-glycerate 1-phosphotransferase,C00008 + C00236 <=> C00002 + C00197
+
+// 3-Phospho-D-glycerate <=> 2-Phospho-D-glycerate
+// curl -X GET http://rest.kegg.jp/get/rn:R01518
+// Notes: reversed the KEGG reaction string 
+ec:5.4.2.11::ec:5.4.2.12,rn:R01518,D-phosphoglycerate 23-phosphomutase,C00197 <=> C00631
+
+// 2-Phospho-D-glycerate <=> Phosphoenolpyruvate + H2O
+// curl -X GET http://rest.kegg.jp/get/rn:R00658
+ec:4.2.1.11,rn:R00658,2-phospho-D-glycerate hydrolyase,C00631 <=> C00074 + C00001
+
+// ADP + Phosphoenolpyruvate <=> ATP + Pyruvate
+// curl -X GET http://rest.kegg.jp/get/rn:R00200
+ec:2.7.1.40,rn:R00200,ATP:pyruvate 2-O-phosphotransferase,C00008 + C00074 <=> C00002 + C00022
+
+// Pyruvate dehydrogenase (pdh) 1.2.1.4; 2.3.1.12; 1.8.1.4
+// R_pdh,M_coa_c+M_nad_c+M_pyr_c,M_accoa_c+M_co2_c+M_nadh_c+M_h_c,0,inf
+// Notes: lumped reaction to make Acetyl-CoA
+ec:1.2.1.4::ec:2.3.1.12::1.8.1.4,rn:b06060cd-1a8c-44b6-80a2-db68fe9dd490,Pyruvate dehydrogenase (pdh),C00010 + C00003 + C00022 <=> C00024 + C00011 + C00004 + C00080
+
+// ADP + Acetyl-CoA + Orthophosphate <=> ATP + Acetate + CoA
+// curl -X GET http://rest.kegg.jp/get/rn:R00229
+// Notes: reversed the KEGG reaction string
+ec:6.2.1.13,rn:R00229,acetate:CoA ligase,C00008 + C00024 + C00009 <=> C00002 + C00033 + C00010
+
+// Pyruvate + Orthophosphate + Oxygen <=> Acetyl phosphate + Hydrogen peroxide + CO2
+// curl -X GET http://rest.kegg.jp/get/rn:R00207
+ec:1.2.3.3,rn:R00207,Pyruvate:oxygen 2-oxidoreductase,C00022 + C00009 + C00007 <=> C00227 + C00027 + C00011
+
+// Orthophosphate + Acetyl phosphate <=> Diphosphate + Acetate 
+// curl -X GET http://rest.kegg.jp/get/rn:R00320
+// Notes: reversed the KEGG reaction string
+ec:2.7.2.12,rn:R00320,diphosphate:acetate phosphotransferase,C00009 + C00227 <=> C00013 + C00033
+
+// ADP + Acetyl phosphate <=> ATP + Acetate
+// curl -X GET http://rest.kegg.jp/get/rn:R00315
+// Notes: reversed the KEGG reaction string
+ec:2.7.2.1::ec:2.7.2.15,rn:R00315,ATP:acetate phosphotransferase,C00008 + C00227 <=> C00002 + C00033
+
+// --------------------------------------------------------------------------------------------------------- //
+// TCA CYCLE
+// --------------------------------------------------------------------------------------------------------- //
+// Acetyl-CoA + H2O + Oxaloacetate <=> Citrate + CoA
+// curl -X GET http://rest.kegg.jp/get/rn:R00351
+// Notes: reversed the KEGG reaction string
+ec:2.3.3.1::ec:2.3.3.3::ec:2.3.3.16,rn:R00351,acetyl-CoA:oxaloacetate C-acetyltransferase,C00024 + C00001 + C00036 <=> C00158 + C00010
+
+// Citrate <=> cis-Aconitate + H2O
+// curl -X GET http://rest.kegg.jp/get/rn:R01325
+ec:4.2.1.3,rn:R01325,citrate hydrolyase,C00158 <=> C00417 + C00001
+
+// cis-Aconitate + H2O <=> Isocitrate
+// curl -X GET http://rest.kegg.jp/get/rn:R01900
+// Notes: reversed the KEGG reaction string
+ec:4.2.1.3,rn:R01900,isocitrate hydrolyase,C00417 + C00001 <=> C00311
+
+// Isocitrate + NAD+ <=> 2-Oxoglutarate + CO2 + NADH + H+
+// curl -X GET http://rest.kegg.jp/get/rn:R00709
+ec:1.1.1.41::ec:1.1.1.286,rn:R00709,isocitrate:NAD+ oxidoreductase,C00311 + C00003 <=> C00026 + C00011 + C00004 + C00080
+
+// 2 Oxidized ferredoxin + 2-Oxoglutarate + CoA <=> 2 Reduced ferredoxin + Succinyl-CoA + CO2 + 2 H+ 
+// curl -X GET http://rest.kegg.jp/get/rn:R01197
+// Notes: reversed the KEGG reaction string
+ec:1.2.7.3::ec:1.2.7.11,rn:R01197,2-oxoglutarate:ferredoxin oxidoreductase,2 C00139 + C00026 + C00010 <=> 2 C00138 + C00091 + C00011 + 2 C00080
+
+// ADP + Orthophosphate + Succinyl-CoA <=> ATP + Succinate + CoA
+// curl -X GET http://rest.kegg.jp/get/rn:R00405
+// Notes: reversed the KEGG reaction string 
+ec:6.2.1.5,rn:R00405,Succinate:CoA ligase,C00008 + C00009 + C00091 <=> C00002 + C00042 + C00010
+
+// Quinone + Succinate <=> Hydroquinone + Fumarate
+// curl -X GET http://rest.kegg.jp/get/rn:R02164
+// Notes: Replaced placeholder Quinones C15602 => C00399 and C15603 => C00390
+// Notes: This change *should* match rn:R11945
+ec:1.3.5.1::ec:1.3.5.4,rn:R02164,succinate:quinone oxidoreductase,C00399 + C00042 <=> C00390 + C00122
+
+// Fumarate + H2O <=> (S)-Malate
+// curl -X GET http://rest.kegg.jp/get/rn:R01082
+// Notes: reversed the KEGG reaction string
+ec:4.2.1.2,rn:R01082,(S)-malate hydrolyase,C00122 + C00001 <=> C00149
+
+// (S)-Malate + NAD+ <=> Oxaloacetate + NADH + H+
+// curl -X GET http://rest.kegg.jp/get/rn:R00342
+ec:1.1.1.37::1.1.1.299,rn:R00342,(S)-malate:NAD+ oxidoreductase,C00149 + C00003 <=> C00036 + C00004 + C00080
+
+// --------------------------------------------------------------------------------------------------------- //
+// PENTOSE PHOSPHATE PATHWAY
+// --------------------------------------------------------------------------------------------------------- //
+// D-Xylulose 5-phosphate <=> D-Ribulose 5-phosphate 
+// curl -X GET http://rest.kegg.jp/get/rn:R01529
+// Notes: reversed the KEGG reaction string
+ec:5.1.3.1,rn:R01529,D-Ribulose-5-phosphate 3-epimerase,C00231 <=> C00199
+
+// D-Ribulose 5-phosphate <=> D-Ribose 5-phosphate
+// curl -X GET http://rest.kegg.jp/get/rn:R01056
+// Notes: reversed the KEGG reaction string
+ec:5.3.1.6,rn:R01056,D-ribose-5-phosphate aldose-ketose-isomerase,C00199 <=> C00117
+
+// D-Ribose 5-phosphate + D-Xylulose 5-phosphate <=> Sedoheptulose 7-phosphate + D-Glyceraldehyde 3-phosphate
+// curl -X GET http://rest.kegg.jp/get/rn:R01641
+// Notes: reversed the KEGG reaction string
+ec:2.2.1.1,rn:R01641,sedoheptulose-7-phosphate:D-glyceraldehyde-3-phosphate glycolaldehyde transferase,C00117 + C00231 <=> C05382 + C00118
+
+// Sedoheptulose 7-phosphate + D-Glyceraldehyde 3-phosphate <=> D-Erythrose 4-phosphate + beta-D-Fructose 6-phosphate
+// curl -X GET http://rest.kegg.jp/get/rn:R01827
+ec:2.2.1.2,rn:R01827,sedoheptulose-7-phosphate:D-glyceraldehyde-3-phosphate glyceronetransferase,C05382 + C00118 <=> C00279 + C05345
+
+// beta-D-Fructose 6-phosphate + D-Glyceraldehyde 3-phosphate <=> D-Erythrose 4-phosphate + D-Xylulose 5-phosphate
+// curl -X GET http://rest.kegg.jp/get/rn:R01830
+ec:2.2.1.1,rn:R01830,beta-D-Fructose 6-phosphate:D-glyceraldehyde-3-phosphate glycolaldehyde transferase,C05345 + C00118 <=> C00279 + C00231
+
+// D-Xylulose 5-phosphate + Orthophosphate <=> Acetyl phosphate + D-Glyceraldehyde 3-phosphate + H2O
+// curl -X GET http://rest.kegg.jp/get/rn:R01621
+ec:4.1.2.9,rn:R01621,D-xylulose 5-phosphate D-glyceraldehyde-3-phosphate-lyase,C00231 + C00009 <=> C00227 + C00118 + C00001
+
+// beta-D-Glucose 6-phosphate + NADP+ <=> D-Glucono-15-lactone 6-phosphate + NADPH + H+
+// curl -X GET http://rest.kegg.jp/get/rn:R02736
+// Notes: irreversible
+ec:1.1.1.49::ec:1.1.1.363,rn:R02736,beta-D-glucose-6-phosphate:NADP+ 1-oxoreductase,C01172 + C00006 <=> C01236 + C00005 + C00080
+
+// D-Glucono-1,5-lactone 6-phosphate + H2O <=> 6-Phospho-D-gluconate
+// curl -X GET http://rest.kegg.jp/get/rn:R02035
+ec:3.1.1.31,rn:R02035,6-Phospho-D-glucono-15-lactone lactonohydrolase,C01236 + C00001 <=> C00345
+
+// 6-Phospho-D-gluconate + NADP+ <=> D-Ribulose 5-phosphate + CO2 + NADPH + H+
+// curl -X GET http://rest.kegg.jp/get/rn:R01528
+ec:1.1.1.44::ec:1.1.1.351,rn:R01528,6-phospho-D-gluconate:NADP+ 2-oxidoreductase,C00345 + C00006 <=> C00199 + C00011 + C00005 + C00080
+
+// --------------------------------------------------------------------------------------------------------- //
+// OXIDATIVE PHOSPHORYLATION AND ENERGY METABOLISM
+// --------------------------------------------------------------------------------------------------------- //
+// Ubiquinone + NADH + 6 H+ <=> Ubiquinol + NAD+ + 5 H+
+// curl -X GET http://rest.kegg.jp/get/rn:R11945
+// Notes: complex I
+ec:7.1.1.2,rn:R11945,NADH:ubiquinone oxidoreductase,C00399 + C00004 + 6 C00080 <=> C00390 + C00003 + 5 C00080
+
+// Quinone + Succinate <=> Hydroquinone + Fumarate
+// curl -X GET http://rest.kegg.jp/get/rn:R02164
+// Notes: complex II
+// Notes: Replaced placeholder Quinones C15602 => C00399 and C15603 => C00390
+// ec:1.3.5.1::ec:1.3.5.4,rn:R02164,succinate:quinone oxidoreductase,C00399 + C00042 <=> C00390 + C00122
+
+// quinol + 2 ferricytochrome c = quinone + 2 ferrocytochrome c + 2 H+
+// Notes: no reaction?
+// Notes: complex III
+ec:7.1.1.8,rn:a484c567-c328-42ea-9c39-3ebac4a587c8,complex III,C00390 +  2 C00125 <=> C00399 +  2 C00126 + 2 C00080
+
+// Oxygen + 4 Ferrocytochrome c + 4 H+ <=> 4 Ferricytochrome c + 2 H2O
+// curl -X GET http://rest.kegg.jp/get/rn:R00081
+// Notes: complex IV
+ec:1.7.2.1::ec:7.1.1.9,rn:R00081,ferrocytochrome-c:oxygen oxidoreductase,C00007 + 4 C00126 + 4 C00080 <=> 4 C00125 + 2 C00001
+
+// proton-translocating ATPase
+// Notes: no reaction?
+// Notes: complex V
+ec:7.1.2.1,rn:74aa5235-32e2-403a-9043-5b7e59d56255,proton-translocating ATPase,C00008 + C00009 + 3 C00080 <=> C00002 + C00001 + 3 C00080
+
+// Diphosphate + H2O <=> 2 Orthophosphate
+// curl -X GET http://rest.kegg.jp/get/rn:R00004
+ec:3.6.1.1,rn:R00004,diphosphate phosphohydrolase,C00013 + C00001 <=> 2 C00009
+
+// ATP + NDP <=> ADP + Nucleoside triphosphate
+// curl -X GET http://rest.kegg.jp/get/rn:R00331
+// Notes: CTP => C00063
+// Notes: CDP => C00112
+ec:2.7.4.6,rn:R00331,ATP:nucleoside-diphosphate phosphotransferase,C00002 + C00112 <=> C00008 + C00063
+
+// ATP + CMP <=> ADP + CDP
+// curl -X GET http://rest.kegg.jp/get/rn:R00512
+ec:2.7.4.14::ec:2.7.4.25,rn:R00512,ATP:CMP phosphotransferase,C00002 + C00055 <=> C00008 + C00112
+
+// --------------------------------------------------------------------------------------------------------- //
+// PRODUCTS
+// --------------------------------------------------------------------------------------------------------- //
+
+// 1,2 Propanedioldinatrate (PDGN)
+// Glycerone phosphate <=> Methylglyoxal + Orthophosphate
+// curl -X GET http://rest.kegg.jp/get/rn:R01016
+ec:4.2.3.3,rn:R01016,glycerone-phosphate phosphate-lyase,C00111 <=> C00546 + C00009
+
+// Methylglyoxal + NADPH + H+ <=> (S)-Lactaldehyde + NADP+
+// curl -X GET http://rest.kegg.jp/get/rn:R02260
+// Notes: reversed the KEGG reaction string
+ec:1.1.1.283::ec:1.2.1.49,rn:R02260,(S)-lactaldehyde:NADP+ oxidoreductase,C00546 + C00005 + C00080 <=> C00424 + C00006
+
+// Methylglyoxal + NADH + H+ <=> (S)-Lactaldehyde + NAD+
+// curl -X GET http://rest.kegg.jp/get/rn:R10715
+// Notes: reversed the KEGG reaction string
+ec:1.1.1.6,rn:R10715,(S)-lactaldehyde:NAD+ oxidoreductase,C00546 + C00004 + C00080 <=> C00424 + C00003
+
+// (S)-Lactaldehyde + NADH + H+ <=> Propane-1,2-diol + NAD+
+// curl -X GET http://rest.kegg.jp/get/rn:R02257
+// Notes: reversed the KEGG reaction string
+ec:1.1.1.77,rn:R02257,Propane-12-diol:NAD+ oxidoreductase,C00424 + C00004 + C00080 <=> C00583 + C00003
+
+// Propane-1,2-diol + 2 KNO3 <=> PGDN +  2 KOH
+// Notes: not in KEGG
+// Notes: PGDN => 1,2 Propylene glycol dinitrate
+// Notes: KNO3 => C13557 and KOH => C12568
+ec:0.0.0.0,rn:28235c0c-ec00-4a11-8acb-510b0f2e2687,Magical PGDN reaction,C00583 + 2 C13557 <=> PGDN + 2 C12568
+
+// Hydrazine
+// Nitrate + 2 Reduced ferredoxin <=> Nitrite + H2O + 2 Oxidized ferredoxin
+// curl -X GET http://rest.kegg.jp/get/rn:R00791
+// Notes: reversed the KEGG reaction string 
+ec:1.7.7.2,rn:R00791,nitrite:ferredoxin oxidoreductase,C00244 + 2 C00138 <=> C00088 + C00001 + 2 C00139
+
+// Nitrite + Ferrocytochrome c + H+ <=> Nitric oxide + H2O + Ferricytochrome c
+// curl -X GET http://rest.kegg.jp/get/rn:R00783
+// Notes: reversed the KEGG reaction string 
+// Notes: changed KEGG reaction string so eQuilibrator gave an answer
+// Notes: Nitrite + NADH + H+ <=> Nitric oxide + H2O + NAD
+ec:1.7.2.1,rn:R00783,nitric-oxide:ferricytochrome-c oxidoreductase,C00088 + C00004 + C00080 <=> C00533 + C00001 + C00003
+
+// Nitric oxide + Ammonia + 3 Ferrocytochrome c <=> Hydrazine + H2O + 3 Ferricytochrome c
+// curl -X GET http://rest.kegg.jp/get/rn:R09799
+// Notes: changed KEGG reaction string so eQuilibrator gave an answer
+// Notes: Nitric oxide + Ammonia + 1.5 NADH <=> Hydrazine + H2O + 1.5 NAD
+ec:1.7.2.7,rn:R09799,hydrazine:ferricytochrome-c oxidoreductase,C00533 + C00014 + 1.5 C00004 <=> C05361 + C00001 + 1.5 C00003
+
+// Isoprene
+// Pyruvate + D-Glyceraldehyde 3-phosphate <=> 1-Deoxy-D-xylulose 5-phosphate + CO2
+// curl -X GET http://rest.kegg.jp/get/rn:R05636
+ec:2.2.1.7,rn:R05636,1-Deoxy-D-xylulose-5-phosphate pyruvate-lyase,C00022 + C00118 <=> C11437 + C00011
+
+// 1-Deoxy-D-xylulose 5-phosphate + NADPH + H+ <=> 2-C-Methyl-D-erythritol 4-phosphate + NADP+
+// curl -X GET http://rest.kegg.jp/get/rn:R05688 
+// Notes: reversed the KEGG reaction string 
+ec:1.1.1.267,rn:R05688,1-Deoxy-D-xylulose-5-phosphate isomeroreductase,C11437 + C00005 + C00080 <=> C11434 + C00006
+
+// 2-C-Methyl-D-erythritol 4-phosphate + CTP <=> 4-(Cytidine 5'-diphospho)-2-C-methyl-D-erythritol + Diphosphate
+// curl -X GET http://rest.kegg.jp/get/rn:R05633  
+ec:2.7.7.60,rn:R05633,CTP: 2-C-Methyl-D-erythritol 4-phosphate cytidylyltransferase,C11434 + C00063 <=> C11435 + C00013
+
+// 4-(Cytidine 5'-diphospho)-2-C-methyl-D-erythritol + ATP <=> 2-Phospho-4-(cytidine 5'-diphospho)-2-C-methyl-D-erythritol + ADP
+// curl -X GET http://rest.kegg.jp/get/rn:R05634
+ec:2.7.1.148,rn:R05634,ATP:4-(Cytidine 5'-diphospho)-2-C-methyl-D-erythritol 2-phosphotransferase,C11435 + C00002 <=> C11436 + C00008
+
+// 2-Phospho-4-(cytidine 5'-diphospho)-2-C-methyl-D-erythritol <=> 2-C-Methyl-D-erythritol 2,4-cyclodiphosphate + CMP
+// curl -X GET http://rest.kegg.jp/get/rn:R05637
+ec:4.6.1.12,rn:R05637,2-Phospho-4-(cytidine 5'-diphospho)-2-C-methyl-D-erythritol CMP-lyase,C11436 <=> C11453 + C00055
+
+// 2-C-Methyl-D-erythritol 2,4-cyclodiphosphate + 2 Reduced ferredoxin <=> 1-Hydroxy-2-methyl-2-butenyl 4-diphosphate + H2O + 2 Oxidized ferredoxin
+// curl -X GET http://rest.kegg.jp/get/rn:R08689 
+ec:1.17.7.1,rn:R08689,(E)-4-hydroxy-3-methylbut-2-en-1-yl-diphosphate:oxidized ferredoxin oxidoreductase,C11453 + 2 C00138 <=> C11811 + C00001 + 2 C00139
+
+// 1-Hydroxy-2-methyl-2-butenyl 4-diphosphate + 2 Reduced ferredoxin + 2 H+ <=> Dimethylallyl diphosphate + 2 Oxidized ferredoxin + H2O
+// curl -X GET http://rest.kegg.jp/get/rn:R08210
+// Notes: reversed the KEGG reaction
+ec:1.17.7.4,rn:R08210,dimethylallyl diphosphate:ferredoxin oxidoreductase,C11811 + 2 C00138 + 2 C00080 <=> C00235 + 2 C00139 + C00001
+
+// Dimethylallyl diphosphate <=> Isoprene + Diphosphate
+// curl -X GET http://rest.kegg.jp/get/rn:R08199
+ec:4.2.3.27,rn:R08199,dimethylallyl-diphosphate diphosphate-lyase,C00235 <=> C16521 + C00013
+
+// 1,3 Propanediol (PDO)
+
+// First step in PDO pathway:
+// Link: https://doi.org/10.1038/s41598-019-48091-7
+ec:0.0.0.0,rn:c42429df-59e1-4ba0-b105-eaf5aa035863,Glycerol-3-phosphate dehydrogenase,C00111 + C00004 <=> C00093 + C00003
+
+// sn-Glycerol 3-phosphate + H2O <=> Glycerol + Orthophosphate
+// curl -X GET http://rest.kegg.jp/get/rn:R00841 
+ec:3.1.3.21,rn:R00841,sn-glycerol-3-phosphate phosphohydrolase,C00093 + C00001 <=> C00116 + C00009
+
+// Glycerol <=> 3-Hydroxypropanal + H2O
+// curl -X GET http://rest.kegg.jp/get/rn:R01047
+ec:4.2.1.30,rn:R01047,glycerol hydrolyase,C00116 <=> C00969 + C00001
+
+// 3-Hydroxypropanal + NADH + H+ <=> Propane-1,3-diol + NAD+
+// curl -X GET http://rest.kegg.jp/get/rn:R03119
+// Notes: reversed KEGG reaction string
+ec:1.1.1.202,rn:R03119,propane-13-diol:NAD+ 1-oxidoreductase,C00969 + C00004 + C00080 <=> C02457 + C00003

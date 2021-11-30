@@ -32,7 +32,29 @@ end
 # ╔═╡ 7d3b5c92-152f-416a-b82c-82682e61ab9d
 md"""
 ### Example: Flux Balance Analysis and the ENGRI-1120 Project Networks
+
+The FBA problem is (traditinally) a Linear Programming (LP) problem in which a linear objective function $\mathcal{O}$:
+
+$$\mathcal{O} = \sum_{j=1}^{\mathcal{R}}c_{j}\dot{\epsilon}_{j}$$
+
+is subject to constraints on the reaction bounds (written in our case as the open extent) and species bounds (species mol balances). In our design problem, these constraints take the form (single in, single out):
+
+$$\begin{eqnarray}
+\mathcal{L}_{j}\leq&\dot{\epsilon}_{j}&\leq\mathcal{U}_{j}\qquad{j=1,2\dots,\mathcal{R}}\\
+-\dot{n}_{i,i}\leq&\sum_{j=1}^{\mathcal{R}}\sigma_{ij}\dot{\epsilon}_{j}&\leq\infty\\
+\end{eqnarray}$$
+
+Let's set up these bounds for the design project, and run some sample calculations to get a feel for the performance of the metabolic reaction network.
+
 """
+
+# ╔═╡ 762e417b-b3f3-4bc0-9c9c-f777ae273303
+md"""
+##### What's in the model_v2.bson file?
+"""
+
+# ╔═╡ bbfe850c-1f2c-4efb-9a9c-61bb2261370c
+
 
 # ╔═╡ a1507115-b73d-482a-b66c-734f58463e49
 md"""
@@ -639,6 +661,8 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 
 # ╔═╡ Cell order:
 # ╟─7d3b5c92-152f-416a-b82c-82682e61ab9d
+# ╟─762e417b-b3f3-4bc0-9c9c-f777ae273303
+# ╠═bbfe850c-1f2c-4efb-9a9c-61bb2261370c
 # ╟─a1507115-b73d-482a-b66c-734f58463e49
 # ╠═39b2b92f-4d6b-4f8c-b840-da2fb0dc79e2
 # ╟─fe7efbdb-237c-4ac5-9e40-06df4264266c
