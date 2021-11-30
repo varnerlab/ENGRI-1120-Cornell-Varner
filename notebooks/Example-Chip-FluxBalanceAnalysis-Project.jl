@@ -31,13 +31,13 @@ end
 
 # ╔═╡ 7d3b5c92-152f-416a-b82c-82682e61ab9d
 md"""
-### Example: Flux Balance Analysis and the ENGRI-1120 Project Networks
+### Example: Flux Balance Analysis using the ENGRI-1120 Project Networks
 
 The FBA problem is (traditinally) a Linear Programming (LP) problem in which a linear objective function $\mathcal{O}$:
 
 $$\mathcal{O} = \sum_{j=1}^{\mathcal{R}}c_{j}\dot{\epsilon}_{j}$$
 
-is subject to constraints on the reaction bounds (written in our case as the open extent) and species bounds (species mol balances). In our design problem, these constraints take the form (single in, single out):
+is minimized (or maximized) subject to constraints on the reaction bounds (written in terms of the open extent) and species bounds (species mole balances). In our design problem, these constraints take the form (shown for a single in, single out):
 
 $$\begin{eqnarray}
 \mathcal{L}_{j}\leq&\dot{\epsilon}_{j}&\leq\mathcal{U}_{j}\qquad{j=1,2\dots,\mathcal{R}}\\
