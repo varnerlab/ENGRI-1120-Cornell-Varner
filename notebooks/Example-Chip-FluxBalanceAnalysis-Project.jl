@@ -23,7 +23,7 @@ begin
 	include(joinpath(_PATH_TO_SRC,"Include.jl"))
 
 	# load the model -
-	MODEL = BSON.load(joinpath(_PATH_TO_MODEL,"model_v1.bson"), @__MODULE__)
+	MODEL = BSON.load(joinpath(_PATH_TO_MODEL,"model_v2.bson"), @__MODULE__)
 
 	# show -
 	nothing
@@ -34,20 +34,25 @@ md"""
 ### Example: Flux Balance Analysis and the ENGRI-1120 Project Networks
 """
 
-# ╔═╡ af120aff-6436-430b-9a61-fe20176196a8
+# ╔═╡ a1507115-b73d-482a-b66c-734f58463e49
+md"""
+##### Setup the flux balance analysis calculation
 
+Let's build the $\mathcal{M}\times\mathcal{R}$ stoichiometric array from data in the `model_v2.bson` file. Then, we can set up the reaction bounds, the species bounds, and the objective coefficient arrays (all of which are needed for the calculation).
 
-# ╔═╡ ada13751-776b-4664-9610-36d6fee06406
-# rn:R08199 = isoprene
-# rn:28235c0c-ec00-4a11-8acb-510b0f2e2687 = PGDN
-# rn:rn:R09799 = Hydrazine
-# rn:R03119 = 3G
-idx_target_rate = find_reaction_index(MODEL,:reaction_number=>"rn:R09799")
+"""
 
 # ╔═╡ 39b2b92f-4d6b-4f8c-b840-da2fb0dc79e2
 begin
 
 	# setup the FBA calculation for the project -
+
+	# What rate are trying to maximize?
+	# rn:R08199 = isoprene
+	# rn:28235c0c-ec00-4a11-8acb-510b0f2e2687 = PGDN
+	# rn:rn:R09799 = Hydrazine
+	# rn:R03119 = 3G
+	idx_target_rate = find_reaction_index(MODEL,:reaction_number=>"rn:R09799")
 
 	# First, let's build the stoichiometric matrix from the model object -
 	(cia,ria,S) = build_stoichiometric_matrix(MODEL);
@@ -56,32 +61,42 @@ begin
 	(ℳ,ℛ) = size(S)
 
 	# Next, setup a default bounds array => update specific elements
-	flux_bounds = [-10*ones(ℛ,1) 10*ones(ℛ,1)]
+	# We'll correct the directionality below -
+	Vₘ = (13.7)*(3600)*(50e-9)*(1000) # units: mmol/hr
+	flux_bounds = [-Vₘ*ones(ℛ,1) Vₘ*ones(ℛ,1)]
 
 	# What is the default mol flow input array => update specific elements
-	n_dot_input_stream_1 = ones(ℳ,1)	
-	n_dot_input_stream_2 = zeros(ℳ,1)
+	# strategy: start with nothing in both streams, add material(s) back
+	n_dot_input_stream_1 = zeros(ℳ,1)	# stream 1
+	n_dot_input_stream_2 = zeros(ℳ,1)	# stream 2
 
-	# Default: we don't supply the product in the feed -
-	n_dot_input_stream_1[67] = 0.0 # 3G
-	n_dot_input_stream_1[69] = 0.0 # Hydrazine
-	n_dot_input_stream_1[80] = 0.0 # isoprene
-	n_dot_input_stream_1[81] = 0.0 # PGDN
+	# Let's lookup stuff that we want/need to supply to the chip to get the reactiont to go -
+	compounds_that_we_need_to_supply = [
+		"oxygen", "maltose", "nitric oxide", "ammonia"
+	]
 
-	# Default: we only supply the specified carbon source -
-	n_dot_input_stream_1[14] = 0.0 # pyruvate
-	n_dot_input_stream_1[19] = 0.0 # oxaloacetate (OAA)
-	n_dot_input_stream_1[20] = 0.0 # succinate
-	n_dot_input_stream_1[22] = 0.0 # CTP
-	n_dot_input_stream_1[23] = 0.0 # phosphoenolpyruvate (PEP)
+	# what are the amounts that we need to supply?
+	mol_flow_values = [
+		10.0 ; # oxygen mmol/hr
+		20.0 ; # maltose mmol/hr
+		10.0 ; # nitric oxide mmol/hr
+		3.0  ; # ammonia mmol/hr
+	]
 
-	# example: hydrazine optimization 
-	n_dot_input_stream_1[5] = 10.0 	# nadph
-	n_dot_input_stream_1[8] = 10.0 	# adp
-	n_dot_input_stream_1[59] = 10.0 # nitric oxide
+	idx_supply = Array{Int64,1}()
+	for compound in compounds_that_we_need_to_supply
+		idx = find_compound_index(MODEL,:compound_name=>compound)
+		push!(idx_supply,idx)
+	end
+
+	# supply -
+	n_dot_input_stream_1[idx_supply] .= mol_flow_values
 	
 	# setup the species bounds array -
 	species_bounds = [-1.0*(n_dot_input_stream_1.+n_dot_input_stream_2) 1000.0*ones(ℳ,1)]
+
+	# how can we force the system to use a compound?
+	# species_bounds[40,2] = species_bounds[40,1]
 
 	# Lastly, let's setup the objective function -
 	c = zeros(ℛ)
@@ -90,6 +105,19 @@ begin
 	# show -
 	nothing
 end
+
+# ╔═╡ fe7efbdb-237c-4ac5-9e40-06df4264266c
+md"""
+#### Estimate the directionality of reaction flux
+
+By default, we assume that all reactions are reversible. However, while this may be theoretically true we can get a better estimate of whether a reaction is likely to run backward (and hence a have lower bound $\neq$ 0) by 
+looking at the Gibbs energy of reaction $\Delta{G}_{r}$. In particular, the heuristic:
+
+$$\mathrm{sgn}(\dot{\epsilon}_{j}) = -\mathrm{sgn}\left(\Delta{G}_{r,j}\right)$$
+
+gives us a tool to assign the lower bound of $\dot{\epsilon}_{j}$ to zero, or to a non-zero value. If $\mathrm{sgn}(\dot{\epsilon}_{j})<0$, we have a non-zero lower bound (reaction is reversible).
+
+"""
 
 # ╔═╡ 537e0c28-b2d7-4d29-9592-0bb35747cd81
 begin
@@ -111,12 +139,20 @@ begin
 	# get the open extent vector -
 	ϵ_dot = result.calculated_flux_array
 
-	# show -
-	nothing 
+	# did this converge?
+	with_terminal() do
+
+		# get exit/status information from the solver -
+		exit_flag = result.exit_flag
+		status_flag = result.status_flag
+
+		# display -
+		println("exit_flag = 0: $(exit_flag==0) and status_flag = 5: $(status_flag == 5)")
+	end
 end
 
-# ╔═╡ 5ed3ef45-bf72-4434-a3b9-3f5d69bc7922
-idx_test = findall(x->x==-1.0,result.uptake_array)
+# ╔═╡ d29277d6-8d05-4cc7-b38f-313c52a3f752
+result
 
 # ╔═╡ 6068c779-9367-48d6-a134-b84d3d760ae8
 # compute the mol flow rate out of the device -
@@ -159,7 +195,10 @@ with_terminal() do
 	ℳ_local = length(compound_id_strings)
 	
 	# initialize some storage -
-	state_table = Array{Any,2}(undef,ℳ_local,6)
+	state_table = Array{Any,2}(undef,ℳ_local,7)
+
+	# get the uptake array from the result -
+	uptake_array = result.uptake_array
 
 	# populate the state table -
 	for compound_index = 1:ℳ_local
@@ -168,32 +207,30 @@ with_terminal() do
 		state_table[compound_index,3] = compound_id_strings[compound_index]
 		state_table[compound_index,4] = n_dot_input_stream_1[compound_index]
 		state_table[compound_index,5] = n_dot_input_stream_2[compound_index]
-		state_table[compound_index,6] = n_dot_output[compound_index]
+
+		# for display -
+		tmp_value = abs(n_dot_output[compound_index])
+		state_table[compound_index,6] = (tmp_value) <= 1e-6 ? 0.0 : n_dot_output[compound_index]
+
+		# show the Δ -
+		tmp_value = abs(uptake_array[compound_index])
+		state_table[compound_index,7] = (tmp_value) <= 1e-6 ? 0.0 : uptake_array[compound_index]
 	end
 
 	# header row -
-	state_table_header_row = (["i","name","id","n₁_dot", "n₂_dot", "n₃_dot"],
-		["","","","mol/time", "mol/time", "mol/time"]);
+	state_table_header_row = (["i","name","id","n₁_dot", "n₂_dot", "n₃_dot","Δ"],
+		["","","","mol/time", "mol/time", "mol/time", "mol/time"]);
 		
 	# write the table -
 	pretty_table(state_table; header=state_table_header_row)
 end
-
-# ╔═╡ fce7c3a7-a77a-488d-b6cd-a72631d3f19d
-MODEL
-
-# ╔═╡ d329594c-3c80-43ed-b51f-ca6a2efdd585
-MODEL[:reactions][52,:]
-
-# ╔═╡ b7104f4a-99d2-42af-ab67-ceded6967659
-
 
 # ╔═╡ 5f0bd4a2-4f86-11ec-3402-0563716ffc85
 html"""
 <style>
 main {
     max-width: 1200px;
-    width: 75%;
+    width: 85%;
     margin: auto;
     font-family: "Roboto, monospace";
 }
@@ -602,19 +639,16 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 
 # ╔═╡ Cell order:
 # ╟─7d3b5c92-152f-416a-b82c-82682e61ab9d
-# ╠═af120aff-6436-430b-9a61-fe20176196a8
-# ╠═ada13751-776b-4664-9610-36d6fee06406
+# ╟─a1507115-b73d-482a-b66c-734f58463e49
 # ╠═39b2b92f-4d6b-4f8c-b840-da2fb0dc79e2
+# ╟─fe7efbdb-237c-4ac5-9e40-06df4264266c
 # ╠═537e0c28-b2d7-4d29-9592-0bb35747cd81
 # ╠═bd8f1a4a-61f8-406a-9015-c7841e0cc8d9
-# ╠═5ed3ef45-bf72-4434-a3b9-3f5d69bc7922
+# ╠═d29277d6-8d05-4cc7-b38f-313c52a3f752
 # ╠═6068c779-9367-48d6-a134-b84d3d760ae8
 # ╠═05e503a8-10fb-45ce-bd65-78c5fe11dc60
 # ╠═bcab8188-9820-4bbc-9abb-5d43df9d5479
-# ╠═fce7c3a7-a77a-488d-b6cd-a72631d3f19d
-# ╠═d329594c-3c80-43ed-b51f-ca6a2efdd585
 # ╠═f701a8a6-3a30-4d86-9018-f201276f9369
-# ╠═b7104f4a-99d2-42af-ab67-ceded6967659
 # ╟─5f0bd4a2-4f86-11ec-3402-0563716ffc85
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
