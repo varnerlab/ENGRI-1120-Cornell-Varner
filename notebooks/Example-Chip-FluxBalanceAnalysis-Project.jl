@@ -69,7 +69,7 @@ begin
 
 	# setup the FBA calculation for the project -
 
-	# What rate are trying to maximize?
+	# What rate are trying to maximize? (select your product)
 	# rn:R08199 = isoprene
 	# rn:28235c0c-ec00-4a11-8acb-510b0f2e2687 = PGDN
 	# rn:rn:R09799 = Hydrazine
@@ -92,6 +92,7 @@ begin
 	n_dot_input_stream_1 = zeros(ℳ,1)	# stream 1
 	n_dot_input_stream_2 = zeros(ℳ,1)	# stream 2
 
+	# === YOU NEED TO CHANGE BELOW HERE ====================================================== #
 	# Let's lookup stuff that we want/need to supply to the chip to get the reactiont to go -
 	compounds_that_we_need_to_supply = [
 		"oxygen", "maltose", "nitric oxide", "ammonia"
@@ -104,13 +105,14 @@ begin
 		10.0 ; # nitric oxide mmol/hr
 		2.0  ; # ammonia mmol/hr
 	]
+	# === YOU NEED TO CHANGE ABOVE HERE ====================================================== #
 
 	idx_supply = Array{Int64,1}()
 	for compound in compounds_that_we_need_to_supply
 		idx = find_compound_index(MODEL,:compound_name=>compound)
 		push!(idx_supply,idx)
 	end
-
+	
 	# supply -
 	n_dot_input_stream_1[idx_supply] .= mol_flow_values
 	
@@ -128,9 +130,6 @@ begin
 	nothing
 end
 
-# ╔═╡ cf17b7dd-077a-494b-aaa7-d9476a8b9193
-idx_target_rate
-
 # ╔═╡ fe7efbdb-237c-4ac5-9e40-06df4264266c
 md"""
 #### Estimate the directionality of reaction flux
@@ -140,7 +139,8 @@ looking at the Gibbs energy of reaction $\Delta{G}_{r}$. In particular, the heur
 
 $$\mathrm{sgn}(\dot{\epsilon}_{j}) = -\mathrm{sgn}\left(\Delta{G}_{r,j}\right)$$
 
-gives us a tool to assign the lower bound of $\dot{\epsilon}_{j}$ to zero, or to a non-zero value. If $\mathrm{sgn}(\dot{\epsilon}_{j})<0$, we have a non-zero lower bound (reaction is reversible).
+gives us a tool to assign the lower bound of $\dot{\epsilon}_{j}$ to zero, or to a non-zero value, where
+$\mathrm{sgn}\left(\star\right)$ denotes the [sign function](https://en.wikipedia.org/wiki/Sign_function). If $\mathrm{sgn}(\dot{\epsilon}_{j})<0$, we have a non-zero lower bound (reaction is reversible).
 
 """
 
@@ -668,7 +668,6 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╠═bbfe850c-1f2c-4efb-9a9c-61bb2261370c
 # ╟─a1507115-b73d-482a-b66c-734f58463e49
 # ╠═39b2b92f-4d6b-4f8c-b840-da2fb0dc79e2
-# ╠═cf17b7dd-077a-494b-aaa7-d9476a8b9193
 # ╟─fe7efbdb-237c-4ac5-9e40-06df4264266c
 # ╠═537e0c28-b2d7-4d29-9592-0bb35747cd81
 # ╠═bd8f1a4a-61f8-406a-9015-c7841e0cc8d9
