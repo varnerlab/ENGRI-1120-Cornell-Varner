@@ -203,7 +203,7 @@ with_terminal() do
 
 	# header row -
 	flux_table_header_row = (["i","R","ϵ₁_dot LB", "ϵ₁_dot UB", "ϵᵢ_dot"],
-		["","","mol/time", "mol/time", "mol/time"]);
+		["","","mmol/hr", "mmol/hr", "mmol/hr"]);
 		
 	# write the table -
 	pretty_table(flux_table; header=flux_table_header_row)
@@ -244,7 +244,7 @@ with_terminal() do
 
 	# header row -
 	state_table_header_row = (["i","name","id","n₁_dot", "n₂_dot", "n₃_dot","Δ"],
-		["","","","mol/time", "mol/time", "mol/time", "mol/time"]);
+		["","","","mmol/hr", "mmol/hr", "mmol/hr", "mmol/hr"]);
 		
 	# write the table -
 	pretty_table(state_table; header=state_table_header_row)
