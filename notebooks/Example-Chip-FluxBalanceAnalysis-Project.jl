@@ -198,7 +198,10 @@ with_terminal() do
 		flux_table[reaction_index,2] = reaction_strings[reaction_index]
 		flux_table[reaction_index,3] = flux_bounds[reaction_index,1]
 		flux_table[reaction_index,4] = flux_bounds[reaction_index,2]
-		flux_table[reaction_index,5] = ϵ_dot[reaction_index]
+
+		# clean up the display -
+		tmp_value = abs(ϵ_dot[reaction_index])
+		flux_table[reaction_index,5] = tmp_value < 1e-6 ? 0.0 : ϵ_dot[reaction_index]
 	end
 
 	# header row -
