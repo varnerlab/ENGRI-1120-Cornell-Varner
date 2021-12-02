@@ -75,7 +75,7 @@ begin
 	# rn:28235c0c-ec00-4a11-8acb-510b0f2e2687 = PGDN
 	# rn:rn:R09799 = Hydrazine
 	# rn:R03119 = 3G
-	idx_target_rate = find_reaction_index(MODEL,:reaction_number=>"rn:R09799")
+	idx_target_rate = find_reaction_index(MODEL,:reaction_number=>"rn:28235c0c-ec00-4a11-8acb-510b0f2e2687")
 	# ================================================================================= #
 
 	# First, let's build the stoichiometric matrix from the model object -
@@ -88,6 +88,7 @@ begin
 	# We'll correct the directionality below -
 	Vₘ = (13.7)*(3600)*(50e-9)*(1000) # units: mmol/hr
 	flux_bounds = [-Vₘ*ones(ℛ,1) Vₘ*ones(ℛ,1)]
+			
 
 	# What is the default mol flow input array => update specific elements
 	# strategy: start with nothing in both streams, add material(s) back
@@ -98,15 +99,14 @@ begin
 	# Let's lookup stuff that we want/need to supply to the chip to get the reactiont to go -
 	# what you feed *depends upon your product*
 	compounds_that_we_need_to_supply = [
-		"oxygen", "maltose", "nitric oxide", "ammonia"
+		"oxygen", "sucrose", "potassium nitrate"
 	]
 
 	# what are the amounts that we need to supply to chip (units: mmol/hr)?
 	mol_flow_values = [
 		10.0 ; # oxygen mmol/hr
-		20.0 ; # maltose mmol/hr
-		10.0 ; # nitric oxide mmol/hr
-		2.0  ; # ammonia mmol/hr
+		20.0 ; # sucrose mmol/hr
+		10.0 ; # KNO3 mmol/hr
 	]
 	# === YOU NEED TO CHANGE ABOVE HERE ====================================================== #
 
