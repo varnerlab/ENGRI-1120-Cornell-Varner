@@ -40,7 +40,7 @@ This repository holds example problems discussed in lecture. The problems are st
 Example calculation for the rate of product _P_ formation in a steady-state micro-reactor using Flux Balance Analysis (FBA).
 
 * [Example notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-Chip-FluxBalanceAnalysis-Project.jl.html): 
-Example calculation for the rate of product formation in a steady-state micro-reactor using Flux Balance Analysis (FBA) for the Design Project network
+Example calculation for the rate of product formation in a steady-state micro-reactor using Flux Balance Analysis (FBA) for the Design Project network.
 
 #### Material/mass balance examples
 

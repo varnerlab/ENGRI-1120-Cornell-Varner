@@ -276,7 +276,9 @@ end
 md"""
 #### Separation of 1,3 propanediol using the Magical Sepration Units (MSU)
 
-The magical separation units (MSUs) for the project have one stream in, and two streams out (called the top, and bottom, respectively) and a fixed separation ratio for all products (that's what makes them magical), where the desired product is _always_ in the top stream at some ratio $\theta$. In particular, if we denote $i=\star$ as the index for the desired product (in this case 1,3 propanediol), then after one pass (stream 1 is the input, stream 2 is the top, and stream 3 is the bottom) we have:
+Separations are a huge component of any chemical process. It is rarely the case that a reaction of interest goes to completion and all we are left with is the desired product itself. Thus, we (as chemical engineers) must develop operations to pull apart (or separate) mixtures into streams that contain desired and undesired chemical components. For more on the general area of Separations (and the various types of tools that we can use), check out the [Separations section in the LearnCheme series](https://learncheme.com/screencasts/separations-mass-transfer/).
+
+For the project, we are going to develop a hypothetical downstream separation, that illustrates some of the ideas you'll see in your later courses, but without the headache that comes along with reality. To make this happen, let's suppose the teaching team invented a magical separation unit or MSU. MSUs have one stream in, and two streams out (called the top, and bottom, respectively) and a fixed separation ratio for all products (that's what makes them magical), where the desired product is _always_ in the top stream at some ratio $\theta$. In particular, if we denote $i=\star$ as the index for the desired product (in this case 1,3 propanediol), then after one pass (stream 1 is the input, stream 2 is the top, and stream 3 is the bottom) we have:
 
 $$\begin{eqnarray}
 \dot{m}_{\star,2} &=& \theta_{\star}\dot{m}_{\star,1}\\
@@ -1440,7 +1442,7 @@ version = "0.9.1+5"
 # ╟─1e2fffcc-9c02-445d-a313-870f3dc1c706
 # ╟─3193dc2f-5822-4718-89e9-2c92eae5c0b1
 # ╟─0ba02949-6b61-49d6-a585-9852bec5bfe8
-# ╟─6e7365bc-e9ee-4182-89be-34eff2a70950
+# ╠═6e7365bc-e9ee-4182-89be-34eff2a70950
 # ╟─9ea5990a-30e8-4704-b85c-2f33ee6e92ce
 # ╠═0e22c74b-603f-4f86-84cc-32e1ac6bb1c6
 # ╠═ac5e2adf-0be2-4505-b6cc-bf1ceefb795b
