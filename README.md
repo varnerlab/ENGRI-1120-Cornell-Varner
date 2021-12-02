@@ -42,6 +42,10 @@ Example calculation for the rate of product _P_ formation in a steady-state micr
 * [Example notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-Chip-FluxBalanceAnalysis-Project.jl.html): 
 Example calculation for the rate of product formation in a steady-state micro-reactor using Flux Balance Analysis (FBA) for the Design Project network.
 
+* [Example notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-Chip-FluxBalanceAnalysis-PDO.jl.html): 
+Downstream separation of 1,3 propanediol using Magical Separation Units (MSUs).
+
+
 #### Material/mass balance examples
 
  * [Example notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-HFCS.jl.html): 
