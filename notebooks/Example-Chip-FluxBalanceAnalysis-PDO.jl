@@ -109,7 +109,7 @@ begin
 	mol_flow_values = [
 		10.0 	; # oxygen mmol/hr
 		Vₘ 		; # glycerol mmol/hr
-		10.0 	; # sucrose
+		2.0 	; # sucrose
 	]
 	# === YOU NEED TO CHANGE ABOVE HERE ====================================================== #
 
@@ -301,11 +301,11 @@ $(PlutoUI.LocalResource(joinpath(_PATH_TO_FIGS,"Fig-BTree.png")))
 
 # ╔═╡ 9ea5990a-30e8-4704-b85c-2f33ee6e92ce
 md"""
-The richest product stream will always be the top stream. Thus, after three separation operations (level $l=4$ in tree) the composition in the top stream will be (stream 8 using the numbering down convention):
+The richest product stream will always be the top stream. Thus, after three separation operations (level $l=4$ in tree) the composition in the top stream will be (stream ? using the numbering down convention):
 
 $$\begin{eqnarray}
-\dot{m}_{\star,8} &=& \left[\theta_{\star}^{l-1}\right]\dot{m}_{\star,1}\qquad{i=\star}\\
-\dot{m}_{i,8} &=& \left[(1-\theta_{\star})^{l-1}\right]\dot{m}_{i,1}\qquad{\forall{i}\neq\star}\\
+\dot{m}_{\star,?} &=& \left[\theta_{\star}^{l-1}\right]\dot{m}_{\star,1}\qquad{i=\star}\\
+\dot{m}_{i,?} &=& \left[(1-\theta_{\star})^{l-1}\right]\dot{m}_{i,1}\qquad{\forall{i}\neq\star}\\
 \end{eqnarray}$$
 
 """
@@ -1442,10 +1442,10 @@ version = "0.9.1+5"
 # ╟─1e2fffcc-9c02-445d-a313-870f3dc1c706
 # ╟─3193dc2f-5822-4718-89e9-2c92eae5c0b1
 # ╟─0ba02949-6b61-49d6-a585-9852bec5bfe8
-# ╠═6e7365bc-e9ee-4182-89be-34eff2a70950
+# ╟─6e7365bc-e9ee-4182-89be-34eff2a70950
 # ╟─9ea5990a-30e8-4704-b85c-2f33ee6e92ce
 # ╠═0e22c74b-603f-4f86-84cc-32e1ac6bb1c6
-# ╠═ac5e2adf-0be2-4505-b6cc-bf1ceefb795b
+# ╟─ac5e2adf-0be2-4505-b6cc-bf1ceefb795b
 # ╠═5e5d80c9-b52f-49f9-932c-c334b8b00796
 # ╠═27138f88-f353-4c38-9b98-8652f260d907
 # ╠═d47b2c7c-ef23-427f-aea2-f2a18748bdbf
