@@ -4,9 +4,10 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ 52266654-9a67-4262-88dd-8f88ccec7289
+# ╔═╡ 7c1fbe33-982c-45f6-95a0-35369e15a7bc
 begin
 
+	
 	# load some external packages 
 	using PlutoUI
 	using DataFrames
@@ -29,394 +30,23 @@ begin
 
 	# show -
 	nothing
+	
 end
 
-# ╔═╡ 69f55401-5f11-4d62-8707-09da24981690
+# ╔═╡ eeb0cb9a-1ff7-4aeb-9949-c52abe1d996d
 md"""
-
-#### Example: Cell-Free Production and Purification of 1,3-propanediol from Glycerol
-
-We want to produce a product 1,3-propanediol (PDO; desired product) from the feedstock Glycerol using a cell-free biochemical process operating in a well-mixed continuous microfluidic chip with two inputs and a single output, and a liquid reaction volume of V = 100 μL. Possible reaction pathways reproduced from:
-
-* [Frazão, C.J.R., Trichez, D., Serrano-Bataille, H. et al. Construction of a synthetic pathway for the production of 1,3-propanediol from glucose. Sci Rep 9, 11576 (2019). https://doi.org/10.1038/s41598-019-48091-7](https://www.nature.com/articles/s41598-019-48091-7)
-
-are shown in Fig 1. 
-
-__Assumptions__
-* Microfluidic chip is well-mixed and operates at steady-state
-* Constant T, P on the chip
-* Liquid phase is ideal
-
-__Compute__
-* Use flux balance analysis to compute the optimal open extent of reaction $\dot{\epsilon}_{i}$, where the objective function is to maximize PDO
-* Compute the state and flux table for the mol flow rates given an input flow composition (mol flow rate)
-* Compute the number of separation stages required to generate a stream with a 95% purity of PDO 
+### Example: Parallel or Series Operation of Well-Mixed CSTRs?
 """
 
-# ╔═╡ ffe55797-fcd5-4f33-9766-91b8b0939278
-PlutoUI.LocalResource(joinpath(_PATH_TO_FIGS,"Fig-PDO-Pathways.png"))
+# ╔═╡ 5c00486f-875f-41bb-bc6f-f1c0f22233ab
 
-# ╔═╡ 4cdfb112-2551-4123-bf00-ef168798faa9
-md"""
-##### Setup the Flux Balance Analysis (FBA) problem to estimate the optimal reaction extents $\dot{\epsilon}_{j}$
-"""
 
-# ╔═╡ 404fdbb1-99ac-41e6-9312-ba1f5745f3fc
-begin
-
-	# setup the FBA calculation for the project -
-
-	# === SELECT YOUR PRODUCT HERE ==================================================== #
-	# What rate are trying to maximize? (select your product)
-	# rn:R08199 = isoprene
-	# rn:28235c0c-ec00-4a11-8acb-510b0f2e2687 = PGDN
-	# rn:rn:R09799 = Hydrazine
-	# rn:R03119 = 3G
-	idx_target_rate = find_reaction_index(MODEL,:reaction_number=>"rn:R03119")
-	# ================================================================================= #
-
-	# First, let's build the stoichiometric matrix from the model object -
-	(cia,ria,S) = build_stoichiometric_matrix(MODEL);
-
-	# Next, what is the size of the system? (ℳ = number of metabolites, ℛ = number of reactions)
-	(ℳ,ℛ) = size(S)
-
-	# Next, setup a default bounds array => update specific elements
-	# We'll correct the directionality below -
-	Vₘ = (13.7)*(3600)*(50e-9)*(1000) # units: mmol/hr
-	flux_bounds = [-Vₘ*ones(ℛ,1) Vₘ*ones(ℛ,1)]
-
-	# update the flux bounds -> which fluxes can can backwards? 
-	# do determine this: sgn(v) = -1*sgn(ΔG)
-	updated_flux_bounds = update_flux_bounds_directionality(MODEL,flux_bounds)
-
-	# hard code some bounds that we know -
-	updated_flux_bounds[44,1] = 0.0
-
-	# What is the default mol flow input array => update specific elements
-	# strategy: start with nothing in both streams, add material(s) back
-	n_dot_input_stream_1 = zeros(ℳ,1)	# stream 1
-	n_dot_input_stream_2 = zeros(ℳ,1)	# stream 2
-
-	# === YOU NEED TO CHANGE BELOW HERE ====================================================== #
-	# Let's lookup stuff that we want/need to supply to the chip to get the reactiont to go -
-	# what you feed *depends upon your product*
-	compounds_that_we_need_to_supply = [
-		"oxygen", "glycerol", "sucrose"
-	]
-
-	# what are the amounts that we need to supply to chip (units: mmol/hr)?
-	mol_flow_values = [
-		10.0 	; # oxygen mmol/hr
-		Vₘ 		; # glycerol mmol/hr
-		2.0 	; # sucrose
-	]
-	# === YOU NEED TO CHANGE ABOVE HERE ====================================================== #
-
-	idx_supply = Array{Int64,1}()
-	for compound in compounds_that_we_need_to_supply
-		idx = find_compound_index(MODEL,:compound_name=>compound)
-		push!(idx_supply,idx)
-	end
-	
-	# supply -
-	n_dot_input_stream_1[idx_supply] .= mol_flow_values
-	
-	# setup the species bounds array -
-	species_bounds = [-1.0*(n_dot_input_stream_1.+n_dot_input_stream_2) 1000.0*ones(ℳ,1)]
-
-	# Lastly, let's setup the objective function -
-	c = zeros(ℛ)
-	c[idx_target_rate] = -1.0
-
-	# show -
-	nothing
-end
-
-# ╔═╡ d8f20936-2ab5-417e-aed2-c63a894f6499
-begin
-	
-	# compute the optimal flux -
-	result = calculate_optimal_flux_distribution(S, updated_flux_bounds, species_bounds, c);
-
-	# get the open extent vector -
-	ϵ_dot = result.calculated_flux_array
-
-	# did this converge?
-	with_terminal() do
-
-		# get exit/status information from the solver -
-		exit_flag = result.exit_flag
-		status_flag = result.status_flag
-
-		# display -
-		println("Computed optimal flux distribution. Solver: exit_flag = 0: $(exit_flag==0) and status_flag = 5: $(status_flag == 5)")
-	end
-end
-
-# ╔═╡ 40878d6d-6b69-4eac-a148-f7b86f3c89df
-md"""
-##### Table 1: Flux table for maximizing flux = $(idx_target_rate)
-
-The [GNU Linear Programming Kit solver](https://www.gnu.org/software/glpk/) produced an estimate of the (open) reaction extents $\dot{\epsilon}_{j}~\forall{j}$ given your constraints. We can then use these values to compute the output composition.
-
-
-"""
-
-# ╔═╡ 1e2fffcc-9c02-445d-a313-870f3dc1c706
-with_terminal() do
-
-	# initialize some storage -
-	flux_table = Array{Any,2}(undef,ℛ,6)
-
-	# what are the reaction strings? -> we can get these from the MODEL object 
-	reaction_strings = MODEL[:reactions][!,:reaction_markup]
-	reaction_id = MODEL[:reactions][!,:reaction_number]
-
-	# populate the state table -
-	for reaction_index = 1:ℛ
-		flux_table[reaction_index,1] = reaction_index
-		flux_table[reaction_index,2] = reaction_id[reaction_index]
-		flux_table[reaction_index,3] = reaction_strings[reaction_index]
-		flux_table[reaction_index,4] = flux_bounds[reaction_index,1]
-		flux_table[reaction_index,5] = flux_bounds[reaction_index,2]
-
-		# clean up the display -
-		tmp_value = abs(ϵ_dot[reaction_index])
-		flux_table[reaction_index,6] = tmp_value < 1e-6 ? 0.0 : ϵ_dot[reaction_index]
-	end
-
-	# header row -
-	flux_table_header_row = (["i","RID","R","ϵ₁_dot LB", "ϵ₁_dot UB", "ϵᵢ_dot"],
-		["","","", "mmol/hr", "mmol/hr", "mmol/hr"]);
-		
-	# write the table -
-	pretty_table(flux_table; header=flux_table_header_row)
-end
-
-# ╔═╡ 3193dc2f-5822-4718-89e9-2c92eae5c0b1
-md"""
-##### Table 2: State table for maximizing flux = $(idx_target_rate)
-
-The flux balance analysis problem produces estimates for the optimal value of the (open) reaction extents $\dot{\epsilon}_{j}~\forall{j}$ (units: mmol/hr). We can then use the steady-state species mol balances to compute the output composition (stream 1, 2 are inputs, stream 3 is an output):
-
-$$\dot{n}_{i,3} = \dot{n}_{i,1}+\dot{n}_{i,2} + \sum_{j=1}^{\mathcal{R}}\sigma_{ij}\dot{\epsilon}_{j}\qquad{i=1,2,\dots,\mathcal{M}}$$
-
-In addition, since we have the molecular weight of each of the compounds in the model (provided in the MODEL compounds table), we can compute the species mass flow rate $\dot{m}_{i,3}~\forall{i}$, and the mass fraction of component $i$ in stream 3, $\omega_{i,3}~\forall{i}$.
-"""
-
-# ╔═╡ 0ba02949-6b61-49d6-a585-9852bec5bfe8
-begin
-
-	# compute the mol flow rate out of the device -
-	n_dot_output = (n_dot_input_stream_1 + n_dot_input_stream_2 + S*ϵ_dot);
-
-	# get the array of MW -
-	MW_array = MODEL[:compounds][!,:compound_mw]
-
-	# convert the output mol stream to a mass stream -
-	mass_dot_output = (n_dot_output.*MW_array)*(1/1000)
-
-	# what is the total coming out?
-	total_mass_out = sum(mass_dot_output)
-	
-	
-	with_terminal() do
-
-		# what are the compound names and code strings? -> we can get these from the MODEL object 
-		compound_name_strings = MODEL[:compounds][!,:compound_name]
-		compound_id_strings = MODEL[:compounds][!,:compound_id]
-		
-		# how many molecules are in the state array?
-		ℳ_local = length(compound_id_strings)
-	
-		# initialize some storage -
-		state_table = Array{Any,2}(undef,ℳ_local,9)
-
-		# get the uptake array from the result -
-		uptake_array = result.uptake_array
-
-		# populate the state table -
-		for compound_index = 1:ℳ_local
-			state_table[compound_index,1] = compound_index
-			state_table[compound_index,2] = compound_name_strings[compound_index]
-			state_table[compound_index,3] = compound_id_strings[compound_index]
-			state_table[compound_index,4] = n_dot_input_stream_1[compound_index]
-			state_table[compound_index,5] = n_dot_input_stream_2[compound_index]
-			
-
-			# for display -
-			tmp_value = abs(n_dot_output[compound_index])
-			state_table[compound_index,6] = (tmp_value) <= 1e-6 ? 0.0 : n_dot_output[compound_index]
-
-			# show the Δ -
-			tmp_value = abs(uptake_array[compound_index])
-			state_table[compound_index,7] = (tmp_value) <= 1e-6 ? 0.0 : uptake_array[compound_index]
-
-			# show the mass -
-			tmp_value = abs(mass_dot_output[compound_index])
-			state_table[compound_index,8] = (tmp_value) <= 1e-6 ? 0.0 : mass_dot_output[compound_index]
-
-			# show the mass fraction -
-			# show the mass -
-			tmp_value = abs(mass_dot_output[compound_index])
-			state_table[compound_index,9] = (tmp_value) <= 1e-6 ? 0.0 : (1/total_mass_out)*mass_dot_output[compound_index]
-		end
-
-		# header row -
-		state_table_header_row = (["i","name","id","n₁_dot", "n₂_dot", "n₃_dot","Δn_dot", "m₃_dot", "ωᵢ_output"],
-			["","","","mmol/hr", "mmol/hr", "mmol/hr", "mmol/hr", "g/hr", ""]);
-		
-		# write the table -
-		pretty_table(state_table; header=state_table_header_row)
-	end
-end
-
-# ╔═╡ 6e7365bc-e9ee-4182-89be-34eff2a70950
-md"""
-#### Separation of 1,3 propanediol using the Magical Sepration Units (MSU)
-
-Separations are a huge component of any chemical process. It is rarely the case that a reaction of interest goes to completion and all we are left with is the desired product itself. Thus, we (as chemical engineers) must develop operations to pull apart (or separate) mixtures into streams that contain desired and undesired chemical components. For more on the general area of Separations (and the various types of tools that we can use), check out the [Separations section in the LearnCheme series](https://learncheme.com/screencasts/separations-mass-transfer/).
-
-For the project, we are going to develop a hypothetical downstream separation, that illustrates some of the ideas you'll see in your later courses, but without the headache that comes along with reality. To make this happen, let's suppose the teaching team invented a magical separation unit or MSU. MSUs have one stream in, and two streams out (called the top, and bottom, respectively) and a fixed separation ratio for all products (that's what makes them magical), where the desired product is _always_ in the top stream at some ratio $\theta$. In particular, if we denote $i=\star$ as the index for the desired product (in this case 1,3 propanediol), then after one pass (stream 1 is the input, stream 2 is the top, and stream 3 is the bottom) we have:
-
-$$\begin{eqnarray}
-\dot{m}_{\star,2} &=& \theta_{\star}\dot{m}_{\star,1}\\
-\dot{m}_{\star,3} &=& (1-\theta_{\star})\dot{m}_{\star,1}\\
-\end{eqnarray}$$
-
-for the product. In this case, we set $\theta_{\star}$ = 0.75. On the other hand, for _all_ other materials in the input, we have $\left(1-\theta_{\star}\right)$ in the top, and $\theta_{\star}$ in the bottom, i.e.,
-
-$$\begin{eqnarray}
-\dot{m}_{i,2} &=& (1-\theta_{\star})\dot{m}_{i,1}\qquad{\forall{i}\neq\star}\\
-\dot{m}_{i,3} &=& \theta_{\star}\dot{m}_{i,1}\\
-\end{eqnarray}$$
-
-If we chain these units together we can achieve a desired degree of separation. This type of arrangement gives rise to a binary separation tree shown in Fig 2. 
-
-Fig 2. [Binary separation tree](https://en.wikipedia.org/wiki/Binary_tree) where a single input stream is fractionated at each level of the tree at a fixed ratio.
-
-$(PlutoUI.LocalResource(joinpath(_PATH_TO_FIGS,"Fig-BTree.png")))
-"""
-
-# ╔═╡ 9ea5990a-30e8-4704-b85c-2f33ee6e92ce
-md"""
-The richest product stream will always be the top stream. Thus, after three separation operations (level $l=4$ in tree) the composition in the top stream will be (stream ? using the numbering down convention):
-
-$$\begin{eqnarray}
-\dot{m}_{\star,?} &=& \left[\theta_{\star}^{l-1}\right]\dot{m}_{\star,1}\qquad{i=\star}\\
-\dot{m}_{i,?} &=& \left[(1-\theta_{\star})^{l-1}\right]\dot{m}_{i,1}\qquad{\forall{i}\neq\star}\\
-\end{eqnarray}$$
-
-"""
-
-# ╔═╡ 0e22c74b-603f-4f86-84cc-32e1ac6bb1c6
-begin
-
-	# define the split -
-	θ = 0.75
-
-	# most of the "stuff" has a 1 - θ in the up, and a θ in the down
-	u = (1-θ)*ones(ℳ,1)
-	d = θ*ones(ℳ,1)
-
-	# However: the desired product has the opposite => correct for my compound of interest -
-	idx_target_compound = find_compound_index(MODEL,:compound_name=>"propane-1,3-diol")
-
-	# correct defaults -
-	u[idx_target_compound] = θ
-	d[idx_target_compound] = 1 - θ
-
-	# let's compute the composition of the *always up* stream -
-	
-	# how many levels are we going to have?
-	number_of_levels = 7
-	
-	# initialize some storage -
-	species_mass_flow_array_top = zeros(ℳ,number_of_levels)
-	species_mass_flow_array_bottom = zeros(ℳ,number_of_levels)
-
-	for species_index = 1:ℳ
-		value = mass_dot_output[species_index]
-		species_mass_flow_array_top[species_index,1] = value
-		species_mass_flow_array_bottom[species_index,1] = value
-	end
-	
-	for level = 2:number_of_levels
-
-		# compute the mass flows coming out of the top -
-		m_dot_top = mass_dot_output.*(u.^(level-1))
-		m_dot_bottom = mass_dot_output.*(d.^(level-1))
-
-		# update my storage array -
-		for species_index = 1:ℳ
-			species_mass_flow_array_top[species_index,level] = m_dot_top[species_index]
-			species_mass_flow_array_bottom[species_index,level] = m_dot_bottom[species_index]
-		end
-	end
-	
-	# what is the mass fraction in the top stream -
-	species_mass_fraction_array_top = zeros(ℳ,number_of_levels)
-	species_mass_fraction_array_bottom = zeros(ℳ,number_of_levels)
-	
-	# this is a dumb way to do this ... you're better than that JV come on ...
-	T_top = sum(species_mass_flow_array_top,dims=1)
-	T_bottom = sum(species_mass_flow_array_bottom,dims=1)
-	for level = 1:number_of_levels
-
-		# get the total for this level -
-		T_level_top = T_top[level]
-		T_level_bottom = T_bottom[level]
-
-		for species_index = 1:ℳ
-			species_mass_fraction_array_top[species_index,level] = (1/T_level_top)*(species_mass_flow_array_top[species_index,level])
-			species_mass_fraction_array_bottom[species_index,level] = (1/T_level_bottom)*(species_mass_flow_array_bottom[species_index,level])
-		end
-	end
-end
-
-# ╔═╡ ac5e2adf-0be2-4505-b6cc-bf1ceefb795b
-begin
-
-	stages = (1:number_of_levels) |> collect
-	plot(stages,species_mass_fraction_array_top[idx_target_compound,:], linetype=:steppre,lw=2,legend=:bottomright, 
-		label="Mass fraction i = PDO Tops")
-	xlabel!("Stage index l",fontsize=18)
-	ylabel!("Tops mass fraction ωᵢ (dimensionless)",fontsize=18)
-
-	# make a 0.95 line target line -
-	target_line = 0.95*ones(number_of_levels)
-	plot!(stages, target_line, color="red", lw=2,linestyle=:dash, label="Target 95% purity")
-	
-end
-
-# ╔═╡ 5e5d80c9-b52f-49f9-932c-c334b8b00796
-species_mass_flow_array_top[idx_target_compound,:]
-
-# ╔═╡ 27138f88-f353-4c38-9b98-8652f260d907
-species_mass_fraction_array_top[idx_target_compound,:]
-
-# ╔═╡ d47b2c7c-ef23-427f-aea2-f2a18748bdbf
-begin
-
-	# what species do we want to look at in the bottoms?
-	idx_species_bottoms = find_compound_index(MODEL,:compound_name=>"sucrose")
-
-	plot(stages,species_mass_fraction_array_bottom[idx_species_bottoms,:], linetype=:steppre,lw=2,legend=:bottomright, 
-		label="Mass fraction i = $(idx_species_bottoms) Bottoms")
-	xlabel!("Stage index l",fontsize=18)
-	ylabel!("Bottoms mass fraction ωᵢ (dimensionless)",fontsize=18)	
-end
-
-# ╔═╡ 9b43ebda-188c-4315-96c3-20ea8f6e665e
-species_mass_fraction_array_bottom[idx_species_bottoms,:]
-
-# ╔═╡ 63d1340a-52bf-11ec-0890-43ada50baa38
+# ╔═╡ 4e4dfc28-5394-11ec-2ca5-11d089cc7d32
 html"""
 <style>
 main {
     max-width: 1200px;
-    width: 85%;
+    width: 75%;
     margin: auto;
     font-family: "Roboto, monospace";
 }
@@ -444,7 +74,7 @@ PrettyTables = "08abe8d2-0d0c-5749-adfa-8a2ac140af0d"
 [compat]
 BSON = "~0.3.4"
 DataFrames = "~1.2.2"
-GLPK = "~0.15.1"
+GLPK = "~0.15.2"
 Plots = "~1.24.3"
 PlutoUI = "~0.7.21"
 PrettyTables = "~1.2.3"
@@ -682,15 +312,15 @@ version = "3.3.5+1"
 
 [[GLPK]]
 deps = ["BinaryProvider", "CEnum", "GLPK_jll", "Libdl", "MathOptInterface"]
-git-tree-sha1 = "8c9b0ce6d476800c7a7e8cc0db5a60e241cf107a"
+git-tree-sha1 = "ab6d06aa06ce3de20a82de5f7373b40796260f72"
 uuid = "60bf3e95-4087-53dc-ae20-288a0d20c6a6"
-version = "0.15.1"
+version = "0.15.2"
 
 [[GLPK_jll]]
 deps = ["Artifacts", "GMP_jll", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "01de09b070d4b8e3e1250c6542e16ed5cad45321"
+git-tree-sha1 = "fe68622f32828aa92275895fdb324a85894a5b1b"
 uuid = "e8aa6df9-e6ca-548a-97ff-1f85fc5b8b98"
-version = "5.0.0+0"
+version = "5.0.1+0"
 
 [[GMP_jll]]
 deps = ["Artifacts", "Libdl"]
@@ -1433,24 +1063,9 @@ version = "0.9.1+5"
 """
 
 # ╔═╡ Cell order:
-# ╟─69f55401-5f11-4d62-8707-09da24981690
-# ╟─ffe55797-fcd5-4f33-9766-91b8b0939278
-# ╟─4cdfb112-2551-4123-bf00-ef168798faa9
-# ╠═404fdbb1-99ac-41e6-9312-ba1f5745f3fc
-# ╟─d8f20936-2ab5-417e-aed2-c63a894f6499
-# ╟─40878d6d-6b69-4eac-a148-f7b86f3c89df
-# ╟─1e2fffcc-9c02-445d-a313-870f3dc1c706
-# ╟─3193dc2f-5822-4718-89e9-2c92eae5c0b1
-# ╟─0ba02949-6b61-49d6-a585-9852bec5bfe8
-# ╟─6e7365bc-e9ee-4182-89be-34eff2a70950
-# ╟─9ea5990a-30e8-4704-b85c-2f33ee6e92ce
-# ╠═0e22c74b-603f-4f86-84cc-32e1ac6bb1c6
-# ╟─ac5e2adf-0be2-4505-b6cc-bf1ceefb795b
-# ╠═5e5d80c9-b52f-49f9-932c-c334b8b00796
-# ╠═27138f88-f353-4c38-9b98-8652f260d907
-# ╠═d47b2c7c-ef23-427f-aea2-f2a18748bdbf
-# ╠═9b43ebda-188c-4315-96c3-20ea8f6e665e
-# ╠═52266654-9a67-4262-88dd-8f88ccec7289
-# ╟─63d1340a-52bf-11ec-0890-43ada50baa38
+# ╟─eeb0cb9a-1ff7-4aeb-9949-c52abe1d996d
+# ╠═5c00486f-875f-41bb-bc6f-f1c0f22233ab
+# ╠═7c1fbe33-982c-45f6-95a0-35369e15a7bc
+# ╟─4e4dfc28-5394-11ec-2ca5-11d089cc7d32
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

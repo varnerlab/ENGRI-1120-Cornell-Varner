@@ -10,3 +10,10 @@ mutable struct KEGGReaction
 
     KEGGReaction() = new()
 end
+
+
+mutable struct Problem
+end
+
+mutable struct Solution
+end
