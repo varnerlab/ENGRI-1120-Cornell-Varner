@@ -34,7 +34,7 @@ end
 # ╔═╡ 69f55401-5f11-4d62-8707-09da24981690
 md"""
 
-#### Example: Cell Free Production and Purification of 1,3-propanediol from Glycerol
+#### Example: Cell-Free Production and Purification of 1,3-propanediol from Glycerol
 
 We want to produce a product 1,3-propanediol (PDO; desired product) from the feedstock Glycerol using a cell-free biochemical process operating in a well-mixed continuous microfluidic chip with two inputs and a single output, and a liquid reaction volume of V = 100 μL. Possible reaction pathways reproduced from:
 
