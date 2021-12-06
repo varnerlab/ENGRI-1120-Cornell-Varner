@@ -84,7 +84,7 @@ begin
 	# what are the amounts that we need to supply to chip in feed stream 1 (units: mmol/hr)?
 	mol_flow_values_feed_1 = [
 		10.0 	; # oxygen mmol/hr
-		5.0 	; # sucrose mmol/hr
+		6.1 	; # sucrose mmol/hr
 	]
 
 	# what is coming into feed stream 2?
@@ -157,7 +157,7 @@ end
 begin
 
 	# setup calculation for chips i = 2,....,N
-	N = 12
+	N = 13
 
 	# initialize some space to store the mol flow rates -
 	series_mol_state_array = zeros(ℳ,N)
@@ -295,6 +295,94 @@ begin
 		pretty_table(state_table; header=state_table_header_row)
 	end
 end
+
+# ╔═╡ aa9da19f-e0da-4fd1-bd00-f52fea9ee4c7
+begin
+
+	# define the split -
+	θ = 0.75
+
+	# most of the "stuff" has a 1 - θ in the up, and a θ in the down
+	u = (1-θ)*ones(ℳ,1)
+	d = θ*ones(ℳ,1)
+
+	# However: the desired product has the opposite => correct for my compound of interest -
+	idx_target_compound = find_compound_index(MODEL,:compound_name=>"propane-1,3-diol")
+
+	# correct defaults -
+	u[idx_target_compound] = θ
+	d[idx_target_compound] = 1 - θ
+
+	# let's compute the composition of the *always up* stream -
+	
+	# how many levels are we going to have?
+	number_of_levels = 7
+	
+	# initialize some storage -
+	species_mass_flow_array_top = zeros(ℳ,number_of_levels)
+	species_mass_flow_array_bottom = zeros(ℳ,number_of_levels)
+
+	for species_index = 1:ℳ
+		value = mass_dot_output[species_index]
+		species_mass_flow_array_top[species_index,1] = value
+		species_mass_flow_array_bottom[species_index,1] = value
+	end
+	
+	for level = 2:number_of_levels
+
+		# compute the mass flows coming out of the top -
+		m_dot_top = mass_dot_output.*(u.^(level-1))
+		m_dot_bottom = mass_dot_output.*(d.^(level-1))
+
+		# update my storage array -
+		for species_index = 1:ℳ
+			species_mass_flow_array_top[species_index,level] = m_dot_top[species_index]
+			species_mass_flow_array_bottom[species_index,level] = m_dot_bottom[species_index]
+		end
+	end
+	
+	# what is the mass fraction in the top stream -
+	species_mass_fraction_array_top = zeros(ℳ,number_of_levels)
+	species_mass_fraction_array_bottom = zeros(ℳ,number_of_levels)
+	
+	# this is a dumb way to do this ... you're better than that JV come on ...
+	T_top = sum(species_mass_flow_array_top,dims=1)
+	T_bottom = sum(species_mass_flow_array_bottom,dims=1)
+	for level = 1:number_of_levels
+
+		# get the total for this level -
+		T_level_top = T_top[level]
+		T_level_bottom = T_bottom[level]
+
+		for species_index = 1:ℳ
+			species_mass_fraction_array_top[species_index,level] = (1/T_level_top)*
+				(species_mass_flow_array_top[species_index,level])
+			species_mass_fraction_array_bottom[species_index,level] = (1/T_level_bottom)*
+				(species_mass_flow_array_bottom[species_index,level])
+		end
+	end
+
+	
+	
+	
+end
+
+# ╔═╡ f9e4b849-fb44-4592-aa64-48acf29f137c
+begin
+
+	stages = (1:number_of_levels) |> collect
+	plot(stages,species_mass_fraction_array_top[idx_target_compound,:], linetype=:steppre,lw=2,legend=:bottomright, 
+		label="Mass fraction i = PDO Tops")
+	xlabel!("Stage index l",fontsize=18)
+	ylabel!("Tops mass fraction ωᵢ (dimensionless)",fontsize=18)
+
+	# make a 0.95 line target line -
+	target_line = 0.95*ones(number_of_levels)
+	plot!(stages, target_line, color="red", lw=2,linestyle=:dash, label="Target 95% purity")
+end
+
+# ╔═╡ 73d2d832-ed5c-4e9c-82c3-5b4746325dc4
+[species_mass_fraction_array_top[idx_target_compound,:] species_mass_flow_array_top[idx_target_compound,:]]
 
 # ╔═╡ 0567fcbe-56b1-11ec-03e1-75c2c98376b8
 html"""
@@ -1337,6 +1425,9 @@ version = "0.9.1+5"
 # ╠═b3c074ab-d95c-4e9c-812c-c3bcca357531
 # ╠═e910dfd7-4bb5-433c-a096-af566fc0ee25
 # ╠═9bac2bce-1634-49df-ac9e-a431f47145a6
+# ╠═aa9da19f-e0da-4fd1-bd00-f52fea9ee4c7
+# ╠═f9e4b849-fb44-4592-aa64-48acf29f137c
+# ╠═73d2d832-ed5c-4e9c-82c3-5b4746325dc4
 # ╠═c08c447d-33a4-42dd-8938-33bb77fc4b31
 # ╠═0567fcbe-56b1-11ec-03e1-75c2c98376b8
 # ╟─00000000-0000-0000-0000-000000000001
