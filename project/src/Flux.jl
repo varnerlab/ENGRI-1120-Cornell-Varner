@@ -24,15 +24,12 @@
 
 """
     calculate_optimal_flux_distribution(S,[Lv,Uv],[Lx,Ux],c; min_flag=true)
-
     Computes the optimal metabolic flux distribution given the constraints.
-
     Inputs:
     `S` - stoichiometric_matrix (M x R)
     `[Lv,Uv]` - (R x 2) array of the flux lower (L) and upper (U) bounds
     `[Lx,Ux]` - (M x 2) array of species lower (L) and upper (U) bounds (if at steady-state, L = U = 0)
     `c` - R x 1 vector holding indexes for objective vector
-
     Outputs:
     `objective_value` - value of the objective function at the optimum
     `calculated_flux_array` - R x 1 flux array at the optimum
