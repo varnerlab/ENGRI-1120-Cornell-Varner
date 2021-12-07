@@ -4,7 +4,7 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ c08c447d-33a4-42dd-8938-33bb77fc4b31
+# ╔═╡ e7960693-cd74-4762-9bbe-b1808007bc07
 begin
 
 	# load some external packages 
@@ -31,18 +31,17 @@ begin
 	nothing
 end
 
-# ╔═╡ 5bf2cb0f-9f95-4125-a397-b8164e586a4b
+# ╔═╡ ff66bc74-28ca-4559-8a87-c7c3fca346ba
 md"""
-### Example: Chips in Series for 1,3 Propanediol Production from Gycerol and Sucrose
+### Example: Chips in Parallel for 1,3 Propanediol Production from Gycerol and Sucrose
 
-One possible configuration for chemical reactors (in this case our microfluidic chips) is to run them in _series_ where the output of one reactor is the input to another reactor. In this scenario for the project, chip $1$ is fed from the syringe pump while the input to chip $2$ is the output from chip $1$. For each chip, we use the second channel from the syringe pump to supply an identical glycerol stream. The output of the last chip (chip $N$) is then fed to the downstream separation system. 
+One possible configuration for chemical reactors (in this case our microfluidic chips) is to run them in _parallel_ where the feed is split (using a splitter) into $N$ equal streams and fed into $N$ chips operating in parallel. The output from each chip is then recombined via a mixing unit and sent to the downstream separator unit. For each chip, we use the second channel from the syringe pump to supply an identical glycerol stream. The output of the last chip (chip $N$) is then fed to the downstream separation system. 
 
-$(PlutoUI.LocalResource(joinpath(_PATH_TO_FIGS,"Fig-Series-Chips.png")))
+$(PlutoUI.LocalResource(joinpath(_PATH_TO_FIGS,"Fig-Parallel-Chips.png")))
 """
 
-# ╔═╡ d573a93c-e4dd-4434-a43d-0acccb7a9311
+# ╔═╡ e487468c-9043-40d6-a28a-7542a4d54de2
 md"""
-
 __Assumptions__
 * Microfluidic chip is well-mixed and operates at steady-state
 * Constant T, P on the chip
@@ -50,15 +49,14 @@ __Assumptions__
 
 __Compute__
 * Compute the number of chips $N$ needed to reach desired purity (95%) and flow rate (0.75 g/hr) targets. 
-
 """
 
-# ╔═╡ 5f94ec6f-5953-4bb5-95d3-e07bc49a72b7
+# ╔═╡ b92fa269-6da7-46be-a854-bca64210c5cb
 md"""
-##### Step 1: Compute the output of Chip 1 in a series of $N$ chips (first pass)
+##### Step 1: Compute the output of a single chip
 """
 
-# ╔═╡ 19cca950-53eb-4d55-bbc4-d0469f7f99bf
+# ╔═╡ 4e347b66-917d-428d-8cf8-9f5f4a85d055
 begin
 
 	# setup the FBA calculation for the project -
@@ -105,7 +103,7 @@ begin
 	# what are the amounts that we need to supply to chip in feed stream 1 (units: mmol/hr)?
 	mol_flow_values_feed_1 = [
 		10.0 	; # oxygen mmol/hr
-		6.1 	; # sucrose mmol/hr (or maybe 6.1?)
+		6.1 	; # sucrose mmol/hr
 	]
 
 	# what is coming into feed stream 2?
@@ -150,7 +148,7 @@ begin
 	nothing
 end
 
-# ╔═╡ 4ffdc704-2f40-49f9-ae80-92fbccc5a5a0
+# ╔═╡ 01cce127-bef1-4dc7-a760-3be1a79f3b85
 begin
 
 	# compute the optimal flux -
@@ -174,88 +172,27 @@ begin
 	end
 end
 
-# ╔═╡ 4e616314-cc9c-417c-b779-0b433c183304
+# ╔═╡ 1d90951d-bb6b-4f5e-8235-d7d45c7ebfe0
 md"""
-##### Step 2: Compute the output of chips $i=2,\dots,N$.
+###### Table 1: State table from a single chip (species mol flow rate mmol/hr at exit)
 """
 
-# ╔═╡ 87089ac3-67b7-47f3-afb2-61e6d3d08e6d
+# ╔═╡ 29b8daeb-10fc-4c50-b475-d7e5394e60bb
 begin
 
-	# setup calculation for chips i = 2,....,N
-	N = 19 # number of chips
-
-	# initialize some space to store the mol flow rates -
-	series_mol_state_array = zeros(ℳ,N)
-	exit_flag_array = Array{Int64,1}()
-	status_flag_array = Array{Int64,1}()
-
-	# the initial col of this array is the output of from chip 1
-	for species_index = 1:ℳ
-		series_mol_state_array[species_index,1] = n_dot_out_chip_1[species_index]
-	end
-	
-	# assumption: we *always* feed glycerol into port 2 - so we only need to update the input flow into port 1
-	for chip_index = 2:N
-
-		# update the input into the chip -
-		n_dot_input_port_1 = series_mol_state_array[:,chip_index - 1] 		# the input to chip j comes from j - 1
-	
-		# setup the species bounds array -
-		species_bounds_next_chip = [-1.0*(n_dot_input_port_1.+n_dot_input_stream_2) 1000.0*ones(ℳ,1)]
-
-		# run the optimal calculation -
-		result_next_chip = calculate_optimal_flux_distribution(S, updated_flux_bounds, species_bounds_next_chip, c);
-
-		# grab the status and exit flags ... so we can check all is right with the world ...
-		push!(exit_flag_array, result_next_chip.exit_flag)
-		push!(status_flag_array, result_next_chip.status_flag)
-
-		# Get the flux from the result object -
-		ϵ_dot_next_chip = result_next_chip.calculated_flux_array
-
-		# compute the output from chip j = chip_index 
-		n_dot_out_next_chip = (n_dot_input_port_1 + n_dot_input_stream_2 + S*ϵ_dot_next_chip);
-
-		# copy this state vector into the state array 
-		for species_index = 1:ℳ
-			series_mol_state_array[species_index,chip_index] = n_dot_out_next_chip[species_index]
-		end
-
-		# go around again ...
-	end
-end
-
-# ╔═╡ 6fb99c42-7c48-46ac-b558-361b2595a96f
-exit_flag_array
-
-# ╔═╡ b3c074ab-d95c-4e9c-812c-c3bcca357531
-status_flag_array
-
-# ╔═╡ 4b7e7144-5043-44fb-854c-3a42ee860e9d
-md"""
-##### Table 1: State table describing the exit composition (mol/hr) for each chip
-
-Each row of the table shows a different compound, while the columns show the mol flow rate for component $i$ in the output from chip $i$. 
-The last two columns show the mass flow rate and mass fraction for component $i$ in the exit from chip $N$.
-"""
-
-# ╔═╡ 9bac2bce-1634-49df-ac9e-a431f47145a6
-begin
-
-	# what chip r we looking at?
-	n_dot_output_chip = series_mol_state_array[:,end]
+	# compute the mol flow rate out of the device -
+	n_dot_output = (n_dot_input_stream_1 + n_dot_input_stream_2 + S*ϵ_dot);
 
 	# get the array of MW -
 	MW_array = MODEL[:compounds][!,:compound_mw]
 
 	# convert the output mol stream to a mass stream -
-	mass_dot_output = (n_dot_output_chip.*MW_array)*(1/1000)
+	mass_dot_output = (n_dot_output.*MW_array)*(1/1000)
 
 	# what is the total coming out?
 	total_mass_out = sum(mass_dot_output)
 	
-	# display code makes the table -
+	# display -
 	with_terminal() do
 
 		# what are the compound names and code strings? -> we can get these from the MODEL object 
@@ -266,8 +203,7 @@ begin
 		ℳ_local = length(compound_id_strings)
 	
 		# initialize some storage -
-		number_of_cols = 3 + N + 2
-		state_table = Array{Any,2}(undef,ℳ_local,number_of_cols)
+		state_table = Array{Any,2}(undef,ℳ_local,9)
 
 		# get the uptake array from the result -
 		uptake_array = result.uptake_array
@@ -277,57 +213,67 @@ begin
 			state_table[compound_index,1] = compound_index
 			state_table[compound_index,2] = compound_name_strings[compound_index]
 			state_table[compound_index,3] = compound_id_strings[compound_index]
+			state_table[compound_index,4] = n_dot_input_stream_1[compound_index]
+			state_table[compound_index,5] = n_dot_input_stream_2[compound_index]
+			
 
-			for chip_index = 1:N
-				tmp_value = abs(series_mol_state_array[compound_index, chip_index])
-				state_table[compound_index,chip_index + 3] = (tmp_value) <= 1e-6 ? 0.0 : 
-					series_mol_state_array[compound_index, chip_index]
-			end
+			# for display -
+			tmp_value = abs(n_dot_output[compound_index])
+			state_table[compound_index,6] = (tmp_value) <= 1e-6 ? 0.0 : n_dot_output[compound_index]
+
+			# show the Δ -
+			tmp_value = abs(uptake_array[compound_index])
+			state_table[compound_index,7] = (tmp_value) <= 1e-6 ? 0.0 : uptake_array[compound_index]
 
 			# show the mass -
 			tmp_value = abs(mass_dot_output[compound_index])
-			state_table[compound_index,(N + 3 + 1)] = (tmp_value) <= 1e-6 ? 0.0 : mass_dot_output[compound_index]
+			state_table[compound_index,8] = (tmp_value) <= 1e-6 ? 0.0 : mass_dot_output[compound_index]
 
 			# show the mass fraction -
 			# show the mass -
 			tmp_value = abs(mass_dot_output[compound_index])
-			state_table[compound_index, (N + 3 + 2)] = (tmp_value) <= 1e-6 ? 0.0 : 	
-				(1/total_mass_out)*mass_dot_output[compound_index]
+			state_table[compound_index,9] = (tmp_value) <= 1e-6 ? 0.0 : (1/total_mass_out)*mass_dot_output[compound_index]
 		end
 
-		# build the table header -
-		id_header_row = Array{String,1}()
-		units_header_row = Array{String,1}()
-
-		# setup id row -
-		push!(id_header_row, "i")
-		push!(id_header_row, "name")
-		push!(id_header_row, "id")
-		for chip = 1:N
-			push!(id_header_row, "Chip $(chip)")
-		end
-		push!(id_header_row, "m_dot")
-		push!(id_header_row, "ωᵢ_output")
-
-		# setup units header row -
-		push!(units_header_row, "")
-		push!(units_header_row, "")
-		push!(units_header_row, "")
-		for chip = 1:N
-			push!(units_header_row, "mmol/hr")
-		end
-		push!(units_header_row, "g/hr")
-		push!(units_header_row, "")
-		
 		# header row -
-		state_table_header_row = (id_header_row, units_header_row)
+		state_table_header_row = (["i","name","id","n₁_dot", "n₂_dot", "n₃_dot","Δn_dot", "m₃_dot", "ωᵢ_output"],
+			["","","","mmol/hr", "mmol/hr", "mmol/hr", "mmol/hr", "g/hr", ""]);
 		
 		# write the table -
 		pretty_table(state_table; header=state_table_header_row)
 	end
 end
 
-# ╔═╡ 48830c91-7bb8-49f1-b132-ef46f330af8f
+# ╔═╡ 982f45ff-7574-4217-be4c-d3e009200dff
+md"""
+#### Step 2: Compute the composition that is going into the downstream separation system 
+
+In a parallel system of $N$ chips, each chip acts independently. Thus, to compute the output from the mixer operation we add up the components in each stream into the mixer (N inputs and a single output). Starting from the steady-state species mol balance: 
+
+$$\sum_{s=1}^{N+1}v_{s}\dot{n}_{i,s} = 0\qquad{i=1,2,\dots,\mathcal{M}}$$
+
+we can solve for the mixer output stream composition:
+
+$$\dot{n}_{i,N+1} = -\sum_{s=1}^{N}v_{s}\dot{n}_{i,s}\qquad{i=1,2,\dots,\mathcal{M}}$$
+
+However, since each chip is _identical_ we know that: $\dot{n}_{i,N+1} = N\times\dot{n}_{i,1}$. Alternatively, we could do the same thing with species mass balances (which is probably more useful in this case because our downstream separation units operate on a mass basis).
+
+"""
+
+# ╔═╡ 4f8fb433-1a9c-4a98-b346-8fceb8df9d77
+begin
+
+	# who many chips do we have?
+	N = 30
+
+	# mass flow coming out of the mixer -
+	total_species_mass_dot_out = (N)*mass_dot_output
+
+	# show -
+	nothing
+end
+
+# ╔═╡ 21b7f22b-6520-43dd-b450-8f0c72b6c8aa
 md"""
 ##### Step 3: Downstream separation using Magical Sepration Units (MSUs)
 
@@ -348,13 +294,16 @@ $$\begin{eqnarray}
 If we chain these units together we can achieve a desired degree of separation.
 """
 
-# ╔═╡ 9ce7ab35-99cd-41c8-8864-46f34302af83
+# ╔═╡ 697607c5-17db-4e2e-a94c-aa68d61ceac8
 # how many levels are we going to have in the separation tree?
 number_of_levels = 7	
 
-# ╔═╡ aa9da19f-e0da-4fd1-bd00-f52fea9ee4c7
+# ╔═╡ 8685d420-d952-40bd-b91d-a7fe312bf776
 begin
 
+	# alias the mass flow into the sep-units
+	mass_flow_into_seps = total_species_mass_dot_out
+	
 	# define the split -
 	θ = 0.75
 
@@ -376,7 +325,7 @@ begin
 	species_mass_flow_array_bottom = zeros(ℳ,number_of_levels)
 
 	for species_index = 1:ℳ
-		value = mass_dot_output[species_index]
+		value = mass_flow_into_seps[species_index]
 		species_mass_flow_array_top[species_index,1] = value
 		species_mass_flow_array_bottom[species_index,1] = value
 	end
@@ -384,8 +333,8 @@ begin
 	for level = 2:number_of_levels
 
 		# compute the mass flows coming out of the top -
-		m_dot_top = mass_dot_output.*(u.^(level-1))
-		m_dot_bottom = mass_dot_output.*(d.^(level-1))
+		m_dot_top = mass_flow_into_seps.*(u.^(level-1))
+		m_dot_bottom = mass_flow_into_seps.*(d.^(level-1))
 
 		# update my storage array -
 		for species_index = 1:ℳ
@@ -416,7 +365,7 @@ begin
 	end
 end
 
-# ╔═╡ f9e4b849-fb44-4592-aa64-48acf29f137c
+# ╔═╡ 572cabad-3676-47bd-b857-ab9c4eb842cb
 begin
 
 	stages = (1:number_of_levels) |> collect
@@ -430,10 +379,26 @@ begin
 	plot!(stages, target_line, color="red", lw=2,linestyle=:dash, label="Target 95% purity")
 end
 
-# ╔═╡ 73d2d832-ed5c-4e9c-82c3-5b4746325dc4
-[species_mass_fraction_array_top[idx_target_compound,:] species_mass_flow_array_top[idx_target_compound,:]]
+# ╔═╡ 6ec321a1-25bb-45ff-8cd7-56b1553f512f
+with_terminal() do
 
-# ╔═╡ 0567fcbe-56b1-11ec-03e1-75c2c98376b8
+	# initialize some space -
+	state_table = Array{Any,2}(undef, number_of_levels, 3)
+	for level_index = 1:number_of_levels
+		state_table[level_index,1] = level_index
+		state_table[level_index,2] = species_mass_fraction_array_top[idx_target_compound, level_index]
+		state_table[level_index,3] = species_mass_flow_array_top[idx_target_compound, level_index]
+	end
+	
+	# header -
+	state_table_header_row = (["stage","ωᵢ i=⋆ top","mdot"],
+			["","","g/hr"]);
+
+	# write the table -
+	pretty_table(state_table; header=state_table_header_row)
+end
+
+# ╔═╡ 82aabdc4-5747-11ec-2693-df997882e1af
 html"""
 <style>
 main {
@@ -818,9 +783,9 @@ uuid = "92d709cd-6900-40b7-9082-c6be49f344b6"
 version = "0.1.1"
 
 [[deps.IterTools]]
-git-tree-sha1 = "05110a2ab1fc5f932622ffea2a003221f4782c18"
+git-tree-sha1 = "fa6287a4469f5e048d763df38279ee729fbd44e5"
 uuid = "c8e1da08-722c-5040-9ed9-7db0dc04731e"
-version = "1.3.0"
+version = "1.4.0"
 
 [[deps.IteratorInterfaceExtensions]]
 git-tree-sha1 = "a3f24677c21f5bbe9d2a714f95dcd58337fb2856"
@@ -1466,23 +1431,21 @@ version = "0.9.1+5"
 """
 
 # ╔═╡ Cell order:
-# ╟─5bf2cb0f-9f95-4125-a397-b8164e586a4b
-# ╟─d573a93c-e4dd-4434-a43d-0acccb7a9311
-# ╟─5f94ec6f-5953-4bb5-95d3-e07bc49a72b7
-# ╠═19cca950-53eb-4d55-bbc4-d0469f7f99bf
-# ╠═4ffdc704-2f40-49f9-ae80-92fbccc5a5a0
-# ╟─4e616314-cc9c-417c-b779-0b433c183304
-# ╠═87089ac3-67b7-47f3-afb2-61e6d3d08e6d
-# ╠═6fb99c42-7c48-46ac-b558-361b2595a96f
-# ╠═b3c074ab-d95c-4e9c-812c-c3bcca357531
-# ╟─4b7e7144-5043-44fb-854c-3a42ee860e9d
-# ╟─9bac2bce-1634-49df-ac9e-a431f47145a6
-# ╟─48830c91-7bb8-49f1-b132-ef46f330af8f
-# ╠═9ce7ab35-99cd-41c8-8864-46f34302af83
-# ╟─aa9da19f-e0da-4fd1-bd00-f52fea9ee4c7
-# ╟─f9e4b849-fb44-4592-aa64-48acf29f137c
-# ╠═73d2d832-ed5c-4e9c-82c3-5b4746325dc4
-# ╟─c08c447d-33a4-42dd-8938-33bb77fc4b31
-# ╟─0567fcbe-56b1-11ec-03e1-75c2c98376b8
+# ╟─ff66bc74-28ca-4559-8a87-c7c3fca346ba
+# ╟─e487468c-9043-40d6-a28a-7542a4d54de2
+# ╟─b92fa269-6da7-46be-a854-bca64210c5cb
+# ╠═4e347b66-917d-428d-8cf8-9f5f4a85d055
+# ╟─01cce127-bef1-4dc7-a760-3be1a79f3b85
+# ╟─1d90951d-bb6b-4f5e-8235-d7d45c7ebfe0
+# ╠═29b8daeb-10fc-4c50-b475-d7e5394e60bb
+# ╟─982f45ff-7574-4217-be4c-d3e009200dff
+# ╠═4f8fb433-1a9c-4a98-b346-8fceb8df9d77
+# ╟─21b7f22b-6520-43dd-b450-8f0c72b6c8aa
+# ╠═697607c5-17db-4e2e-a94c-aa68d61ceac8
+# ╟─8685d420-d952-40bd-b91d-a7fe312bf776
+# ╟─572cabad-3676-47bd-b857-ab9c4eb842cb
+# ╠═6ec321a1-25bb-45ff-8cd7-56b1553f512f
+# ╠═e7960693-cd74-4762-9bbe-b1808007bc07
+# ╠═82aabdc4-5747-11ec-2693-df997882e1af
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
