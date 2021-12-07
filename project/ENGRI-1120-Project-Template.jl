@@ -57,6 +57,321 @@ md"""
 ### Materials and Methods
 """
 
+# ╔═╡ 4867b51c-fb6c-42a9-b87d-4131e014b402
+md"""
+##### Setup the Flux Balance Analysis (FBA) calculation to estimate of optimal reaction rates
+"""
+
+# ╔═╡ 5432f738-c2cd-4727-821a-ca4fb4b04d19
+begin
+
+	# setup the FBA calculation for the project -
+
+	# === SELECT YOUR PRODUCT HERE ==================================================== #
+	# What rate are trying to maximize? (select your product)
+	# rn:R08199 = isoprene
+	# rn:28235c0c-ec00-4a11-8acb-510b0f2e2687 = PGDN
+	# rn:rn:R09799 = Hydrazine
+	# rn:R03119 = 3G
+	idx_target_rate = find_reaction_index(MODEL,:reaction_number=>"rn:R03119")
+	# ================================================================================= #
+
+	# First, let's build the stoichiometric matrix from the model object -
+	(cia,ria,S) = build_stoichiometric_matrix(MODEL);
+
+	# Next, what is the size of the system? (ℳ = number of metabolites, ℛ = number of reactions)
+	(ℳ,ℛ) = size(S)
+
+	# Next, setup a default bounds array => update specific elements
+	# We'll correct the directionality below -
+	Vₘ = (13.7)*(3600)*(50e-9)*(1000) # units: mmol/hr
+	flux_bounds = [-Vₘ*ones(ℛ,1) Vₘ*ones(ℛ,1)]
+
+	# update the flux bounds -> which fluxes can can backwards? 
+	# do determine this: sgn(v) = -1*sgn(ΔG)
+	updated_flux_bounds = update_flux_bounds_directionality(MODEL,flux_bounds)
+
+	# hard code some bounds that we know -
+	updated_flux_bounds[44,1] = 0.0  # ATP synthesis can't run backwards 
+
+	# What is the default mol flow input array => update specific elements
+	# strategy: start with nothing in both streams, add material(s) back
+	n_dot_input_stream_1 = zeros(ℳ,1)	# stream 1
+	n_dot_input_stream_2 = zeros(ℳ,1)	# stream 2
+
+	# === YOU NEED TO CHANGE BELOW HERE ====================================================== #
+	# Let's lookup stuff that we want/need to supply to the chip to get the reactiont to go -
+	# what you feed *depends upon your product*
+	compounds_that_we_need_to_supply_feed_1 = [
+		"oxygen", "sucrose"
+	]
+
+	# what are the amounts that we need to supply to chip in feed stream 1 (units: mmol/hr)?
+	mol_flow_values_feed_1 = [
+		10.0 	; # oxygen mmol/hr
+		0.822 	; # sucrose mmol/hr (maybe: 0.822 or 6.1?)
+	]
+
+	# what is coming into feed stream 2?
+	compounds_that_we_need_to_supply_feed_2 = [
+		"glycerol"
+	]
+
+	# let's always add Vₘ into feed stream 2
+	mol_flow_values_feed_2 = [
+		Vₘ 		; # glycerol mmol/hr
+	]
+	
+	
+	# === YOU NEED TO CHANGE ABOVE HERE ====================================================== #
+
+	# stream 1:
+	idx_supply_stream_1 = Array{Int64,1}()
+	for compound in compounds_that_we_need_to_supply_feed_1
+		idx = find_compound_index(MODEL,:compound_name=>compound)
+		push!(idx_supply_stream_1,idx)
+	end
+
+	# stream 2:
+	idx_supply_stream_2 = Array{Int64,1}()
+	for compound in compounds_that_we_need_to_supply_feed_2
+		idx = find_compound_index(MODEL,:compound_name=>compound)
+		push!(idx_supply_stream_2,idx)
+	end
+	
+	# supply for stream 1 and stream 2
+	n_dot_input_stream_1[idx_supply_stream_1] .= mol_flow_values_feed_1
+	n_dot_input_stream_2[idx_supply_stream_2] .= mol_flow_values_feed_2
+	
+	# setup the species bounds array -
+	species_bounds = [-1.0*(n_dot_input_stream_1.+n_dot_input_stream_2) 1000.0*ones(ℳ,1)]
+
+	# Lastly, let's setup the objective function -
+	c = zeros(ℛ)
+	c[idx_target_rate] = -1.0
+
+	# show -
+	nothing
+end
+
+# ╔═╡ 2e275308-40d1-473a-9834-5df647b99e0a
+md"""
+###### Check: did calculation converge?
+"""
+
+# ╔═╡ c0d2722d-1b85-4bc0-841c-53a2a80a9aea
+begin
+
+	# compute the optimal flux -
+	result = calculate_optimal_flux_distribution(S, updated_flux_bounds, species_bounds, c);
+
+	# get the open extent vector -
+	ϵ_dot = result.calculated_flux_array
+
+	# what is the composition coming out of the first chip?
+	n_dot_out_chip_1 = (n_dot_input_stream_1 + n_dot_input_stream_2 + S*ϵ_dot);
+
+	# did this converge?
+	with_terminal() do
+
+		# get exit/status information from the solver -
+		exit_flag = result.exit_flag
+		status_flag = result.status_flag
+
+		# display -
+		println("Computed optimal flux distribution w/exit_flag = 0: $(exit_flag==0) and status_flag = 5: $(status_flag == 5)")
+	end
+end
+
+# ╔═╡ e933ddd9-8fd8-416a-8710-a64d3eb36f79
+md"""
+###### Table 1: State table from a single chip (species mol flow rate mmol/hr at exit). The mass flow for all species at the exit of the chip is encoded in the `mass_dot_output_array` array.
+"""
+
+# ╔═╡ 8a732899-7493-45da-bd6d-ecfba04f3ef1
+begin
+
+	# compute the mol flow rate out of the device -
+	n_dot_output = (n_dot_input_stream_1 + n_dot_input_stream_2 + S*ϵ_dot);
+
+	# get the array of MW -
+	MW_array = MODEL[:compounds][!,:compound_mw]
+
+	# convert the output mol stream to a mass stream (units: g/L)
+	mass_dot_output_array = (n_dot_output.*MW_array)*(1/1000)
+
+	# what is the total coming out?
+	total_mass_out = sum(mass_dot_output_array)
+	
+	# display -
+	with_terminal() do
+
+		# what are the compound names and code strings? -> we can get these from the MODEL object 
+		compound_name_strings = MODEL[:compounds][!,:compound_name]
+		compound_id_strings = MODEL[:compounds][!,:compound_id]
+		
+		# how many molecules are in the state array?
+		ℳ_local = length(compound_id_strings)
+	
+		# initialize some storage -
+		state_table = Array{Any,2}(undef,ℳ_local,9)
+
+		# get the uptake array from the result -
+		uptake_array = result.uptake_array
+
+		# populate the state table -
+		for compound_index = 1:ℳ_local
+			state_table[compound_index,1] = compound_index
+			state_table[compound_index,2] = compound_name_strings[compound_index]
+			state_table[compound_index,3] = compound_id_strings[compound_index]
+			state_table[compound_index,4] = n_dot_input_stream_1[compound_index]
+			state_table[compound_index,5] = n_dot_input_stream_2[compound_index]
+			
+
+			# for display -
+			tmp_value = abs(n_dot_output[compound_index])
+			state_table[compound_index,6] = (tmp_value) <= 1e-6 ? 0.0 : n_dot_output[compound_index]
+
+			# show the Δ -
+			tmp_value = abs(uptake_array[compound_index])
+			state_table[compound_index,7] = (tmp_value) <= 1e-6 ? 0.0 : uptake_array[compound_index]
+
+			# show the mass -
+			tmp_value = abs(mass_dot_output_array[compound_index])
+			state_table[compound_index,8] = (tmp_value) <= 1e-6 ? 0.0 : mass_dot_output_array[compound_index]
+
+			# show the mass fraction -
+			# show the mass -
+			tmp_value = abs(mass_dot_output_array[compound_index])
+			state_table[compound_index,9] = (tmp_value) <= 1e-6 ? 0.0 : (1/total_mass_out)*mass_dot_output_array[compound_index]
+		end
+
+		# header row -
+		state_table_header_row = (["i","name","id","n₁_dot", "n₂_dot", "n₃_dot","Δn_dot", "m₃_dot", "ωᵢ_output"],
+			["","","","mmol/hr", "mmol/hr", "mmol/hr", "mmol/hr", "g/hr", ""]);
+		
+		# write the table -
+		pretty_table(state_table; header=state_table_header_row)
+	end
+end
+
+# ╔═╡ 7720a5a6-5d7e-4c79-8aba-0a4bb04973af
+md"""
+##### Compute the downstream separation using Magical Separation Units (MSUs)
+"""
+
+# ╔═╡ 8fa0d539-5f6d-45c6-9151-f47273434f9c
+# how many levels are we going to have in the separation tree?
+number_of_levels = 7
+
+# ╔═╡ 47b1c30a-158c-44cc-9fd1-87a9eb6dc0fe
+begin
+	# alias the mass flow into the sep-units
+	mass_flow_into_seps = mass_dot_output_array
+	
+	# define the split -
+	θ = 0.75
+
+	# most of the "stuff" has a 1 - θ in the up, and a θ in the down
+	u = (1-θ)*ones(ℳ,1)
+	d = θ*ones(ℳ,1)
+
+	# However: the desired product has the opposite => correct for my compound of interest -> this is compound i = ⋆
+	idx_target_compound = find_compound_index(MODEL,:compound_name=>"propane-1,3-diol")
+
+	# correct defaults -
+	u[idx_target_compound] = θ
+	d[idx_target_compound] = 1 - θ
+
+	# let's compute the composition of the *always up* stream -
+	
+	# initialize some storage -
+	species_mass_flow_array_top = zeros(ℳ,number_of_levels)
+	species_mass_flow_array_bottom = zeros(ℳ,number_of_levels)
+
+	for species_index = 1:ℳ
+		value = mass_flow_into_seps[species_index]
+		species_mass_flow_array_top[species_index,1] = value
+		species_mass_flow_array_bottom[species_index,1] = value
+	end
+	
+	for level = 2:number_of_levels
+
+		# compute the mass flows coming out of the top -
+		m_dot_top = mass_flow_into_seps.*(u.^(level-1))
+		m_dot_bottom = mass_flow_into_seps.*(d.^(level-1))
+
+		# update my storage array -
+		for species_index = 1:ℳ
+			species_mass_flow_array_top[species_index,level] = m_dot_top[species_index]
+			species_mass_flow_array_bottom[species_index,level] = m_dot_bottom[species_index]
+		end
+	end
+	
+	# what is the mass fraction in the top stream -
+	species_mass_fraction_array_top = zeros(ℳ,number_of_levels)
+	species_mass_fraction_array_bottom = zeros(ℳ,number_of_levels)
+
+	# array to hold the *total* mass flow rate -
+	total_mdot_top_array = zeros(number_of_levels)
+	total_mdot_bottom_array = zeros(number_of_levels)
+	
+	# this is a dumb way to do this ... you're better than that JV come on ...
+	T_top = sum(species_mass_flow_array_top,dims=1)
+	T_bottom = sum(species_mass_flow_array_bottom,dims=1)
+	for level = 1:number_of_levels
+
+		# get the total for this level -
+		T_level_top = T_top[level]
+		T_level_bottom = T_bottom[level]
+
+		# grab -
+		total_mdot_top_array[level] = T_level_top
+		total_mdot_bottom_array[level] = T_level_bottom
+
+		for species_index = 1:ℳ
+			species_mass_fraction_array_top[species_index,level] = (1/T_level_top)*
+				(species_mass_flow_array_top[species_index,level])
+			species_mass_fraction_array_bottom[species_index,level] = (1/T_level_bottom)*
+				(species_mass_flow_array_bottom[species_index,level])
+		end
+	end
+end
+
+# ╔═╡ 7db73d0b-ea5f-4619-be61-a57676868be4
+begin
+
+	stages = (1:number_of_levels) |> collect
+	plot(stages,species_mass_fraction_array_top[idx_target_compound,:], linetype=:steppre,lw=2,legend=:bottomright, 
+		label="Mass fraction i = Product Tops")
+	xlabel!("Stage index l",fontsize=18)
+	ylabel!("Tops mass fraction ωᵢ (dimensionless)",fontsize=18)
+
+	# make a 0.95 line target line -
+	target_line = 0.95*ones(number_of_levels)
+	plot!(stages, target_line, color="red", lw=2,linestyle=:dash, label="Target 95% purity")
+end
+
+
+# ╔═╡ 519f62ab-75a9-44fb-bf01-560d0efa11e7
+with_terminal() do
+
+	# initialize some space -
+	state_table = Array{Any,2}(undef, number_of_levels, 3)
+	for level_index = 1:number_of_levels
+		state_table[level_index,1] = level_index
+		state_table[level_index,2] = species_mass_fraction_array_top[idx_target_compound, level_index]
+		state_table[level_index,3] = total_mdot_top_array[level_index]
+	end
+	
+	# header -
+	state_table_header_row = (["stage","ωᵢ i=⋆ top","mdot"],
+			["","","g/hr"]);
+
+	# write the table -
+	pretty_table(state_table; header=state_table_header_row)
+end
+
 # ╔═╡ 77107b01-dae9-4900-b9f7-f0c0224a492b
 md"""
 ### Results and Discussion
@@ -1291,6 +1606,17 @@ version = "0.9.1+5"
 # ╟─8ca99e1f-afd6-4c1c-8918-db6d9747099c
 # ╟─a0ad3474-1844-41bc-bd95-242aa94a5ff1
 # ╟─40da982c-1cc4-4881-a2ea-fbeef5c46d2d
+# ╟─4867b51c-fb6c-42a9-b87d-4131e014b402
+# ╠═5432f738-c2cd-4727-821a-ca4fb4b04d19
+# ╟─2e275308-40d1-473a-9834-5df647b99e0a
+# ╟─c0d2722d-1b85-4bc0-841c-53a2a80a9aea
+# ╟─e933ddd9-8fd8-416a-8710-a64d3eb36f79
+# ╠═8a732899-7493-45da-bd6d-ecfba04f3ef1
+# ╟─7720a5a6-5d7e-4c79-8aba-0a4bb04973af
+# ╠═8fa0d539-5f6d-45c6-9151-f47273434f9c
+# ╟─47b1c30a-158c-44cc-9fd1-87a9eb6dc0fe
+# ╟─7db73d0b-ea5f-4619-be61-a57676868be4
+# ╟─519f62ab-75a9-44fb-bf01-560d0efa11e7
 # ╟─77107b01-dae9-4900-b9f7-f0c0224a492b
 # ╟─ab9084e1-57a2-4c6b-ad32-8fee8c142c43
 # ╟─836e69f7-9a2d-4674-8c20-51b07d13b7ab
