@@ -1,3 +1,17 @@
+function _process_reaction_phrase(phrase_array::Array{String,1})
+
+    tmp_string = ""
+    for phrase in phrase_array
+        tmp_string*="$(phrase) + "
+    end
+
+    # cutoff -
+    tmp_string = tmp_string |> rstrip
+
+    # cutoff the trailing + 
+    return (tmp_string[1:end-1] |> rstrip)
+end
+
 function build_stoichiometric_matrix(model::Dict{Symbol,Any})
 
     try
@@ -101,4 +115,76 @@ function update_flux_bounds_directionality(MODEL,default_flux_bounds)
     end
 
     return default_flux_bounds
+end
+
+function translation_reaction_string_to_human(model::Dict{Symbol,Any})
+
+    # get the compound table -
+    compound_table = model[:compounds]
+    reaction_table = model[:reactions]
+
+    # build a translation table -
+    (number_of_compounds, _) = size(compound_table) 
+    compound_translation_table = Dict{String,String}()
+    for compound_index = 1:number_of_compounds
+        kegg_name = compound_table[compound_index, :compound_id]
+        human_name = compound_table[compound_index, :compound_name]
+        compound_translation_table[kegg_name] = human_name
+    end
+
+    # hack: -
+    compound_translation_table["C00138"] = "Reduced ferredoxin"
+    compound_translation_table["C00139"] = "Oxidized ferredoxin"
+
+    # number of _reactions -
+    (number_of_reactions, _) = size(reaction_table)
+
+    # initialze space -
+    tmp_reaction_string_array = Array{String,1}(undef,number_of_reactions)
+
+    # just so we are safe - copy the old strings into the tmp array in case something doesn't work
+    for reaction_index = 1:number_of_reactions
+        old_string = reaction_table[reaction_index, :reaction_markup]
+        tmp_reaction_string_array[reaction_index] = old_string
+    end
+
+    # init some tmp storage -
+    tmp_reactant_phrase_array = Array{String,1}()
+    tmp_product_phrase_array = Array{String,1}()
+
+    # main loop - here we go .... let's do this ...
+    for reaction_index = 1:number_of_reactions
+    
+        # grab the st dictionary for this reaction -
+        stoichiometric_dictionary = reaction_table[reaction_index, :stoichiometric_dictionary]
+        for (key,value) in stoichiometric_dictionary
+
+            # look up this key in the translation table -
+            human_key = get(compound_translation_table, key, "?")
+
+            if (abs(value) != 1)
+                tmp_phrase = "$(abs(value)) $(human_key)"
+            else
+                tmp_phrase = "$(human_key)"
+            end
+
+            if (value<0)
+                push!(tmp_reactant_phrase_array, tmp_phrase)
+            else
+                push!(tmp_product_phrase_array, tmp_phrase)
+            end
+        end
+
+        # build new reaction string ...
+        reactant_string = _process_reaction_phrase(tmp_reactant_phrase_array)
+        product_string = _process_reaction_phrase(tmp_product_phrase_array)
+        full_reaction_string = "$(reactant_string) <=> $(product_string)"
+        tmp_reaction_string_array[reaction_index] = full_reaction_string
+        
+        # empty -
+        empty!(tmp_reactant_phrase_array)
+        empty!(tmp_product_phrase_array)
+    end
+
+    return tmp_reaction_string_array
 end
