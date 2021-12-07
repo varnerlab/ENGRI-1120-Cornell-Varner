@@ -31,10 +31,31 @@ begin
 	nothing
 end
 
+# ╔═╡ 5bf2cb0f-9f95-4125-a397-b8164e586a4b
+md"""
+### Example: Chips in Series for 1,3 Propanediol Production from Gycerol and Sucrose
+
+One possible configuration for chemical reactors (in this case our microfluidic chips) is to run them in _series_ where the output of one reactor is the input to another reactor. In this scenario for the project, chip $1$ is fed from the syringe pump while the input to chip $2$ is the output from chip $1$. For each chip, we use the second channel from the syringe pump to supply an identical glycerol stream. The output of the last chip (chip $N$) is then fed to the downstream separation system. 
+
+$(PlutoUI.LocalResource(joinpath(_PATH_TO_FIGS,"Fig-Series-Chips.png")))
+"""
+
+# ╔═╡ d573a93c-e4dd-4434-a43d-0acccb7a9311
+md"""
+
+__Assumptions__
+* Microfluidic chip is well-mixed and operates at steady-state
+* Constant T, P on the chip
+* Liquid phase is ideal
+
+__Compute__
+* Compute the number of chips $N$ needed to reach desired purity (95%) and flow rate (0.75 g/hr) targets. 
+
+"""
+
 # ╔═╡ 5f94ec6f-5953-4bb5-95d3-e07bc49a72b7
 md"""
-### Setup the First Pass Calculation
-
+##### Step 1: Compute the output of Chip 1 in a series of $N$ chips (first pass)
 """
 
 # ╔═╡ 19cca950-53eb-4d55-bbc4-d0469f7f99bf
@@ -153,11 +174,16 @@ begin
 	end
 end
 
+# ╔═╡ 4e616314-cc9c-417c-b779-0b433c183304
+md"""
+##### Step 2: Compute the output of chips $i=2,\dots,N$.
+"""
+
 # ╔═╡ 87089ac3-67b7-47f3-afb2-61e6d3d08e6d
 begin
 
 	# setup calculation for chips i = 2,....,N
-	N = 13
+	N = 8 # number of chips
 
 	# initialize some space to store the mol flow rates -
 	series_mol_state_array = zeros(ℳ,N)
@@ -206,8 +232,13 @@ exit_flag_array
 # ╔═╡ b3c074ab-d95c-4e9c-812c-c3bcca357531
 status_flag_array
 
-# ╔═╡ e910dfd7-4bb5-433c-a096-af566fc0ee25
-2.466 - 1.644
+# ╔═╡ 4b7e7144-5043-44fb-854c-3a42ee860e9d
+md"""
+##### State table: What is is the exit composition (mol/hr) for each chip?
+
+Each row of the table shows a different compound, while the columns show the mol flow rate for component $i$ in the output from chip $i$. 
+The last two columns show the mass flow rate, and mass fraction for component $i$ in the exit from chip $N$.
+"""
 
 # ╔═╡ 9bac2bce-1634-49df-ac9e-a431f47145a6
 begin
@@ -224,7 +255,7 @@ begin
 	# what is the total coming out?
 	total_mass_out = sum(mass_dot_output)
 	
-	
+	# display code makes the table -
 	with_terminal() do
 
 		# what are the compound names and code strings? -> we can get these from the MODEL object 
@@ -296,6 +327,31 @@ begin
 	end
 end
 
+# ╔═╡ 48830c91-7bb8-49f1-b132-ef46f330af8f
+md"""
+##### Step 3: Downstream separation using Magical Sepration Units (MSUs)
+
+To separate the desired product from the unreacted starting materials and by-products, let's suppose the teaching team invented a magical separation unit or MSU. MSUs have one stream in, and two streams out (called the top, and bottom, respectively) and a fixed separation ratio for all products (that's what makes them magical), where the desired product is _always_ in the top stream at some ratio $\theta$. In particular, if we denote $i=\star$ as the index for the desired product (in this case 1,3 propanediol), then after one pass (stream 1 is the input, stream 2 is the top, and stream 3 is the bottom) we have:
+
+$$\begin{eqnarray}
+\dot{m}_{\star,2} &=& \theta_{\star}\dot{m}_{\star,1}\\
+\dot{m}_{\star,3} &=& (1-\theta_{\star})\dot{m}_{\star,1}\\
+\end{eqnarray}$$
+
+for the product. In this case, we set $\theta_{\star}$ = 0.75. On the other hand, for _all_ other materials in the input, we have $\left(1-\theta_{\star}\right)$ in the top, and $\theta_{\star}$ in the bottom, i.e.,
+
+$$\begin{eqnarray}
+\dot{m}_{i,2} &=& (1-\theta_{\star})\dot{m}_{i,1}\qquad{\forall{i}\neq\star}\\
+\dot{m}_{i,3} &=& \theta_{\star}\dot{m}_{i,1}\\
+\end{eqnarray}$$
+
+If we chain these units together we can achieve a desired degree of separation.
+"""
+
+# ╔═╡ 9ce7ab35-99cd-41c8-8864-46f34302af83
+# how many levels are we going to have in the separation tree?
+number_of_levels = 7	
+
 # ╔═╡ aa9da19f-e0da-4fd1-bd00-f52fea9ee4c7
 begin
 
@@ -306,7 +362,7 @@ begin
 	u = (1-θ)*ones(ℳ,1)
 	d = θ*ones(ℳ,1)
 
-	# However: the desired product has the opposite => correct for my compound of interest -
+	# However: the desired product has the opposite => correct for my compound of interest -> this is compound i = ⋆
 	idx_target_compound = find_compound_index(MODEL,:compound_name=>"propane-1,3-diol")
 
 	# correct defaults -
@@ -314,9 +370,6 @@ begin
 	d[idx_target_compound] = 1 - θ
 
 	# let's compute the composition of the *always up* stream -
-	
-	# how many levels are we going to have?
-	number_of_levels = 7
 	
 	# initialize some storage -
 	species_mass_flow_array_top = zeros(ℳ,number_of_levels)
@@ -361,10 +414,6 @@ begin
 				(species_mass_flow_array_bottom[species_index,level])
 		end
 	end
-
-	
-	
-	
 end
 
 # ╔═╡ f9e4b849-fb44-4592-aa64-48acf29f137c
@@ -1417,18 +1466,23 @@ version = "0.9.1+5"
 """
 
 # ╔═╡ Cell order:
-# ╠═5f94ec6f-5953-4bb5-95d3-e07bc49a72b7
+# ╟─5bf2cb0f-9f95-4125-a397-b8164e586a4b
+# ╟─d573a93c-e4dd-4434-a43d-0acccb7a9311
+# ╟─5f94ec6f-5953-4bb5-95d3-e07bc49a72b7
 # ╠═19cca950-53eb-4d55-bbc4-d0469f7f99bf
 # ╠═4ffdc704-2f40-49f9-ae80-92fbccc5a5a0
+# ╟─4e616314-cc9c-417c-b779-0b433c183304
 # ╠═87089ac3-67b7-47f3-afb2-61e6d3d08e6d
 # ╠═6fb99c42-7c48-46ac-b558-361b2595a96f
 # ╠═b3c074ab-d95c-4e9c-812c-c3bcca357531
-# ╠═e910dfd7-4bb5-433c-a096-af566fc0ee25
-# ╠═9bac2bce-1634-49df-ac9e-a431f47145a6
-# ╠═aa9da19f-e0da-4fd1-bd00-f52fea9ee4c7
-# ╠═f9e4b849-fb44-4592-aa64-48acf29f137c
+# ╟─4b7e7144-5043-44fb-854c-3a42ee860e9d
+# ╟─9bac2bce-1634-49df-ac9e-a431f47145a6
+# ╟─48830c91-7bb8-49f1-b132-ef46f330af8f
+# ╠═9ce7ab35-99cd-41c8-8864-46f34302af83
+# ╟─aa9da19f-e0da-4fd1-bd00-f52fea9ee4c7
+# ╟─f9e4b849-fb44-4592-aa64-48acf29f137c
 # ╠═73d2d832-ed5c-4e9c-82c3-5b4746325dc4
-# ╠═c08c447d-33a4-42dd-8938-33bb77fc4b31
-# ╠═0567fcbe-56b1-11ec-03e1-75c2c98376b8
+# ╟─c08c447d-33a4-42dd-8938-33bb77fc4b31
+# ╟─0567fcbe-56b1-11ec-03e1-75c2c98376b8
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
