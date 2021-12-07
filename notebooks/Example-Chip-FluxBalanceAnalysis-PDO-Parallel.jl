@@ -103,7 +103,7 @@ begin
 	# what are the amounts that we need to supply to chip in feed stream 1 (units: mmol/hr)?
 	mol_flow_values_feed_1 = [
 		10.0 	; # oxygen mmol/hr
-		6.1 	; # sucrose mmol/hr (maybe: 0.822 or 6.1?)
+		0.822 	; # sucrose mmol/hr (maybe: 0.822 or 6.1?)
 	]
 
 	# what is coming into feed stream 2?
@@ -264,10 +264,10 @@ However, since each chip is _identical_ we know that: $\dot{n}_{i,N+1} = N\times
 begin
 
 	# who many chips do we have?
-	N = 40
+	N = 20
 
 	# mass flow coming out of the mixer -
-	total_species_mass_dot_out = (N)*mass_dot_output
+	total_species_mass_dot_out = (N)*mass_dot_output # units: g/L-hr
 
 	# show -
 	nothing
@@ -346,6 +346,10 @@ begin
 	# what is the mass fraction in the top stream -
 	species_mass_fraction_array_top = zeros(ℳ,number_of_levels)
 	species_mass_fraction_array_bottom = zeros(ℳ,number_of_levels)
+
+	# array to hold the *total* mass flow rate -
+	total_mdot_top_array = zeros(number_of_levels)
+	total_mdot_bottom_array = zeros(number_of_levels)
 	
 	# this is a dumb way to do this ... you're better than that JV come on ...
 	T_top = sum(species_mass_flow_array_top,dims=1)
@@ -355,6 +359,10 @@ begin
 		# get the total for this level -
 		T_level_top = T_top[level]
 		T_level_bottom = T_bottom[level]
+
+		# grab -
+		total_mdot_top_array[level] = T_level_top
+		total_mdot_bottom_array[level] = T_level_bottom
 
 		for species_index = 1:ℳ
 			species_mass_fraction_array_top[species_index,level] = (1/T_level_top)*
@@ -387,7 +395,7 @@ with_terminal() do
 	for level_index = 1:number_of_levels
 		state_table[level_index,1] = level_index
 		state_table[level_index,2] = species_mass_fraction_array_top[idx_target_compound, level_index]
-		state_table[level_index,3] = species_mass_flow_array_top[idx_target_compound, level_index]
+		state_table[level_index,3] = total_mdot_top_array[level_index]
 	end
 	
 	# header -
@@ -1442,7 +1450,7 @@ version = "0.9.1+5"
 # ╠═4f8fb433-1a9c-4a98-b346-8fceb8df9d77
 # ╟─21b7f22b-6520-43dd-b450-8f0c72b6c8aa
 # ╠═697607c5-17db-4e2e-a94c-aa68d61ceac8
-# ╟─8685d420-d952-40bd-b91d-a7fe312bf776
+# ╠═8685d420-d952-40bd-b91d-a7fe312bf776
 # ╟─572cabad-3676-47bd-b857-ab9c4eb842cb
 # ╠═6ec321a1-25bb-45ff-8cd7-56b1553f512f
 # ╠═e7960693-cd74-4762-9bbe-b1808007bc07

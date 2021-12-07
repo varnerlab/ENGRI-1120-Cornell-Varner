@@ -183,7 +183,7 @@ md"""
 begin
 
 	# setup calculation for chips i = 2,....,N
-	N = 19 # number of chips
+	N = 15 # number of chips
 
 	# initialize some space to store the mol flow rates -
 	series_mol_state_array = zeros(ℳ,N)
@@ -397,6 +397,10 @@ begin
 	# what is the mass fraction in the top stream -
 	species_mass_fraction_array_top = zeros(ℳ,number_of_levels)
 	species_mass_fraction_array_bottom = zeros(ℳ,number_of_levels)
+
+	# array to hold the *total* mass flow rate -
+	total_mdot_top_array = zeros(number_of_levels)
+	total_mdot_bottom_array = zeros(number_of_levels)
 	
 	# this is a dumb way to do this ... you're better than that JV come on ...
 	T_top = sum(species_mass_flow_array_top,dims=1)
@@ -406,6 +410,10 @@ begin
 		# get the total for this level -
 		T_level_top = T_top[level]
 		T_level_bottom = T_bottom[level]
+
+		# grab -
+		total_mdot_top_array[level] = T_level_top
+		total_mdot_bottom_array[level] = T_level_bottom
 
 		for species_index = 1:ℳ
 			species_mass_fraction_array_top[species_index,level] = (1/T_level_top)*
@@ -430,8 +438,24 @@ begin
 	plot!(stages, target_line, color="red", lw=2,linestyle=:dash, label="Target 95% purity")
 end
 
-# ╔═╡ 73d2d832-ed5c-4e9c-82c3-5b4746325dc4
-[species_mass_fraction_array_top[idx_target_compound,:] species_mass_flow_array_top[idx_target_compound,:]]
+# ╔═╡ d55aa6aa-9993-4080-9f5f-17d51398bbb7
+with_terminal() do
+
+	# initialize some space -
+	state_table = Array{Any,2}(undef, number_of_levels, 3)
+	for level_index = 1:number_of_levels
+		state_table[level_index,1] = level_index
+		state_table[level_index,2] = species_mass_fraction_array_top[idx_target_compound, level_index]
+		state_table[level_index,3] = total_mdot_top_array[level_index]
+	end
+	
+	# header -
+	state_table_header_row = (["stage","ωᵢ i=⋆ top","mdot"],
+			["","","g/hr"]);
+
+	# write the table -
+	pretty_table(state_table; header=state_table_header_row)
+end
 
 # ╔═╡ 0567fcbe-56b1-11ec-03e1-75c2c98376b8
 html"""
@@ -1479,9 +1503,9 @@ version = "0.9.1+5"
 # ╟─9bac2bce-1634-49df-ac9e-a431f47145a6
 # ╟─48830c91-7bb8-49f1-b132-ef46f330af8f
 # ╠═9ce7ab35-99cd-41c8-8864-46f34302af83
-# ╟─aa9da19f-e0da-4fd1-bd00-f52fea9ee4c7
+# ╠═aa9da19f-e0da-4fd1-bd00-f52fea9ee4c7
 # ╟─f9e4b849-fb44-4592-aa64-48acf29f137c
-# ╠═73d2d832-ed5c-4e9c-82c3-5b4746325dc4
+# ╠═d55aa6aa-9993-4080-9f5f-17d51398bbb7
 # ╟─c08c447d-33a4-42dd-8938-33bb77fc4b31
 # ╟─0567fcbe-56b1-11ec-03e1-75c2c98376b8
 # ╟─00000000-0000-0000-0000-000000000001
