@@ -45,6 +45,12 @@ Example calculation for the rate of product formation in a steady-state micro-re
 * [Example notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-Chip-FluxBalanceAnalysis-PDO.jl.html): 
 Downstream separation of 1,3 propanediol using Magical Separation Units (MSUs).
 
+* [Example notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-Chip-FluxBalanceAnalysis-PDO-Series.jl.html): 
+Complete process example for 1,3 propanediol production with reactors in __series__. 
+
+* [Example notebook](https://htmlview.glitch.me/?https://github.com/varnerlab/ENGRI-1120-Cornell-Varner/blob/main/html/Example-Chip-FluxBalanceAnalysis-PDO-Parallel.jl.html): 
+Complete process example for 1,3 propanediol production with reactors in __parallel__. 
+
 
 #### Material/mass balance examples
 
