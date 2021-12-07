@@ -103,7 +103,7 @@ begin
 	# what are the amounts that we need to supply to chip in feed stream 1 (units: mmol/hr)?
 	mol_flow_values_feed_1 = [
 		10.0 	; # oxygen mmol/hr
-		6.1 	; # sucrose mmol/hr
+		6.1 	; # sucrose mmol/hr (maybe: 0.822 or 6.1?)
 	]
 
 	# what is coming into feed stream 2?
@@ -264,7 +264,7 @@ However, since each chip is _identical_ we know that: $\dot{n}_{i,N+1} = N\times
 begin
 
 	# who many chips do we have?
-	N = 30
+	N = 40
 
 	# mass flow coming out of the mixer -
 	total_species_mass_dot_out = (N)*mass_dot_output
