@@ -255,6 +255,44 @@ begin
 	end
 end
 
+# ╔═╡ 64daa21a-ac42-4b20-9e6b-ec2d19cd50fc
+md"""
+###### Table 2: Optimal reaction extent table computed by flux balance analysis. 
+
+Each row corresponds to a reaction in the model where $\dot{\epsilon}_{i}$ denotes the optimal open reaction extent computed by flux balance analysis. 
+"""
+
+# ╔═╡ 8de4fb56-8d56-4251-ad5b-478bae38f727
+with_terminal() do
+
+	# initialize some storage -
+	flux_table = Array{Any,2}(undef,ℛ,6)
+
+	# what are the reaction strings? -> we can get these from the MODEL object 
+	reaction_strings = MODEL[:reactions][!,:reaction_markup]
+	reaction_id = MODEL[:reactions][!,:reaction_number]
+
+	# populate the state table -
+	for reaction_index = 1:ℛ
+		flux_table[reaction_index,1] = reaction_index
+		flux_table[reaction_index,2] = reaction_id[reaction_index]
+		flux_table[reaction_index,3] = reaction_strings[reaction_index]
+		flux_table[reaction_index,4] = flux_bounds[reaction_index,1]
+		flux_table[reaction_index,5] = flux_bounds[reaction_index,2]
+
+		# clean up the display -
+		tmp_value = abs(ϵ_dot[reaction_index])
+		flux_table[reaction_index,6] = tmp_value < 1e-6 ? 0.0 : ϵ_dot[reaction_index]
+	end
+
+	# header row -
+	flux_table_header_row = (["i","RID","R","ϵ₁_dot LB", "ϵ₁_dot UB", "ϵᵢ_dot"],
+		["","","", "mmol/hr", "mmol/hr", "mmol/hr"]);
+		
+	# write the table -
+	pretty_table(flux_table; header=flux_table_header_row)
+end
+
 # ╔═╡ 7720a5a6-5d7e-4c79-8aba-0a4bb04973af
 md"""
 ##### Compute the downstream separation using Magical Separation Units (MSUs)
@@ -1608,10 +1646,12 @@ version = "0.9.1+5"
 # ╟─40da982c-1cc4-4881-a2ea-fbeef5c46d2d
 # ╟─4867b51c-fb6c-42a9-b87d-4131e014b402
 # ╠═5432f738-c2cd-4727-821a-ca4fb4b04d19
-# ╟─2e275308-40d1-473a-9834-5df647b99e0a
+# ╠═2e275308-40d1-473a-9834-5df647b99e0a
 # ╟─c0d2722d-1b85-4bc0-841c-53a2a80a9aea
-# ╟─e933ddd9-8fd8-416a-8710-a64d3eb36f79
+# ╠═e933ddd9-8fd8-416a-8710-a64d3eb36f79
 # ╠═8a732899-7493-45da-bd6d-ecfba04f3ef1
+# ╟─64daa21a-ac42-4b20-9e6b-ec2d19cd50fc
+# ╟─8de4fb56-8d56-4251-ad5b-478bae38f727
 # ╟─7720a5a6-5d7e-4c79-8aba-0a4bb04973af
 # ╠═8fa0d539-5f6d-45c6-9151-f47273434f9c
 # ╟─47b1c30a-158c-44cc-9fd1-87a9eb6dc0fe
