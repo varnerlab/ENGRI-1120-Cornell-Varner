@@ -54,7 +54,7 @@ md"""
 
 # ╔═╡ ad5d595e-4dba-49cd-a446-e1df737fd75d
 md"""
-#### Step 1: Configure the Flux Balance Analysis (FBA) calculation for a _single_ chip
+##### Step 1: Configure the Flux Balance Analysis (FBA) calculation for a _single_ chip
 """
 
 # ╔═╡ 5bfdf6f9-2927-4a9a-a386-8840c676329b
@@ -151,7 +151,7 @@ end
 
 # ╔═╡ e8a4faf8-2285-4544-830c-f39d3847e8cc
 md"""
-#### Step 2: Compute the composition that is going into the downstream separation system 
+##### Step 2: Method to compute the composition that is going into the downstream separation system 
 
 In a parallel system of $N$ chips, each chip acts independently. Thus, to compute the output from the mixer operation we add up the components in each stream into the mixer (N inputs and a single output). Starting from the steady-state species mol balance: 
 
