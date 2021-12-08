@@ -195,7 +195,7 @@ begin
 		status_flag = result.status_flag
 
 		# display -
-		println("Computed optimal flux distribution Chip-1 exit_flag = 0: $(exit_flag==0) and status_flag = 5: $(status_flag == 5)")
+		println("Computed optimal flux distribution Chip 1 exit_flag = 0: $(exit_flag==0) and status_flag = 5: $(status_flag == 5)")
 	end
 end
 
