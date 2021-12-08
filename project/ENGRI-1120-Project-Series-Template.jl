@@ -4,7 +4,7 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ c08c447d-33a4-42dd-8938-33bb77fc4b31
+# ╔═╡ 915e211e-5853-11ec-1c6b-51ba02d42502
 begin
 
 	# load some external packages 
@@ -31,34 +31,33 @@ begin
 	nothing
 end
 
-# ╔═╡ 5bf2cb0f-9f95-4125-a397-b8164e586a4b
+# ╔═╡ 9b33620b-d922-4416-9880-50b5d7ad7753
 md"""
-### Example: Chips in Series for 1,3 Propanediol Production from Gycerol and Sucrose
-
-One possible configuration for chemical reactors (in this case our microfluidic chips) is to run them in _series_ where the output of one reactor is the input to another reactor. In this scenario for the project, chip $1$ is fed from the syringe pump while the input to chip $2$ is the output from chip $1$. For each chip, we use the second channel from the syringe pump to supply an identical glycerol stream. The output of the last chip (chip $N$) is then fed to the downstream separation system. 
-
-$(PlutoUI.LocalResource(joinpath(_PATH_TO_FIGS,"Fig-Series-Chips.png")))
+## ENGRI 1120: Design and Analysis of a Sustainable Cell-Free Production Process for Industrially Important Small Molecules
 """
 
-# ╔═╡ d573a93c-e4dd-4434-a43d-0acccb7a9311
-md"""
-
-__Assumptions__
-* Microfluidic chip is well-mixed and operates at steady-state
-* Constant T, P on the chip
-* Liquid phase is ideal
-
-__Compute__
-* Compute the number of chips $N$ needed to reach desired purity (95%) and flow rate (0.75 g/hr) targets. 
-
+# ╔═╡ 50d38e3a-60e1-43f9-8bf6-0a9ea34bc5a4
+html"""
+<p style="font-size:20px;">Team name: Student name, Student name, Student name ... Student name</br>
+Smith School of Chemical and Biomolecular Engineering, Cornell University, Ithaca NY 14850</p>
 """
 
-# ╔═╡ 5f94ec6f-5953-4bb5-95d3-e07bc49a72b7
+# ╔═╡ 46c352c3-60f1-4718-8878-d0031d5bd0ca
 md"""
-##### Step 1: Compute the output of Chip 1 in a series of $N$ chips (first pass)
+### Introduction
 """
 
-# ╔═╡ 19cca950-53eb-4d55-bbc4-d0469f7f99bf
+# ╔═╡ 4bcb9ef8-ea0a-480f-82f0-d15f5a7a7e43
+md"""
+### Materials and Methods
+"""
+
+# ╔═╡ 47bddebd-389d-41d9-ba71-2489040c1925
+md"""
+##### Configure the Flux Balance Analysis (FBA) calculation for a _single_ chip
+"""
+
+# ╔═╡ 7b34264c-2a59-43fb-a079-a1c7ef367b8f
 begin
 
 	# setup the FBA calculation for the project -
@@ -150,7 +149,33 @@ begin
 	nothing
 end
 
-# ╔═╡ 4ffdc704-2f40-49f9-ae80-92fbccc5a5a0
+# ╔═╡ 5bf9e5fb-c9fc-4962-a453-9948e5c6d79c
+md"""
+##### Theory of downstream separation using Magical Sepration Units (MSUs)
+
+To separate the desired product from the unreacted starting materials and by-products, let's suppose the teaching team invented a magical separation unit or MSU. MSUs have one stream in, and two streams out (called the top, and bottom, respectively) and a fixed separation ratio for all products (that's what makes them magical), where the desired product is _always_ in the top stream at some ratio $\theta$. In particular, if we denote $i=\star$ as the index for the desired product (in this case 1,3 propanediol), then after one pass (stream 1 is the input, stream 2 is the top, and stream 3 is the bottom) we have:
+
+$$\begin{eqnarray}
+\dot{m}_{\star,2} &=& \theta_{\star}\dot{m}_{\star,1}\\
+\dot{m}_{\star,3} &=& (1-\theta_{\star})\dot{m}_{\star,1}\\
+\end{eqnarray}$$
+
+for the product. In this case, we set $\theta_{\star}$ = 0.75. On the other hand, for _all_ other materials in the input, we have $\left(1-\theta_{\star}\right)$ in the top, and $\theta_{\star}$ in the bottom, i.e.,
+
+$$\begin{eqnarray}
+\dot{m}_{i,2} &=& (1-\theta_{\star})\dot{m}_{i,1}\qquad{\forall{i}\neq\star}\\
+\dot{m}_{i,3} &=& \theta_{\star}\dot{m}_{i,1}\\
+\end{eqnarray}$$
+
+If we chain these units together we can achieve a desired degree of separation.
+"""
+
+# ╔═╡ 928ef8ae-264a-4448-ac08-3970a8d8d1db
+md"""
+### Results and Discussion
+"""
+
+# ╔═╡ ce17d0fa-b262-4d94-b7c1-4fa16d3e16a6
 begin
 
 	# compute the optimal flux -
@@ -170,20 +195,21 @@ begin
 		status_flag = result.status_flag
 
 		# display -
-		println("Computed optimal flux distribution w/exit_flag = 0: $(exit_flag==0) and status_flag = 5: $(status_flag == 5)")
+		println("Computed optimal flux distribution Chip-1 exit_flag = 0: $(exit_flag==0) and status_flag = 5: $(status_flag == 5)")
 	end
 end
 
-# ╔═╡ 4e616314-cc9c-417c-b779-0b433c183304
+# ╔═╡ 723b1c85-e463-4c30-99f3-66bf59b46988
 md"""
-##### Step 2: Compute the output of chips $i=2,\dots,N$.
+##### Compute the output of chips $i=2,\dots,N$ by solving the flux balance analysis problem for each chip
 """
 
-# ╔═╡ 87089ac3-67b7-47f3-afb2-61e6d3d08e6d
-begin
+# ╔═╡ fe1908c6-2d1d-4eda-b880-1eebc086b92f
+# setup calculation for chips i = 2,....,N
+N = 15;  # number of chips in the series
 
-	# setup calculation for chips i = 2,....,N
-	N = 15 # number of chips
+# ╔═╡ 61a5a07b-532e-47e6-9e93-31cca9366843
+begin
 
 	# initialize some space to store the mol flow rates -
 	series_mol_state_array = zeros(ℳ,N)
@@ -226,13 +252,10 @@ begin
 	end
 end
 
-# ╔═╡ 6fb99c42-7c48-46ac-b558-361b2595a96f
-exit_flag_array
+# ╔═╡ 66b3e443-6d26-4600-a150-35254e3ce0c8
+(exit_flag_array, status_flag_array)
 
-# ╔═╡ b3c074ab-d95c-4e9c-812c-c3bcca357531
-status_flag_array
-
-# ╔═╡ 4b7e7144-5043-44fb-854c-3a42ee860e9d
+# ╔═╡ 0c8d9d3d-dcca-4dd2-9656-327659b7aa50
 md"""
 ##### Table 1: State table describing the exit composition (mol/hr) for each chip
 
@@ -240,7 +263,7 @@ Each row of the table shows a different compound, while the columns show the mol
 The last two columns show the mass flow rate and mass fraction for component $i$ in the exit from chip $N$.
 """
 
-# ╔═╡ 9bac2bce-1634-49df-ac9e-a431f47145a6
+# ╔═╡ d59173a6-2dd4-4354-9ad9-c0e6d1cee03b
 begin
 
 	# what chip r we looking at?
@@ -327,32 +350,20 @@ begin
 	end
 end
 
-# ╔═╡ 48830c91-7bb8-49f1-b132-ef46f330af8f
+# ╔═╡ 745ffb9e-6ae4-413e-b484-1942c40002c1
 md"""
-##### Step 3: Downstream separation using Magical Sepration Units (MSUs)
-
-To separate the desired product from the unreacted starting materials and by-products, let's suppose the teaching team invented a magical separation unit or MSU. MSUs have one stream in, and two streams out (called the top, and bottom, respectively) and a fixed separation ratio for all products (that's what makes them magical), where the desired product is _always_ in the top stream at some ratio $\theta$. In particular, if we denote $i=\star$ as the index for the desired product (in this case 1,3 propanediol), then after one pass (stream 1 is the input, stream 2 is the top, and stream 3 is the bottom) we have:
-
-$$\begin{eqnarray}
-\dot{m}_{\star,2} &=& \theta_{\star}\dot{m}_{\star,1}\\
-\dot{m}_{\star,3} &=& (1-\theta_{\star})\dot{m}_{\star,1}\\
-\end{eqnarray}$$
-
-for the product. In this case, we set $\theta_{\star}$ = 0.75. On the other hand, for _all_ other materials in the input, we have $\left(1-\theta_{\star}\right)$ in the top, and $\theta_{\star}$ in the bottom, i.e.,
-
-$$\begin{eqnarray}
-\dot{m}_{i,2} &=& (1-\theta_{\star})\dot{m}_{i,1}\qquad{\forall{i}\neq\star}\\
-\dot{m}_{i,3} &=& \theta_{\star}\dot{m}_{i,1}\\
-\end{eqnarray}$$
-
-If we chain these units together we can achieve a desired degree of separation.
+###### Downstream separation using Magical Separation Units (MSUs)
 """
 
-# ╔═╡ 9ce7ab35-99cd-41c8-8864-46f34302af83
+# ╔═╡ 24acbfa2-6700-4c2e-97cb-0a74000b741a
 # how many levels are we going to have in the separation tree?
-number_of_levels = 7	
+number_of_levels = 7;
 
-# ╔═╡ aa9da19f-e0da-4fd1-bd00-f52fea9ee4c7
+# ╔═╡ 73f5e8a5-0e53-4b25-94ed-93dd0aba92e0
+# However: the desired product has the opposite => correct for my compound of interest -> this is compound i = ⋆
+idx_target_compound = find_compound_index(MODEL,:compound_name=>"propane-1,3-diol");
+
+# ╔═╡ 19848d78-d595-427f-aca5-ac190a5edf47
 begin
 
 	# define the split -
@@ -361,9 +372,6 @@ begin
 	# most of the "stuff" has a 1 - θ in the up, and a θ in the down
 	u = (1-θ)*ones(ℳ,1)
 	d = θ*ones(ℳ,1)
-
-	# However: the desired product has the opposite => correct for my compound of interest -> this is compound i = ⋆
-	idx_target_compound = find_compound_index(MODEL,:compound_name=>"propane-1,3-diol")
 
 	# correct defaults -
 	u[idx_target_compound] = θ
@@ -424,7 +432,7 @@ begin
 	end
 end
 
-# ╔═╡ f9e4b849-fb44-4592-aa64-48acf29f137c
+# ╔═╡ b6d0376c-9348-4ef7-a16b-ee3c1fd06398
 begin
 
 	stages = (1:number_of_levels) |> collect
@@ -438,7 +446,7 @@ begin
 	plot!(stages, target_line, color="red", lw=2,linestyle=:dash, label="Target 95% purity")
 end
 
-# ╔═╡ d55aa6aa-9993-4080-9f5f-17d51398bbb7
+# ╔═╡ c1146166-6d6b-43bc-8500-40c2f65b6ecb
 with_terminal() do
 
 	# initialize some space -
@@ -457,12 +465,66 @@ with_terminal() do
 	pretty_table(state_table; header=state_table_header_row)
 end
 
-# ╔═╡ 0567fcbe-56b1-11ec-03e1-75c2c98376b8
+# ╔═╡ fe7af914-b934-480d-af63-01265ddb19d8
+md"""
+### Conclusions
+"""
+
+# ╔═╡ 1fad21b1-365b-4cbb-9a38-c42bf5f46951
+md"""
+### References
+"""
+
+# ╔═╡ 8262c84a-1f81-469b-8e7e-b86266c578cd
+html"""
+<script>
+
+	// initialize -
+	var section = 0;
+	var subsection = 0;
+	var headers = document.querySelectorAll('h3, h4');
+	
+	// main loop -
+	for (var i=0; i < headers.length; i++) {
+	    
+		var header = headers[i];
+	    var text = header.innerText;
+	    var original = header.getAttribute("text-original");
+	    if (original === null) {
+	        
+			// Save original header text
+	        header.setAttribute("text-original", text);
+	    } else {
+	        
+			// Replace with original text before adding section number
+	        text = header.getAttribute("text-original");
+	    }
+	
+	    var numbering = "";
+	    switch (header.tagName) {
+	        case 'H3':
+	            section += 1;
+	            numbering = section + ".";
+	            subsection = 0;
+	            break;
+	        case 'H4':
+	            subsection += 1;
+	            numbering = section + "." + subsection;
+	            break;
+	    }
+
+		// update the header text 
+		header.innerText = numbering + " " + text;
+	};
+</script>
+"""
+
+# ╔═╡ 3d738ed7-f784-489b-89d2-842ffaa770b9
 html"""
 <style>
 main {
     max-width: 1200px;
-    width: 85%;
+    width: 75%;
     margin: auto;
     font-family: "Roboto, monospace";
 }
@@ -491,7 +553,7 @@ PrettyTables = "08abe8d2-0d0c-5749-adfa-8a2ac140af0d"
 BSON = "~0.3.4"
 DataFrames = "~1.3.0"
 GLPK = "~0.15.2"
-Plots = "~1.25.0"
+Plots = "~1.25.1"
 PlutoUI = "~0.7.21"
 PrettyTables = "~1.2.3"
 """
@@ -842,9 +904,9 @@ uuid = "92d709cd-6900-40b7-9082-c6be49f344b6"
 version = "0.1.1"
 
 [[deps.IterTools]]
-git-tree-sha1 = "05110a2ab1fc5f932622ffea2a003221f4782c18"
+git-tree-sha1 = "fa6287a4469f5e048d763df38279ee729fbd44e5"
 uuid = "c8e1da08-722c-5040-9ed9-7db0dc04731e"
-version = "1.3.0"
+version = "1.4.0"
 
 [[deps.IteratorInterfaceExtensions]]
 git-tree-sha1 = "a3f24677c21f5bbe9d2a714f95dcd58337fb2856"
@@ -1092,9 +1154,9 @@ version = "1.0.15"
 
 [[deps.Plots]]
 deps = ["Base64", "Contour", "Dates", "Downloads", "FFMPEG", "FixedPointNumbers", "GR", "GeometryBasics", "JSON", "Latexify", "LinearAlgebra", "Measures", "NaNMath", "PlotThemes", "PlotUtils", "Printf", "REPL", "Random", "RecipesBase", "RecipesPipeline", "Reexport", "Requires", "Scratch", "Showoff", "SparseArrays", "Statistics", "StatsBase", "UUIDs", "UnicodeFun"]
-git-tree-sha1 = "8789439a899b77f4fbb4d7298500a6a5781205bc"
+git-tree-sha1 = "3e7e9415f917db410dcc0a6b2b55711df434522c"
 uuid = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
-version = "1.25.0"
+version = "1.25.1"
 
 [[deps.PlutoUI]]
 deps = ["AbstractPlutoDingetjes", "Base64", "Dates", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "Markdown", "Random", "Reexport", "UUIDs"]
@@ -1490,23 +1552,31 @@ version = "0.9.1+5"
 """
 
 # ╔═╡ Cell order:
-# ╟─5bf2cb0f-9f95-4125-a397-b8164e586a4b
-# ╟─d573a93c-e4dd-4434-a43d-0acccb7a9311
-# ╟─5f94ec6f-5953-4bb5-95d3-e07bc49a72b7
-# ╠═19cca950-53eb-4d55-bbc4-d0469f7f99bf
-# ╠═4ffdc704-2f40-49f9-ae80-92fbccc5a5a0
-# ╠═4e616314-cc9c-417c-b779-0b433c183304
-# ╠═87089ac3-67b7-47f3-afb2-61e6d3d08e6d
-# ╠═6fb99c42-7c48-46ac-b558-361b2595a96f
-# ╠═b3c074ab-d95c-4e9c-812c-c3bcca357531
-# ╟─4b7e7144-5043-44fb-854c-3a42ee860e9d
-# ╠═9bac2bce-1634-49df-ac9e-a431f47145a6
-# ╟─48830c91-7bb8-49f1-b132-ef46f330af8f
-# ╠═9ce7ab35-99cd-41c8-8864-46f34302af83
-# ╠═aa9da19f-e0da-4fd1-bd00-f52fea9ee4c7
-# ╠═f9e4b849-fb44-4592-aa64-48acf29f137c
-# ╠═d55aa6aa-9993-4080-9f5f-17d51398bbb7
-# ╠═c08c447d-33a4-42dd-8938-33bb77fc4b31
-# ╠═0567fcbe-56b1-11ec-03e1-75c2c98376b8
+# ╟─9b33620b-d922-4416-9880-50b5d7ad7753
+# ╟─50d38e3a-60e1-43f9-8bf6-0a9ea34bc5a4
+# ╟─46c352c3-60f1-4718-8878-d0031d5bd0ca
+# ╟─4bcb9ef8-ea0a-480f-82f0-d15f5a7a7e43
+# ╟─47bddebd-389d-41d9-ba71-2489040c1925
+# ╠═7b34264c-2a59-43fb-a079-a1c7ef367b8f
+# ╟─5bf9e5fb-c9fc-4962-a453-9948e5c6d79c
+# ╟─928ef8ae-264a-4448-ac08-3970a8d8d1db
+# ╠═ce17d0fa-b262-4d94-b7c1-4fa16d3e16a6
+# ╟─723b1c85-e463-4c30-99f3-66bf59b46988
+# ╠═fe1908c6-2d1d-4eda-b880-1eebc086b92f
+# ╠═61a5a07b-532e-47e6-9e93-31cca9366843
+# ╠═66b3e443-6d26-4600-a150-35254e3ce0c8
+# ╟─0c8d9d3d-dcca-4dd2-9656-327659b7aa50
+# ╟─d59173a6-2dd4-4354-9ad9-c0e6d1cee03b
+# ╟─745ffb9e-6ae4-413e-b484-1942c40002c1
+# ╠═24acbfa2-6700-4c2e-97cb-0a74000b741a
+# ╠═73f5e8a5-0e53-4b25-94ed-93dd0aba92e0
+# ╟─19848d78-d595-427f-aca5-ac190a5edf47
+# ╟─b6d0376c-9348-4ef7-a16b-ee3c1fd06398
+# ╟─c1146166-6d6b-43bc-8500-40c2f65b6ecb
+# ╟─fe7af914-b934-480d-af63-01265ddb19d8
+# ╟─1fad21b1-365b-4cbb-9a38-c42bf5f46951
+# ╠═915e211e-5853-11ec-1c6b-51ba02d42502
+# ╟─8262c84a-1f81-469b-8e7e-b86266c578cd
+# ╟─3d738ed7-f784-489b-89d2-842ffaa770b9
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
