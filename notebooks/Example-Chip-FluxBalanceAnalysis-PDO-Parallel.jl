@@ -172,6 +172,19 @@ begin
 	end
 end
 
+# ╔═╡ 93f6d0f3-c010-4040-a102-7dda111ecb2b
+
+	# did this converge?
+	with_terminal() do
+
+		# get exit/status information from the solver -
+		exit_flag = result.exit_flag
+		status_flag = result.status_flag
+
+		# display -
+		println("Computed optimal flux distribution w/exit_flag = 0: $(exit_flag==0) and status_flag = 5: $(status_flag == 5)")
+	end
+
 # ╔═╡ 1d90951d-bb6b-4f5e-8235-d7d45c7ebfe0
 md"""
 ###### Table 1: State table from a single chip (species mol flow rate mmol/hr at exit)
@@ -1450,6 +1463,7 @@ version = "0.9.1+5"
 # ╟─b92fa269-6da7-46be-a854-bca64210c5cb
 # ╠═4e347b66-917d-428d-8cf8-9f5f4a85d055
 # ╠═01cce127-bef1-4dc7-a760-3be1a79f3b85
+# ╠═93f6d0f3-c010-4040-a102-7dda111ecb2b
 # ╟─1d90951d-bb6b-4f5e-8235-d7d45c7ebfe0
 # ╠═29b8daeb-10fc-4c50-b475-d7e5394e60bb
 # ╟─982f45ff-7574-4217-be4c-d3e009200dff
